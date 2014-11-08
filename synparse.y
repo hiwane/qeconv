@@ -1,7 +1,7 @@
 
 %{
 
-package synparse
+package qeconv
 
 import (
 	"text/scanner"

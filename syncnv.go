@@ -1,5 +1,5 @@
 
-package synparse
+package qeconv
 
 import (
 	"errors"

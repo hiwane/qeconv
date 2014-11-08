@@ -1,4 +1,4 @@
-package synparse
+package qeconv
 
 type Stack struct {
 	v []Node

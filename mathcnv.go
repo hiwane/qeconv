@@ -1,4 +1,8 @@
-package synparse
+package qeconv
+
+import (
+	"strings"
+)
 
 type MathConv struct {
 }
@@ -59,13 +63,12 @@ func (m *MathConv) Ffalse() string {
 	return "False"
 }
 
-func ToMath(l *SynLex) string {
+func ToMath(str string) string {
 	stack = new(Stack)
+	l := new(SynLex)
+	l.Init(strings.NewReader(str))
 	yyParse(l)
 	fml := tofml(stack)
-	trace("go conv")
-	str := conv(fml, new(MathConv))
-	trace("end: " + str)
-	return str
+	return conv(fml, new(MathConv))
 }
 
