@@ -42,6 +42,7 @@ type Formula struct {
 	cmd int
 	str string
 	args []Formula
+	priority int
 }
 
 func tofml(s *Stack) Formula {
@@ -49,6 +50,7 @@ func tofml(s *Stack) Formula {
 	fml := Formula{}
 	fml.cmd = n.cmd
 	fml.str = n.str
+	fml.priority = n.priority
 	fml.args = make([]Formula, n.val)
 	if (fml.cmd == OR || fml.cmd == AND) && n.val == 1 {
 		return tofml(s)
@@ -71,7 +73,13 @@ func mop(fml Formula, cinf CnvInf, op string) string {
 		if i != 0 {
 			ret += op
 		}
-		ret += conv(fml.args[i], cinf)
+		if fml.priority > 0 && fml.priority < fml.args[i].priority {
+			ret += "("
+			ret += conv(fml.args[i], cinf)
+			ret += ")"
+		} else {
+			ret += conv(fml.args[i], cinf)
+		}
 	}
 	return ret
 }
@@ -109,6 +117,7 @@ func conv(fml Formula, cinf CnvInf) string {
 	case PLUS:
 		ret += mop(fml, cinf, "+")
 	case MINUS:
+		ret += mop(fml, cinf, "-")
 	case MULT:
 		ret += mop(fml, cinf, "*")
 	case DIV:
@@ -151,7 +160,13 @@ func infix(fml Formula, cinf CnvInf, op string) string {
 	sep := ""
 	for i := 0; i < len(fml.args); i++ {
 		ret += sep
-		ret += conv(fml.args[i], cinf)
+		if fml.priority > 0 && fml.priority < fml.args[i].priority {
+			ret += "("
+			ret += conv(fml.args[i], cinf)
+			ret += ")"
+		} else {
+			ret += conv(fml.args[i], cinf)
+		}
 		sep = op
 	}
 	return ret

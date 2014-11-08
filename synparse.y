@@ -16,6 +16,7 @@ type Node struct {
 	val int
 	str string
 	rev bool
+	priority int
 }
 
 %}
@@ -151,36 +152,37 @@ type SynLex1 struct {
 	label int
 	v int
 	argn int // 引数の数
+	priority int // 要素に () が必要かを判定するためのフラグ
 }
 
 var sones = []SynLex1 {
-	{"+", PLUS , '+', 2},
-	{"-", MINUS, '-', 2},
-	{"*", MULT , '*', 2},
-	{"/", DIV  , '/', 2},
-	{"^", POW  , '^', 2},
-	{"[", LB   , '[', 0},
-	{"]", RB   , ']', 0},
-	{"{", LC   , '{', 0},
-	{"}", RC   , '{', 0},
-	{"(", LP   , '(', 0},
-	{")", RP   , ')', 0},
-	{",", COMMA, ',', 0},
-	{":", EOL  , ':', 0},
-	{"=", EQOP , '=', 0},
+	{"+", PLUS , '+', 2, 4},
+	{"-", MINUS, '-', 2, 4},
+	{"*", MULT , '*', 2, 3},
+	{"/", DIV  , '/', 2, 3},
+	{"^", POW  , '^', 2, 1},
+	{"[", LB   , '[', 0, 0},
+	{"]", RB   , ']', 0, 0},
+	{"{", LC   , '{', 0, 0},
+	{"}", RC   , '{', 0, 0},
+	{"(", LP   , '(', 0, 0},
+	{")", RP   , ')', 0, 0},
+	{",", COMMA, ',', 0, 0},
+	{":", EOL  , ':', 0, 0},
+	{"=", EQOP , '=', 0, 0},
 }
 
 var sfuns = []SynLex1 {
-	{"And"  , AND    , 0, 0},
-	{"Or"   , OR     , 0, 0},
-	{"Impl" , IMPL   , 0, 2},
-	{"Repl" , REPL   , 0, 2},
-	{"Equiv", EQUIV  , 0, 2},
-	{"Not"  , NOT    , 0, 1},
-	{"All"  , ALL    , 0, 2},
-	{"Ex"   , EX     , 0, 2},
-	{"true" , F_TRUE , 0, 0},
-	{"false", F_FALSE, 0, 0},
+	{"And"  , AND    , 0, 0, 1},
+	{"Or"   , OR     , 0, 0, 2},
+	{"Impl" , IMPL   , 0, 2, 0},
+	{"Repl" , REPL   , 0, 2, 0},
+	{"Equiv", EQUIV  , 0, 2, 0},
+	{"Not"  , NOT    , 0, 1, 0},
+	{"All"  , ALL    , 0, 2, 0},
+	{"Ex"   , EX     , 0, 2, 0},
+	{"true" , F_TRUE , 0, 0, 0},
+	{"false", F_FALSE, 0, 0, 0},
 }
 
 func isupper(ch rune) bool {
@@ -216,7 +218,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 	for i := 0; i < len(sones); i++ {
 		if sones[i].v == c {
 			l.Next()
-			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val}
+			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority}
 			return sones[i].label
 		}
 	}
@@ -258,7 +260,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		lval.node = Node{cmd: NAME, val: 0, str: string(ret)}
 		for i := 0; i < len(sfuns); i++ {
 			if lval.node.str == sfuns[i].val {
-				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val}
+				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority}
 				return sfuns[i].label
 			}
 		}
