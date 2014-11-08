@@ -114,6 +114,8 @@ func conv(fml Formula, cinf CnvInf) string {
 		ret += cinf.Eqop(fml)
 	case NEOP:
 		ret += cinf.Neop(fml)
+	case LIST:
+		ret += cinf.List(fml)
 	case PLUS:
 		ret += mop(fml, cinf, "+")
 	case MINUS:

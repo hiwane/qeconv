@@ -132,11 +132,11 @@ poly
 	| poly MINUS poly	{ trace("-"); stack.push($2)}
 	| poly MULT poly	{ trace("*"); stack.push($2)}
 	| poly DIV poly	{ trace("/"); stack.push($2)}
-	| poly POW NUMBER { trace("^"); stack.push($2)}
+	| poly POW NUMBER { trace("^"); stack.push($3); stack.push($2)}
 	| MINUS poly %prec UNARYMINUS	{ trace("-");
-		$1.cmd = UNARYMINUS; $1.val = 1; stack.push($1) }
+		$1.cmd = UNARYMINUS; $1.val = 1; $1.priority = 2; stack.push($1) }
 	| PLUS poly %prec UNARYPLUS	{ trace("+");
-		$1.cmd = UNARYPLUS; $1.val = 1; stack.push($1) }
+		$1.cmd = UNARYPLUS; $1.val = 1; $1.priority = 2; stack.push($1) }
 	;
 
 %%      /*  start  of  programs  */

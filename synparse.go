@@ -786,6 +786,7 @@ yydefault:
 		//line synparse.y:135
 		{
 			trace("^")
+			stack.push(yyS[yypt-0].node)
 			stack.push(yyS[yypt-1].node)
 		}
 	case 40:
@@ -794,6 +795,7 @@ yydefault:
 			trace("-")
 			yyS[yypt-1].node.cmd = UNARYMINUS
 			yyS[yypt-1].node.val = 1
+			yyS[yypt-1].node.priority = 2
 			stack.push(yyS[yypt-1].node)
 		}
 	case 41:
@@ -802,6 +804,7 @@ yydefault:
 			trace("+")
 			yyS[yypt-1].node.cmd = UNARYPLUS
 			yyS[yypt-1].node.val = 1
+			yyS[yypt-1].node.priority = 2
 			stack.push(yyS[yypt-1].node)
 		}
 	}
