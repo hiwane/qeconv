@@ -50,6 +50,9 @@ func tofml(s *Stack) Formula {
 	fml.cmd = n.cmd
 	fml.str = n.str
 	fml.args = make([]Formula, n.val)
+	if (fml.cmd == OR || fml.cmd == AND) && n.val == 1 {
+		return tofml(s)
+	}
 	if n.rev {
 		for i := 0; i < n.val; i++ {
 			fml.args[i] = tofml(s)
@@ -139,6 +142,7 @@ func prefix(fml Formula, cinf CnvInf, left, right string) string {
 		ret += conv(fml.args[i], cinf)
 		sep = ","
 	}
+	ret += right
 	return ret
 }
 
