@@ -32,7 +32,6 @@ func main() {
 
 	if err == nil {
 		str := qeconv.ToMath(string(b))
-		fmt.Printf("end: %s\n", str)
 		if output == "" {
 			fmt.Printf("%s\n", str)
 		} else {
