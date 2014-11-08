@@ -27,13 +27,16 @@ type Node struct {
 }
 
 %token NAME NUMBER F_TRUE F_FALSE
-%token ALL EX AND OR
-%token PLUS MINUS COMMA MULT DIV
+%token ALL EX AND OR NOT
+%token PLUS MINUS COMMA MULT DIV POW
 %token EOL LB RB LP RP LC RC
 %token INDEXED LIST
+%token IMPL REPL EQUIV
 
 %type <num> seq_var seq_fof
 %type <node> NAME NUMBER var
+%type <node> ALL EX AND OR NOT IMPL REPL EQUIV
+%type <node> PLUS MINUS MULT DIV POW
 
 %left IMPL REPL EQUIV
 %left OR
@@ -55,14 +58,14 @@ expr
 
 
 fof
-	: ALL LP quantifiers COMMA fof RP { trace("ALL");  stack.push(Node{cmd:ALL,val:2})}
-	| EX  LP quantifiers COMMA fof RP { trace("EX");  stack.push(Node{cmd:EX,val:2})}
-	| AND LP seq_fof RP { trace("and"); stack.push(Node{cmd:AND, val:$3})}
-	| OR  LP seq_fof RP { trace("or");  stack.push(Node{cmd:OR, val:$3})}
-	| NOT fof { trace("not");  stack.push(Node{cmd:NOT,val:1})}
-	| IMPL LP fof COMMA fof RP { trace("IMPL");  stack.push(Node{cmd:IMPL,val:2})}
-	| REPL LP fof COMMA fof RP { trace("REPL");  stack.push(Node{cmd:REPL,val:2,rev:true})}
-	| EQUIV LP fof COMMA fof RP { trace("EQUIV");  stack.push(Node{cmd:EQUIV,val:2})}
+	: ALL LP quantifiers COMMA fof RP { trace("ALL"); stack.push($1)}
+	| EX  LP quantifiers COMMA fof RP { trace("EX");  stack.push($1)}
+	| AND LP seq_fof RP { trace("and"); $1.val=$3; stack.push($1)}
+	| OR  LP seq_fof RP { trace("or"); $1.val=$3; stack.push($1)}
+	| NOT fof { trace("not"); stack.push($1)}
+	| IMPL LP fof COMMA fof RP { trace("IMPL"); stack.push($1)}
+	| REPL LP fof COMMA fof RP { trace("REPL"); stack.push($1)}
+	| EQUIV LP fof COMMA fof RP { trace("EQUIV"); stack.push($1)}
 	| LP fof RP
 	| atom
 	;
@@ -124,13 +127,15 @@ poly
 	: LP poly RP
 	| NUMBER	{ trace("num"); stack.push($1) }
 	| var
-	| poly PLUS poly	{ trace("+"); stack.push(Node{cmd: PLUS, str: "+", val:2}) }
-	| poly MINUS poly	{ trace("-"); stack.push(Node{cmd: MINUS, str: "-", val:2}) }
-	| poly MULT poly	{ trace("*"); stack.push(Node{cmd: MULT, str: "*", val:2}) }
-	| poly DIV poly	{ trace("/"); stack.push(Node{cmd: DIV, str: "/", val:2}) }
-	| poly POW NUMBER { trace("^"); stack.push(Node{cmd: POW, str: "^", val:2}) }
-	| MINUS poly %prec UNARYMINUS	{ trace("-"); stack.push(Node{cmd: UNARYMINUS, str: "-", val:1}) }
-	| PLUS poly %prec UNARYPLUS	{ trace("+"); stack.push(Node{cmd: UNARYPLUS, str: "+", val:1}) }
+	| poly PLUS poly	{ trace("+"); stack.push($2)}
+	| poly MINUS poly	{ trace("-"); stack.push($2)}
+	| poly MULT poly	{ trace("*"); stack.push($2)}
+	| poly DIV poly	{ trace("/"); stack.push($2)}
+	| poly POW NUMBER { trace("^"); stack.push($2)}
+	| MINUS poly %prec UNARYMINUS	{ trace("-");
+		$1.cmd = UNARYMINUS; $1.val = 1; stack.push($1) }
+	| PLUS poly %prec UNARYPLUS	{ trace("+");
+		$1.cmd = UNARYPLUS; $1.val = 1; stack.push($1) }
 	;
 
 %%      /*  start  of  programs  */
@@ -145,37 +150,37 @@ type SynLex1 struct {
 	val string
 	label int
 	v int
+	argn int // 引数の数
 }
 
 var sones = []SynLex1 {
-	{"+", PLUS, '+'},
-	{"-", MINUS, '-'},
-	{"*", MULT, '*'},
-	{"/", DIV, '/'},
-	{"^", POW, '^'},
-	{"[", LB, '['},
-	{"]", RB, ']'},
-	{"{", LC, '{'},
-	{"}", RC, '{'},
-	{"(", LP, '('},
-	{")", RP, ')'},
-	{",", COMMA, ','},
-	{":", EOL, ':'},
-	{"=", EQOP, '='},
+	{"+", PLUS , '+', 2},
+	{"-", MINUS, '-', 2},
+	{"*", MULT , '*', 2},
+	{"/", DIV  , '/', 2},
+	{"^", POW  , '^', 2},
+	{"[", LB   , '[', 0},
+	{"]", RB   , ']', 0},
+	{"{", LC   , '{', 0},
+	{"}", RC   , '{', 0},
+	{"(", LP   , '(', 0},
+	{")", RP   , ')', 0},
+	{",", COMMA, ',', 0},
+	{":", EOL  , ':', 0},
+	{"=", EQOP , '=', 0},
 }
 
-
 var sfuns = []SynLex1 {
-	{"And", AND, 0},
-	{"Or", OR, 0},
-	{"Impl", IMPL, 0},
-	{"Repl", REPL, 0},
-	{"Equiv", EQUIV, 0},
-	{"Not", NOT, 0},
-	{"All", ALL, 0},
-	{"Ex", EX, 0},
-	{"true", F_TRUE, 0},
-	{"false", F_FALSE, 0},
+	{"And"  , AND    , 0, 0},
+	{"Or"   , OR     , 0, 0},
+	{"Impl" , IMPL   , 0, 2},
+	{"Repl" , REPL   , 0, 2},
+	{"Equiv", EQUIV  , 0, 2},
+	{"Not"  , NOT    , 0, 1},
+	{"All"  , ALL    , 0, 2},
+	{"Ex"   , EX     , 0, 2},
+	{"true" , F_TRUE , 0, 0},
+	{"false", F_FALSE, 0, 0},
 }
 
 func isupper(ch rune) bool {
@@ -211,6 +216,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 	for i := 0; i < len(sones); i++ {
 		if sones[i].v == c {
 			l.Next()
+			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val}
 			return sones[i].label
 		}
 	}
@@ -252,6 +258,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		lval.node = Node{cmd: NAME, val: 0, str: string(ret)}
 		for i := 0; i < len(sfuns); i++ {
 			if lval.node.str == sfuns[i].val {
+				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val}
 				return sfuns[i].label
 			}
 		}
@@ -272,7 +279,6 @@ func parse(l *SynLex) *Stack {
 	yyParse(l)
 	return stack
 }
-
 
 func trace(s string) {
 	fmt.Printf(s + "\n")
