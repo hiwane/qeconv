@@ -283,7 +283,7 @@ func parse(l *SynLex) *Stack {
 }
 
 func trace(s string) {
-	fmt.Printf(s + "\n")
+//	fmt.Printf(s + "\n")
 }
 
 
