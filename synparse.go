@@ -108,7 +108,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line synparse.y:144
+//line synparse.y:151
 
 /*  start  of  programs  */
 
@@ -280,96 +280,99 @@ var yyExca = []int{
 	-2, 0,
 }
 
-const yyNprod = 42
+const yyNprod = 45
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 179
+const yyLast = 193
 
 var yyAct = []int{
 
-	37, 2, 19, 17, 81, 94, 35, 105, 104, 29,
-	103, 66, 102, 33, 100, 95, 34, 44, 45, 86,
-	46, 47, 48, 63, 50, 52, 53, 64, 54, 54,
-	32, 60, 61, 62, 58, 59, 38, 39, 40, 41,
-	43, 42, 67, 68, 69, 70, 71, 72, 73, 74,
-	75, 76, 66, 57, 31, 79, 22, 18, 82, 82,
-	85, 83, 22, 94, 66, 21, 20, 90, 30, 93,
-	65, 91, 44, 45, 51, 46, 47, 48, 55, 28,
-	49, 92, 56, 27, 26, 96, 25, 24, 97, 98,
-	99, 38, 39, 40, 41, 43, 42, 101, 22, 18,
-	15, 16, 4, 5, 6, 7, 8, 21, 20, 44,
-	45, 23, 46, 47, 48, 36, 12, 48, 89, 64,
-	88, 87, 9, 10, 11, 22, 18, 15, 16, 4,
-	5, 6, 7, 8, 21, 20, 46, 47, 48, 84,
-	80, 14, 78, 12, 77, 22, 13, 3, 1, 9,
-	10, 11, 22, 18, 15, 16, 4, 5, 6, 7,
-	8, 21, 20, 44, 45, 0, 46, 47, 48, 0,
-	12, 0, 0, 0, 0, 0, 9, 10, 11,
+	3, 2, 18, 82, 108, 96, 107, 58, 20, 106,
+	29, 53, 23, 19, 33, 97, 34, 37, 87, 87,
+	105, 22, 21, 103, 50, 52, 88, 86, 59, 59,
+	51, 61, 62, 63, 54, 54, 60, 64, 57, 32,
+	31, 68, 69, 70, 71, 72, 73, 74, 75, 76,
+	77, 30, 44, 45, 80, 46, 47, 48, 28, 27,
+	84, 96, 65, 26, 83, 83, 25, 95, 93, 92,
+	49, 38, 39, 40, 41, 43, 42, 23, 24, 48,
+	44, 45, 94, 46, 47, 48, 98, 91, 99, 67,
+	100, 101, 102, 55, 90, 66, 89, 56, 85, 38,
+	39, 40, 41, 43, 42, 104, 23, 19, 16, 17,
+	5, 6, 7, 8, 9, 22, 21, 46, 47, 48,
+	81, 79, 15, 36, 13, 78, 23, 14, 4, 1,
+	10, 11, 12, 23, 19, 16, 17, 5, 6, 7,
+	8, 9, 22, 21, 35, 0, 0, 0, 0, 15,
+	0, 13, 0, 0, 0, 0, 0, 10, 11, 12,
+	23, 19, 16, 17, 5, 6, 7, 8, 9, 22,
+	21, 44, 45, 0, 46, 47, 48, 0, 13, 0,
+	0, 65, 0, 0, 10, 11, 12, 44, 45, 0,
+	46, 47, 48,
 }
 var yyPact = []int{
 
-	121, -1000, 92, 68, 64, 62, 61, 57, 148, 46,
-	32, 8, 148, -1000, 94, -1000, -1000, 59, -1000, 60,
-	52, 52, -1000, -1000, -1000, 58, 58, 148, 148, -1000,
-	148, 148, 148, 0, 4, 49, -1000, -1000, 52, 52,
-	52, 52, 52, 52, 52, 52, 52, 52, 139, 137,
-	99, 52, 99, 125, 60, 141, 141, 124, 37, -4,
-	106, 105, 103, -1000, -1000, -1000, 148, 150, 150, 150,
-	150, 150, 150, 120, 120, 99, 99, -1000, 50, 96,
-	148, 48, 60, -10, 148, -1000, -1000, 148, 148, 148,
-	-1000, -1000, -9, -1000, 141, -1000, -11, -13, -15, -16,
-	-1000, 60, -1000, -1000, -1000, -1000,
+	129, -1000, 59, -1000, -1000, 44, 41, 37, 36, 156,
+	29, 18, 17, 156, -1000, 102, -1000, -1000, 67, -1000,
+	50, 8, 8, -1000, -1000, 73, 73, 156, 156, -1000,
+	156, 156, 156, 14, 39, 74, -1000, -1000, 8, 8,
+	8, 8, 8, 8, 8, 8, 8, 8, 120, 116,
+	61, 8, 61, 105, 50, 122, 122, 83, 4, -1000,
+	3, 81, 79, 72, -1000, -1000, -1000, 129, 174, 174,
+	174, 174, 174, 174, 101, 101, 61, 61, -1000, 47,
+	158, 156, 46, 50, -10, 156, -1000, 156, -1000, 156,
+	156, 156, -1000, -1000, 0, -1000, 122, -1000, -3, -1000,
+	-14, -17, -19, -1000, 50, -1000, -1000, -1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 4, 6, 2, 148, 0, 147, 26, 146, 3,
+	0, 3, 7, 144, 8, 129, 1, 0, 128, 11,
+	127, 2,
 }
 var yyR1 = []int{
 
-	0, 4, 4, 5, 5, 5, 5, 5, 5, 5,
-	5, 5, 5, 6, 6, 2, 2, 7, 7, 7,
-	1, 1, 3, 3, 8, 8, 8, 8, 8, 8,
-	8, 8, 9, 9, 9, 9, 9, 9, 9, 9,
-	9, 9,
+	0, 5, 6, 6, 7, 7, 7, 7, 7, 7,
+	7, 7, 7, 7, 8, 8, 3, 3, 2, 2,
+	9, 9, 9, 1, 1, 4, 4, 10, 10, 10,
+	10, 10, 10, 10, 10, 11, 11, 11, 11, 11,
+	11, 11, 11, 11, 11,
 }
 var yyR2 = []int{
 
-	0, 2, 2, 6, 6, 4, 4, 2, 6, 6,
-	6, 3, 1, 3, 2, 1, 3, 1, 3, 3,
-	1, 3, 1, 4, 1, 1, 3, 3, 3, 3,
-	3, 3, 3, 1, 1, 3, 3, 3, 3, 3,
-	2, 2,
+	0, 2, 1, 1, 6, 6, 4, 4, 2, 6,
+	6, 6, 3, 1, 3, 2, 1, 3, 1, 3,
+	1, 3, 3, 1, 3, 1, 4, 1, 1, 3,
+	3, 3, 3, 3, 3, 3, 1, 1, 3, 3,
+	3, 3, 3, 2, 2,
 }
 var yyChk = []int{
 
-	-1000, -4, -5, -6, 8, 9, 10, 11, 12, 28,
-	29, 30, 22, -8, 20, 6, 7, -9, 5, -3,
-	14, 13, 4, 19, 19, 22, 22, 22, 22, -5,
-	22, 22, 22, -5, -9, -2, 21, -5, 32, 33,
+	-1000, -5, -6, -7, -8, 8, 9, 10, 11, 12,
+	28, 29, 30, 22, -10, 20, 6, 7, -11, 5,
+	-4, 14, 13, 4, 19, 22, 22, 22, 22, -7,
+	22, 22, 22, -7, -11, -3, 21, -6, 32, 33,
 	34, 35, 37, 36, 13, 14, 16, 17, 18, 20,
-	-9, 22, -9, -7, -3, 20, 24, -7, -2, -2,
-	-5, -5, -5, 23, 23, 21, 15, -9, -9, -9,
-	-9, -9, -9, -9, -9, -9, -9, 5, 5, -9,
-	15, -1, -3, -1, 15, 23, 23, 15, 15, 15,
-	-5, 21, -5, 21, 15, 25, -5, -5, -5, -5,
-	23, -3, 23, 23, 23, 23,
+	-11, 22, -11, -9, -4, 20, 24, -9, -2, -7,
+	-2, -7, -7, -7, 23, 23, 21, 15, -11, -11,
+	-11, -11, -11, -11, -11, -11, -11, -11, 5, 5,
+	-11, 15, -1, -4, -1, 15, 23, 15, 23, 15,
+	15, 15, -6, 21, -7, 21, 15, 25, -7, -7,
+	-7, -7, -7, 23, -4, 23, 23, 23, 23,
 }
 var yyDef = []int{
 
-	0, -2, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 12, 0, 24, 25, 0, 33, 34,
-	0, 0, 22, 1, 2, 0, 0, 0, 0, 7,
-	0, 0, 0, 0, 0, 0, 14, 15, 0, 0,
+	0, -2, 0, 2, 3, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 13, 0, 27, 28, 0, 36,
+	37, 0, 0, 25, 1, 0, 0, 0, 0, 8,
+	0, 0, 0, 0, 0, 0, 15, 16, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	40, 0, 41, 0, 17, 0, 0, 0, 0, 0,
-	0, 0, 0, 11, 32, 13, 0, 26, 27, 28,
-	29, 30, 31, 35, 36, 37, 38, 39, 0, 0,
-	0, 0, 20, 0, 0, 5, 6, 0, 0, 0,
-	16, 23, 0, 18, 0, 19, 0, 0, 0, 0,
-	3, 21, 4, 8, 9, 10,
+	43, 0, 44, 0, 20, 0, 0, 0, 0, 18,
+	0, 0, 0, 0, 12, 35, 14, 0, 29, 30,
+	31, 32, 33, 34, 38, 39, 40, 41, 42, 0,
+	0, 0, 0, 23, 0, 0, 6, 0, 7, 0,
+	0, 0, 17, 26, 0, 21, 0, 22, 0, 19,
+	0, 0, 0, 4, 24, 5, 9, 10, 11,
 }
 var yyTok1 = []int{
 
@@ -611,205 +614,215 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
-	case 3:
-		//line synparse.y:64
+	case 4:
+		//line synparse.y:66
 		{
 			trace("ALL")
 			stack.push(yyS[yypt-5].node)
 		}
-	case 4:
-		//line synparse.y:65
+	case 5:
+		//line synparse.y:67
 		{
 			trace("EX")
 			stack.push(yyS[yypt-5].node)
 		}
-	case 5:
-		//line synparse.y:66
+	case 6:
+		//line synparse.y:68
 		{
 			trace("and")
 			yyS[yypt-3].node.val = yyS[yypt-1].num
 			stack.push(yyS[yypt-3].node)
 		}
-	case 6:
-		//line synparse.y:67
+	case 7:
+		//line synparse.y:69
 		{
 			trace("or")
 			yyS[yypt-3].node.val = yyS[yypt-1].num
 			stack.push(yyS[yypt-3].node)
 		}
-	case 7:
-		//line synparse.y:68
+	case 8:
+		//line synparse.y:70
 		{
 			trace("not")
 			stack.push(yyS[yypt-1].node)
 		}
-	case 8:
-		//line synparse.y:69
+	case 9:
+		//line synparse.y:71
 		{
 			trace("IMPL")
 			stack.push(yyS[yypt-5].node)
 		}
-	case 9:
-		//line synparse.y:70
+	case 10:
+		//line synparse.y:72
 		{
 			trace("REPL")
 			stack.push(yyS[yypt-5].node)
 		}
-	case 10:
-		//line synparse.y:71
+	case 11:
+		//line synparse.y:73
 		{
 			trace("EQUIV")
 			stack.push(yyS[yypt-5].node)
 		}
-	case 13:
-		//line synparse.y:77
+	case 14:
+		//line synparse.y:79
 		{
 			trace("list")
 			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num})
 		}
-	case 14:
-		//line synparse.y:81
+	case 15:
+		//line synparse.y:83
 		{
 			trace("empty-list")
 			stack.push(Node{cmd: LIST, val: 0})
 		}
-	case 15:
-		//line synparse.y:88
+	case 16:
+		//line synparse.y:90
 		{
 			yyVAL.num = 1
 		}
-	case 16:
-		//line synparse.y:89
+	case 17:
+		//line synparse.y:91
 		{
 			yyVAL.num = yyS[yypt-2].num + 1
 		}
-	case 17:
-		//line synparse.y:93
+	case 18:
+		//line synparse.y:95
+		{
+			yyVAL.num = 1
+		}
+	case 19:
+		//line synparse.y:96
+		{
+			yyVAL.num = yyS[yypt-2].num + 1
+		}
+	case 20:
+		//line synparse.y:100
 		{
 			trace("list")
 			stack.push(Node{cmd: LIST, val: 1})
 		}
-	case 18:
-		//line synparse.y:97
+	case 21:
+		//line synparse.y:104
 		{
 			trace("list")
 			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num})
 		}
-	case 19:
-		//line synparse.y:101
+	case 22:
+		//line synparse.y:108
 		{
 			trace("set")
 			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num})
 		}
-	case 20:
-		//line synparse.y:108
+	case 23:
+		//line synparse.y:115
 		{
 			yyVAL.num = 1
 		}
-	case 21:
-		//line synparse.y:109
+	case 24:
+		//line synparse.y:116
 		{
 			yyVAL.num = yyS[yypt-2].num + 1
 		}
-	case 22:
-		//line synparse.y:113
+	case 25:
+		//line synparse.y:120
 		{
 			trace("name")
 			stack.push(yyS[yypt-0].node)
 		}
-	case 23:
-		//line synparse.y:114
+	case 26:
+		//line synparse.y:121
 		{
 			trace("index")
 			stack.push(Node{cmd: INDEXED, val: 2})
 		}
-	case 24:
-		//line synparse.y:118
+	case 27:
+		//line synparse.y:125
 		{
 			trace("true")
 			stack.push(Node{cmd: F_TRUE, val: 0})
 		}
-	case 25:
-		//line synparse.y:119
+	case 28:
+		//line synparse.y:126
 		{
 			trace("false")
 			stack.push(Node{cmd: F_FALSE, val: 0})
 		}
-	case 26:
-		//line synparse.y:120
+	case 29:
+		//line synparse.y:127
 		{
 			trace("<")
 			stack.push(Node{cmd: LTOP, str: "<", val: 2})
 		}
-	case 27:
-		//line synparse.y:121
+	case 30:
+		//line synparse.y:128
 		{
 			trace(">")
 			stack.push(Node{cmd: LTOP, str: ">", val: 2, rev: true})
 		}
-	case 28:
-		//line synparse.y:122
+	case 31:
+		//line synparse.y:129
 		{
 			trace("<=")
 			stack.push(Node{cmd: LEOP, str: "<=", val: 2})
 		}
-	case 29:
-		//line synparse.y:123
+	case 32:
+		//line synparse.y:130
 		{
 			trace(">=")
 			stack.push(Node{cmd: LEOP, str: ">=", val: 2, rev: true})
 		}
-	case 30:
-		//line synparse.y:124
+	case 33:
+		//line synparse.y:131
 		{
 			trace("=")
 			stack.push(Node{cmd: EQOP, str: "=", val: 2})
 		}
-	case 31:
-		//line synparse.y:125
+	case 34:
+		//line synparse.y:132
 		{
 			trace("<>")
 			stack.push(Node{cmd: NEOP, str: "<>", val: 2})
 		}
-	case 33:
-		//line synparse.y:131
+	case 36:
+		//line synparse.y:138
 		{
 			trace("num")
 			stack.push(yyS[yypt-0].node)
 		}
-	case 35:
-		//line synparse.y:133
+	case 38:
+		//line synparse.y:140
 		{
 			trace("+")
 			stack.push(yyS[yypt-1].node)
 		}
-	case 36:
-		//line synparse.y:134
+	case 39:
+		//line synparse.y:141
 		{
 			trace("-")
 			stack.push(yyS[yypt-1].node)
 		}
-	case 37:
-		//line synparse.y:135
+	case 40:
+		//line synparse.y:142
 		{
 			trace("*")
 			stack.push(yyS[yypt-1].node)
 		}
-	case 38:
-		//line synparse.y:136
+	case 41:
+		//line synparse.y:143
 		{
 			trace("/")
 			stack.push(yyS[yypt-1].node)
 		}
-	case 39:
-		//line synparse.y:137
+	case 42:
+		//line synparse.y:144
 		{
 			trace("^")
 			stack.push(yyS[yypt-0].node)
 			stack.push(yyS[yypt-1].node)
 		}
-	case 40:
-		//line synparse.y:138
+	case 43:
+		//line synparse.y:145
 		{
 			trace("-")
 			yyS[yypt-1].node.cmd = UNARYMINUS
@@ -817,8 +830,8 @@ yydefault:
 			yyS[yypt-1].node.priority = 2
 			stack.push(yyS[yypt-1].node)
 		}
-	case 41:
-		//line synparse.y:140
+	case 44:
+		//line synparse.y:147
 		{
 			trace("+")
 			yyS[yypt-1].node.cmd = UNARYPLUS

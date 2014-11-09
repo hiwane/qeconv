@@ -36,7 +36,7 @@ type Node struct {
 %token IMPL REPL EQUIV
 %token COMMENT
 
-%type <num> seq_var seq_fof
+%type <num> seq_var seq_fof seq_mobj
 %type <node> NAME NUMBER var
 %type <node> ALL EX AND OR NOT IMPL REPL EQUIV
 %type <node> PLUS MINUS MULT DIV POW
@@ -55,10 +55,12 @@ type Node struct {
 %%
 
 expr
-	: fof EOL
-	| list_of_fof EOL
+	: mobj EOL
 	;
 
+mobj : fof
+	 | list_of_mobj
+	 ;
 
 fof
 	: ALL LP quantifiers COMMA fof RP { trace("ALL"); stack.push($1)}
@@ -73,8 +75,8 @@ fof
 	| atom
 	;
 
-list_of_fof
-	: LB seq_fof RB {
+list_of_mobj
+	: LB seq_mobj RB {
 		trace("list")
 		stack.push(Node{cmd: LIST, val: $2})
 	}
@@ -82,6 +84,11 @@ list_of_fof
 		trace("empty-list")
 		stack.push(Node{cmd: LIST, val: 0})
 	}
+	;
+
+seq_mobj
+	: mobj { $$ = 1}
+	| seq_mobj COMMA mobj { $$ = $1 + 1 }
 	;
 
 seq_fof
