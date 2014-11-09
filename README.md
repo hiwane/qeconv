@@ -18,3 +18,15 @@ Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
     -i: Use inputfile for input [stdin]
     -o: Use outputfile for outpuut [stdout]
 ```
+
+# Example
+
+```
+> echo "x>0:" | qeconv
+0 < x
+> echo "And(x>0,y>=0):" | qeconv
+0 < x && 0 <= y
+> echo "Ex([y],And(x>0,y>=0)):" | qeconv
+Exists[{y},0 < x && 0 <= y]
+```
+
