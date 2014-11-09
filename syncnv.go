@@ -1,32 +1,36 @@
-
 package qeconv
 
 import (
 	"errors"
 )
 
+type cnv_out struct {
+	str string
+	lno int
+}
+
 type CnvInf interface {
 
 	/* quantifier */
-	All(f Formula) string
-	Ex(f Formula) string
+	All(f Formula, co *cnv_out)
+	Ex(f Formula, co *cnv_out)
 
 	/* logical operator
 	 * Mathematica: Implies/Equivalent
 	 * redlog     : impl/repl/equiv
 	 * qepcad     : =>/<=/<=>
 	 */
-	And(f Formula) string
-	Or(f Formula) string
-	Not(f Formula) string
-	Impl(f Formula) string
-	Equiv(f Formula) string
+	And(f Formula, co *cnv_out)
+	Or(f Formula, co *cnv_out)
+	Not(f Formula, co *cnv_out)
+	Impl(f Formula, co *cnv_out)
+	Equiv(f Formula, co *cnv_out)
 
 	/* comparator */
-	Leop(f Formula) string
-	Ltop(f Formula) string
-	Eqop(f Formula) string
-	Neop(f Formula) string
+	Leop(f Formula, co *cnv_out)
+	Ltop(f Formula, co *cnv_out)
+	Eqop(f Formula, co *cnv_out)
+	Neop(f Formula, co *cnv_out)
 
 	/* atom */
 	Ftrue() string
@@ -34,15 +38,20 @@ type CnvInf interface {
 
 	/* math op */
 
-	List(f Formula) string
+	List(f Formula, co *cnv_out)
 }
 
-
 type Formula struct {
-	cmd int
-	str string
-	args []Formula
+	cmd      int
+	str      string
+	args     []Formula
 	priority int
+	lineno   int
+}
+
+func (c *cnv_out) append(s string) {
+	//	fmt.Printf("append [%s]\n", s)
+	c.str += s
 }
 
 func tofml(s *Stack) Formula {
@@ -50,6 +59,7 @@ func tofml(s *Stack) Formula {
 	fml := Formula{}
 	fml.cmd = n.cmd
 	fml.str = n.str
+	fml.lineno = n.lineno
 	fml.priority = n.priority
 	fml.args = make([]Formula, n.val)
 	if (fml.cmd == OR || fml.cmd == AND) && n.val == 1 {
@@ -61,116 +71,117 @@ func tofml(s *Stack) Formula {
 		}
 	} else {
 		for i := 0; i < n.val; i++ {
-			fml.args[n.val - i - 1] = tofml(s)
+			fml.args[n.val-i-1] = tofml(s)
 		}
 	}
 	return fml
 }
 
-func mop(fml Formula, cinf CnvInf, op string) string {
-	ret := ""
+func mop(fml Formula, cinf CnvInf, op string, co *cnv_out) {
 	for i := 0; i < len(fml.args); i++ {
 		if i != 0 {
-			ret += op
+			co.append(op)
 		}
 		if fml.priority > 0 && fml.priority < fml.args[i].priority {
-			ret += "("
-			ret += conv(fml.args[i], cinf)
-			ret += ")"
+			co.append("(")
+			conv2(fml.args[i], cinf, co)
+			co.append(")")
 		} else {
-			ret += conv(fml.args[i], cinf)
+			conv2(fml.args[i], cinf, co)
 		}
 	}
-	return ret
 }
-func uniop(fml Formula, cinf CnvInf, op string) string {
-	ret := op
-	ret += conv(fml.args[0], cinf)
-	return ret
+func uniop(fml Formula, cinf CnvInf, op string, co *cnv_out) {
+	co.append(op)
+	conv2(fml.args[0], cinf, co)
 }
 
 func conv(fml Formula, cinf CnvInf) string {
-	ret := ""
+	var co *cnv_out
+	co = &cnv_out{str: "", lno: 1}
+	conv2(fml, cinf, co)
+	return co.str
+}
+
+func conv2(fml Formula, cinf CnvInf, co *cnv_out) {
+	//	fmt.Printf("fml.cmd=%d,lineno=%d/%d str=%s\n", fml.cmd, fml.lineno, co.lno, fml.str)
+	for co.lno < fml.lineno {
+		co.append("\n")
+		co.lno++
+	}
+
 	switch fml.cmd {
 	case ALL:
-		ret += cinf.All(fml)
+		cinf.All(fml, co)
 	case EX:
-		ret += cinf.Ex(fml)
+		cinf.Ex(fml, co)
 	case AND:
-		ret += cinf.And(fml)
+		cinf.And(fml, co)
 	case OR:
-		ret += cinf.Or(fml)
+		cinf.Or(fml, co)
 	case NOT:
-		ret += cinf.Not(fml)
+		cinf.Not(fml, co)
 	case IMPL:
-		ret += cinf.Impl(fml)
+		cinf.Impl(fml, co)
 	case EQUIV:
-		ret += cinf.Equiv(fml)
+		cinf.Equiv(fml, co)
 	case LEOP:
-		ret += cinf.Leop(fml)
+		cinf.Leop(fml, co)
 	case LTOP:
-		ret += cinf.Ltop(fml)
+		cinf.Ltop(fml, co)
 	case EQOP:
-		ret += cinf.Eqop(fml)
+		cinf.Eqop(fml, co)
 	case NEOP:
-		ret += cinf.Neop(fml)
+		cinf.Neop(fml, co)
 	case LIST:
-		ret += cinf.List(fml)
+		cinf.List(fml, co)
 	case PLUS:
-		ret += mop(fml, cinf, "+")
+		mop(fml, cinf, "+", co)
 	case MINUS:
-		ret += mop(fml, cinf, "-")
+		mop(fml, cinf, "-", co)
 	case MULT:
-		ret += mop(fml, cinf, "*")
+		mop(fml, cinf, "*", co)
 	case DIV:
-		ret += mop(fml, cinf, "/")
+		mop(fml, cinf, "/", co)
 	case POW:
-		ret += mop(fml, cinf, "^")
-	case NAME:
-		ret += fml.str
-	case NUMBER:
-		ret += fml.str
+		mop(fml, cinf, "^", co)
+	case NAME, NUMBER:
+		co.append(fml.str)
 	case F_TRUE:
-		ret += cinf.Ftrue()
+		co.append(cinf.Ftrue())
 	case F_FALSE:
-		ret += cinf.Ffalse()
+		co.append(cinf.Ffalse())
 	case UNARYMINUS:
-		ret += uniop(fml, cinf, "-")
+		uniop(fml, cinf, "-", co)
 	case UNARYPLUS:
-		ret += uniop(fml, cinf, "+")
+		uniop(fml, cinf, "+", co)
 	default:
 		errors.New("unknown type")
 	}
-
-	return ret
 }
 
-func prefix(fml Formula, cinf CnvInf, left, right string) string {
-	ret := left
+func prefix(fml Formula, cinf CnvInf, left, right string, co *cnv_out) {
+	co.append(left)
 	sep := ""
 	for i := 0; i < len(fml.args); i++ {
-		ret += sep
-		ret += conv(fml.args[i], cinf)
+		co.append(sep)
+		conv2(fml.args[i], cinf, co)
 		sep = ","
 	}
-	ret += right
-	return ret
+	co.append(right)
 }
 
-func infix(fml Formula, cinf CnvInf, op string) string {
-	ret := ""
+func infix(fml Formula, cinf CnvInf, op string, co *cnv_out) {
 	sep := ""
 	for i := 0; i < len(fml.args); i++ {
-		ret += sep
+		co.append(sep)
 		if fml.priority > 0 && fml.priority < fml.args[i].priority {
-			ret += "("
-			ret += conv(fml.args[i], cinf)
-			ret += ")"
+			co.append("(")
+			conv2(fml.args[i], cinf, co)
+			co.append(")")
 		} else {
-			ret += conv(fml.args[i], cinf)
+			conv2(fml.args[i], cinf, co)
 		}
 		sep = op
 	}
-	return ret
 }
-

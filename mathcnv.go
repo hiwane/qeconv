@@ -7,52 +7,52 @@ import (
 type MathConv struct {
 }
 
-func (m *MathConv) All(f Formula) string {
-	return prefix(f, m, "ForAll[", "]")
+func (m *MathConv) All(f Formula, co *cnv_out) {
+	prefix(f, m, "ForAll[", "]", co)
 }
 
-func (m *MathConv) Ex(f Formula) string {
-	return prefix(f, m, "Exists[", "]")
+func (m *MathConv) Ex(f Formula, co *cnv_out) {
+	prefix(f, m, "Exists[", "]", co)
 }
 
-func (m *MathConv) And(f Formula) string {
-	return infix(f, m, " && ")
+func (m *MathConv) And(f Formula, co *cnv_out) {
+	infix(f, m, " && ", co)
 }
 
-func (m *MathConv) Or(f Formula) string {
-	return infix(f, m, " || ")
+func (m *MathConv) Or(f Formula, co *cnv_out) {
+	infix(f, m, " || ", co)
 }
 
-func (m *MathConv) Not(f Formula) string {
-	return prefix(f, m, "Not[", "]")
+func (m *MathConv) Not(f Formula, co *cnv_out) {
+	prefix(f, m, "Not[", "]", co)
 }
 
-func (m *MathConv) Impl(f Formula) string {
-	return prefix(f, m, "Implies[", "]")
+func (m *MathConv) Impl(f Formula, co *cnv_out) {
+	prefix(f, m, "Implies[", "]", co)
 }
 
-func (m *MathConv) Equiv(f Formula) string {
-	return prefix(f, m, "Equivalent[", "]")
+func (m *MathConv) Equiv(f Formula, co *cnv_out) {
+	prefix(f, m, "Equivalent[", "]", co)
 }
 
-func (m *MathConv) Leop(f Formula) string {
-	return infix(f, m, " <= ")
+func (m *MathConv) Leop(f Formula, co *cnv_out) {
+	infix(f, m, " <= ", co)
 }
 
-func (m *MathConv) Ltop(f Formula) string {
-	return infix(f, m, " < ")
+func (m *MathConv) Ltop(f Formula, co *cnv_out) {
+	infix(f, m, " < ", co)
 }
 
-func (m *MathConv) Eqop(f Formula) string {
-	return infix(f, m, " == ")
+func (m *MathConv) Eqop(f Formula, co *cnv_out) {
+	infix(f, m, " == ", co)
 }
 
-func (m *MathConv) Neop(f Formula) string {
-	return infix(f, m, " != ")
+func (m *MathConv) Neop(f Formula, co *cnv_out) {
+	infix(f, m, " != ", co)
 }
 
-func (m *MathConv) List(f Formula) string {
-	return prefix(f, m, "{", "}")
+func (m *MathConv) List(f Formula, co *cnv_out) {
+	prefix(f, m, "{", "}", co)
 }
 
 func (m *MathConv) Ftrue() string {
@@ -71,4 +71,3 @@ func ToMath(str string) string {
 	fml := tofml(stack)
 	return conv(fml, new(MathConv))
 }
-

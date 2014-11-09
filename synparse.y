@@ -17,6 +17,7 @@ type Node struct {
 	str string
 	rev bool
 	priority int
+	lineno int
 }
 
 %}
@@ -214,11 +215,12 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		l.Next()
 	}
 
+	lno := l.Pos().Line
 	c := int(l.Peek())
 	for i := 0; i < len(sones); i++ {
 		if sones[i].v == c {
 			l.Next()
-			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority}
+			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
 			return sones[i].label
 		}
 	}
@@ -248,7 +250,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NUMBER, val: 0, str: string(ret)}
+		lval.node = Node{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
 		return NUMBER
 	}
 
@@ -257,10 +259,10 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) || isletter(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NAME, val: 0, str: string(ret)}
+		lval.node = Node{cmd: NAME, val: 0, str: string(ret), lineno: lno}
 		for i := 0; i < len(sfuns); i++ {
 			if lval.node.str == sfuns[i].val {
-				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority}
+				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
 				return sfuns[i].label
 			}
 		}

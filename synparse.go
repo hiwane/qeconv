@@ -17,9 +17,10 @@ type Node struct {
 	str      string
 	rev      bool
 	priority int
+	lineno   int
 }
 
-//line synparse.y:25
+//line synparse.y:26
 type yySymType struct {
 	yys  int
 	node Node
@@ -105,7 +106,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line synparse.y:142
+//line synparse.y:143
 
 /*  start  of  programs  */
 
@@ -181,11 +182,12 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		l.Next()
 	}
 
+	lno := l.Pos().Line
 	c := int(l.Peek())
 	for i := 0; i < len(sones); i++ {
 		if sones[i].v == c {
 			l.Next()
-			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority}
+			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
 			return sones[i].label
 		}
 	}
@@ -215,7 +217,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NUMBER, val: 0, str: string(ret)}
+		lval.node = Node{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
 		return NUMBER
 	}
 
@@ -224,10 +226,10 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) || isletter(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NAME, val: 0, str: string(ret)}
+		lval.node = Node{cmd: NAME, val: 0, str: string(ret), lineno: lno}
 		for i := 0; i < len(sfuns); i++ {
 			if lval.node.str == sfuns[i].val {
-				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority}
+				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
 				return sfuns[i].label
 			}
 		}
@@ -593,204 +595,204 @@ yydefault:
 	switch yynt {
 
 	case 3:
-		//line synparse.y:62
+		//line synparse.y:63
 		{
 			trace("ALL")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 4:
-		//line synparse.y:63
+		//line synparse.y:64
 		{
 			trace("EX")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 5:
-		//line synparse.y:64
+		//line synparse.y:65
 		{
 			trace("and")
 			yyS[yypt-3].node.val = yyS[yypt-1].num
 			stack.push(yyS[yypt-3].node)
 		}
 	case 6:
-		//line synparse.y:65
+		//line synparse.y:66
 		{
 			trace("or")
 			yyS[yypt-3].node.val = yyS[yypt-1].num
 			stack.push(yyS[yypt-3].node)
 		}
 	case 7:
-		//line synparse.y:66
+		//line synparse.y:67
 		{
 			trace("not")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 8:
-		//line synparse.y:67
+		//line synparse.y:68
 		{
 			trace("IMPL")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 9:
-		//line synparse.y:68
+		//line synparse.y:69
 		{
 			trace("REPL")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 10:
-		//line synparse.y:69
+		//line synparse.y:70
 		{
 			trace("EQUIV")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 13:
-		//line synparse.y:75
+		//line synparse.y:76
 		{
 			trace("list")
 			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num})
 		}
 	case 14:
-		//line synparse.y:79
+		//line synparse.y:80
 		{
 			trace("empty-list")
 			stack.push(Node{cmd: LIST, val: 0})
 		}
 	case 15:
-		//line synparse.y:86
+		//line synparse.y:87
 		{
 			yyVAL.num = 1
 		}
 	case 16:
-		//line synparse.y:87
+		//line synparse.y:88
 		{
 			yyVAL.num = yyS[yypt-2].num + 1
 		}
 	case 17:
-		//line synparse.y:91
+		//line synparse.y:92
 		{
 			trace("list")
 			stack.push(Node{cmd: LIST, val: 1})
 		}
 	case 18:
-		//line synparse.y:95
+		//line synparse.y:96
 		{
 			trace("list")
 			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num})
 		}
 	case 19:
-		//line synparse.y:99
+		//line synparse.y:100
 		{
 			trace("set")
 			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num})
 		}
 	case 20:
-		//line synparse.y:106
+		//line synparse.y:107
 		{
 			yyVAL.num = 1
 		}
 	case 21:
-		//line synparse.y:107
+		//line synparse.y:108
 		{
 			yyVAL.num = yyS[yypt-2].num + 1
 		}
 	case 22:
-		//line synparse.y:111
+		//line synparse.y:112
 		{
 			trace("name")
 			stack.push(yyS[yypt-0].node)
 		}
 	case 23:
-		//line synparse.y:112
+		//line synparse.y:113
 		{
 			trace("index")
 			stack.push(Node{cmd: INDEXED, val: 2})
 		}
 	case 24:
-		//line synparse.y:116
+		//line synparse.y:117
 		{
 			trace("true")
 			stack.push(Node{cmd: F_TRUE, val: 0})
 		}
 	case 25:
-		//line synparse.y:117
+		//line synparse.y:118
 		{
 			trace("false")
 			stack.push(Node{cmd: F_FALSE, val: 0})
 		}
 	case 26:
-		//line synparse.y:118
+		//line synparse.y:119
 		{
 			trace("<")
 			stack.push(Node{cmd: LTOP, str: "<", val: 2})
 		}
 	case 27:
-		//line synparse.y:119
+		//line synparse.y:120
 		{
 			trace(">")
 			stack.push(Node{cmd: LTOP, str: ">", val: 2, rev: true})
 		}
 	case 28:
-		//line synparse.y:120
+		//line synparse.y:121
 		{
 			trace("<=")
 			stack.push(Node{cmd: LEOP, str: "<=", val: 2})
 		}
 	case 29:
-		//line synparse.y:121
+		//line synparse.y:122
 		{
 			trace(">=")
 			stack.push(Node{cmd: LEOP, str: ">=", val: 2, rev: true})
 		}
 	case 30:
-		//line synparse.y:122
+		//line synparse.y:123
 		{
 			trace("=")
 			stack.push(Node{cmd: EQOP, str: "=", val: 2})
 		}
 	case 31:
-		//line synparse.y:123
+		//line synparse.y:124
 		{
 			trace("<>")
 			stack.push(Node{cmd: NEOP, str: "<>", val: 2})
 		}
 	case 33:
-		//line synparse.y:129
+		//line synparse.y:130
 		{
 			trace("num")
 			stack.push(yyS[yypt-0].node)
 		}
 	case 35:
-		//line synparse.y:131
+		//line synparse.y:132
 		{
 			trace("+")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 36:
-		//line synparse.y:132
+		//line synparse.y:133
 		{
 			trace("-")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 37:
-		//line synparse.y:133
+		//line synparse.y:134
 		{
 			trace("*")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 38:
-		//line synparse.y:134
+		//line synparse.y:135
 		{
 			trace("/")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 39:
-		//line synparse.y:135
+		//line synparse.y:136
 		{
 			trace("^")
 			stack.push(yyS[yypt-0].node)
 			stack.push(yyS[yypt-1].node)
 		}
 	case 40:
-		//line synparse.y:136
+		//line synparse.y:137
 		{
 			trace("-")
 			yyS[yypt-1].node.cmd = UNARYMINUS
@@ -799,7 +801,7 @@ yydefault:
 			stack.push(yyS[yypt-1].node)
 		}
 	case 41:
-		//line synparse.y:138
+		//line synparse.y:139
 		{
 			trace("+")
 			yyS[yypt-1].node.cmd = UNARYPLUS
