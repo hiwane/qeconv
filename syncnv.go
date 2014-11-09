@@ -7,9 +7,12 @@ import (
 type cnv_out struct {
 	str string
 	lno int
+	comment []Node
 }
 
 type CnvInf interface {
+
+	Comment(str string) string;
 
 	/* quantifier */
 	All(f Formula, co *cnv_out)
@@ -96,9 +99,9 @@ func uniop(fml Formula, cinf CnvInf, op string, co *cnv_out) {
 	conv2(fml.args[0], cinf, co)
 }
 
-func conv(fml Formula, cinf CnvInf) string {
+func conv(fml Formula, cinf CnvInf, comment []Node) string {
 	var co *cnv_out
-	co = &cnv_out{str: "", lno: 1}
+	co = &cnv_out{str: "", lno: 1, comment: comment}
 	conv2(fml, cinf, co)
 	return co.str
 }
@@ -106,6 +109,10 @@ func conv(fml Formula, cinf CnvInf) string {
 func conv2(fml Formula, cinf CnvInf, co *cnv_out) {
 	//	fmt.Printf("fml.cmd=%d,lineno=%d/%d str=%s\n", fml.cmd, fml.lineno, co.lno, fml.str)
 	for co.lno < fml.lineno {
+		if len(co.comment) > 0 && co.comment[0].lineno == co.lno {
+			co.append(cinf.Comment(co.comment[0].str))
+			co.comment = co.comment[1: len(co.comment)]
+		}
 		co.append("\n")
 		co.lno++
 	}

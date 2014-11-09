@@ -62,6 +62,10 @@ func (m *MathConv) Ftrue() string {
 func (m *MathConv) Ffalse() string {
 	return "False"
 }
+func (m *MathConv) Comment(str string) string {
+	return "(*" + str + "*)"
+}
+
 
 func ToMath(str string) string {
 	stack = new(Stack)
@@ -69,5 +73,5 @@ func ToMath(str string) string {
 	l.Init(strings.NewReader(str))
 	yyParse(l)
 	fml := tofml(stack)
-	return conv(fml, new(MathConv))
+	return conv(fml, new(MathConv), l.comment)
 }

@@ -34,6 +34,7 @@ type Node struct {
 %token EOL LB RB LP RP LC RC
 %token INDEXED LIST
 %token IMPL REPL EQUIV
+%token COMMENT
 
 %type <num> seq_var seq_fof
 %type <node> NAME NUMBER var
@@ -146,6 +147,7 @@ poly
 type SynLex struct {
 	scanner.Scanner
 	s string
+	comment []Node
 }
 
 type SynLex1 struct {
@@ -211,8 +213,23 @@ func isspace(ch rune) bool {
 func (l *SynLex) Lex(lval *yySymType) int {
 
 	// skip space
-	for isspace(l.Peek()) {
+	for {
+		for isspace(l.Peek()) {
+			l.Next()
+		}
+		lno := l.Pos().Line
+		if l.Peek() != '#' {
+			break
+		}
 		l.Next()
+		str := ""
+		for l.Peek() != '\n' {
+			str += string(l.Next())
+		}
+		if str != "" {
+			fmt.Printf("comment %d: %s\n", lno, str)
+			l.comment = append(l.comment, Node{str:str, lineno: lno})
+		}
 	}
 
 	lno := l.Pos().Line
