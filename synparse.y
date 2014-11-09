@@ -40,6 +40,7 @@ type Node struct {
 %type <node> NAME NUMBER var
 %type <node> ALL EX AND OR NOT IMPL REPL EQUIV
 %type <node> PLUS MINUS MULT DIV POW
+%type <node> LB LC
 
 %left IMPL REPL EQUIV
 %left OR
@@ -78,11 +79,11 @@ fof
 list_of_mobj
 	: LB seq_mobj RB {
 		trace("list")
-		stack.push(Node{cmd: LIST, val: $2})
+		stack.push(Node{cmd: LIST, val: $2, lineno: $1.lineno})
 	}
 	| LB RB {
 		trace("empty-list")
-		stack.push(Node{cmd: LIST, val: 0})
+		stack.push(Node{cmd: LIST, val: 0, lineno: $1.lineno})
 	}
 	;
 
@@ -103,11 +104,11 @@ quantifiers
 	}
 	| LB seq_var RB  /* [x,y,z] */ {
 		trace("list")
-		stack.push(Node{cmd: LIST, val: $2})
+		stack.push(Node{cmd: LIST, val: $2, lineno: $1.lineno})
 	}
 	| LC seq_var RC  /* {x,y,z} */ {
 		trace("set")
-		stack.push(Node{cmd: LIST, val: $2})
+		stack.push(Node{cmd: LIST, val: $2, lineno: $1.lineno})
 	}
 	;
 
@@ -234,7 +235,6 @@ func (l *SynLex) Lex(lval *yySymType) int {
 			str += string(l.Next())
 		}
 		if str != "" {
-			fmt.Printf("comment %d: %s\n", lno, str)
 			l.comment = append(l.comment, Node{str:str, lineno: lno})
 		}
 	}
