@@ -95,7 +95,13 @@ func mop(fml Formula, cinf CnvInf, op string, co *cnv_out) {
 }
 func uniop(fml Formula, cinf CnvInf, op string, co *cnv_out) {
 	co.append(op)
-	conv2(fml.args[0], cinf, co)
+	if fml.priority > 0 && fml.priority < fml.args[0].priority {
+		co.append("(")
+		conv2(fml.args[0], cinf, co)
+		co.append(")")
+	} else {
+		conv2(fml.args[0], cinf, co)
+	}
 }
 
 func conv(fml Formula, cinf CnvInf, comment []Node) string {
