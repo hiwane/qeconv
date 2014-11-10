@@ -5,14 +5,13 @@ import (
 )
 
 type cnv_out struct {
-	str string
-	lno int
+	str     string
+	lno     int
 	comment []Node
 }
 
 type CnvInf interface {
-
-	Comment(str string) string;
+	Comment(str string) string
 
 	/* quantifier */
 	All(f Formula, co *cnv_out)
@@ -111,7 +110,7 @@ func conv2(fml Formula, cinf CnvInf, co *cnv_out) {
 	for co.lno < fml.lineno {
 		if len(co.comment) > 0 && co.comment[0].lineno == co.lno {
 			co.append(cinf.Comment(co.comment[0].str))
-			co.comment = co.comment[1: len(co.comment)]
+			co.comment = co.comment[1:len(co.comment)]
 		}
 		co.append("\n")
 		co.lno++

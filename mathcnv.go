@@ -66,7 +66,6 @@ func (m *MathConv) Comment(str string) string {
 	return "(*" + str + "*)"
 }
 
-
 func ToMath(str string) string {
 	stack = new(Stack)
 	l := new(SynLex)
