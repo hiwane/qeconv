@@ -1,7 +1,10 @@
 qeconv
 ======
 
+[![Build Status](https://travis-ci.org/hiwane/qeconv.svg?branch=master)](https://travis-ci.org/hiwane/qeconv)
+
 convert first-order formulas
+
 
 # install
 
