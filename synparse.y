@@ -298,7 +298,8 @@ func (l *SynLex) Lex(lval *yySymType) int {
 }
 
 func (l *SynLex) Error(s string) {
-	fmt.Printf("syntax error: %s\n", s)
+	pos := l.Pos()
+	fmt.Printf("%s:Error:%s \n", pos.String(), s)
 	panic(s)
 }
 
