@@ -2,6 +2,7 @@ package qeconv
 
 import (
 	"errors"
+	"strings"
 )
 
 type cnv_out struct {
@@ -54,6 +55,14 @@ type Formula struct {
 func (c *cnv_out) append(s string) {
 	//	fmt.Printf("append [%s]\n", s)
 	c.str += s
+}
+
+func SynToFml(str string) Formula {
+	stack = new(Stack)
+	l := new(SynLex)
+	l.Init(strings.NewReader(str))
+	yyParse(l)
+	return tofml(stack)
 }
 
 func tofml(s *Stack) Formula {
