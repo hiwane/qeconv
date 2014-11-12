@@ -78,7 +78,7 @@ func SynToFml(str string) Formula {
 }
 
 func tofml(s *Stack) Formula {
-	n := s.pop()
+	n,_ := s.pop()
 	fml := Formula{}
 	fml.cmd = n.cmd
 	fml.str = n.str
