@@ -16,10 +16,10 @@ go get github.com/hiwane/qeconv/qeconv
 
 ```
 Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
-    -f: Use from for input CAS language [syn]
-    -t: Use to for output CAS language {math|tex} [math]
-    -i: Use inputfile for input [stdin]
-    -o: Use outputfile for outpuut [stdout]
+    -f: Use from for input format           [syn]
+    -t: Use to for output format {math|tex} [math]
+    -i: Use inputfile for input             [stdin]
+    -o: Use outputfile for outpuut          [stdout]
 ```
 
 # Example
