@@ -32,16 +32,21 @@ func TestToLaTeX(t *testing.T) {
 		input  string
 		expect string
 	}{
+		{"true:", "\\top"},
+		{"false:", "\\bot"},
 		{"x>0:", "0<x"},
 		{"x+y>0:", "0<x+y"},
+		{"x-2*y<>0:", "x-2 y \\neq 0"},
 		{"-x+y<=0:", "-x+y \\leq 0"},
 		{"-x+(y*2)<=0:", "-x+y 2 \\leq 0"},
 		{"-(x+y/3)=0:", "-(x+y/3)=0"},
 		{"-(x+y)*2<=0:", "-(x+y) 2 \\leq 0"},
+		{"Not(y=0):", "\\neg (y = 0)"},
 		{"And(x<=0, y=0):", "x \\leq 0 \\land y = 0"},
 		{"Or(x<=0, y<>0):", "x \\leq 0 \\lor y \\neq 0"},
 		{"Ex(x, x^2=-1):", "\\exists x (x^{2}=-1)"},
 		{"All([x], a*x^2+b*x+c>0):", "\\forall x (0<a x^{2}+b x+c)"},
+		{"All([x], Ex([y], x+y+a=0)):", "\\forall x \\exists y(x+y+a=0)"},
 	}
 
 	for _, p := range data {

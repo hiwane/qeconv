@@ -72,16 +72,21 @@ func TestToMath(t *testing.T) {
 		input  string
 		expect string
 	}{
+		{"true:", "True"},
+		{"false:", "False"},
 		{"x>0:", "0<x"},
 		{"x+y>0:", "0<x+y"},
+		{"x-2*y<>0:", "x-2*y != 0"},
 		{"-x+y<=0:", "-x+y<=0"},
 		{"-x+(y*2)<=0:", "-x+y*2<=0"},
 		{"-(x+y/3)=0:", "-(x+y/3)==0"},
 		{"-(x+y)*2<=0:", "-(x+y)*2<=0"},
+		{"Not(y=0):", "Not[y == 0]"},
 		{"And(x<=0, y=0):", "x <= 0 && y == 0"},
 		{"Or(x<=0, y<>0):", "x<=0 || y!=0"},
 		{"Ex(x, x^2=-1):", "Exists[{x}, x^2==-1]"},
 		{"All([x], a*x^2+b*x+c>0):", "ForAll[{x}, 0<a*x^2+b*x+c]"},
+		{"All([x], Ex([y], x+y+a=0)):", "ForAll[{x},Exists[{y},x+y+a==0]]"},
 	}
 
 	for _, p := range data {
