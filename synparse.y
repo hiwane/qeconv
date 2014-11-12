@@ -186,9 +186,9 @@ var sones = []SynLex1 {
 var sfuns = []SynLex1 {
 	{"And"  , AND    , 0, 0, 1},
 	{"Or"   , OR     , 0, 0, 2},
-	{"Impl" , IMPL   , 0, 2, 0},
-	{"Repl" , REPL   , 0, 2, 0},
-	{"Equiv", EQUIV  , 0, 2, 0},
+	{"Impl" , IMPL   , 0, 2, 3},
+	{"Repl" , REPL   , 0, 2, 3},
+	{"Equiv", EQUIV  , 0, 2, 3},
 	{"Not"  , NOT    , 0, 1, 0},
 	{"All"  , ALL    , 0, 2, 0},
 	{"Ex"   , EX     , 0, 2, 0},

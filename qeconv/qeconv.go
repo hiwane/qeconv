@@ -19,7 +19,7 @@ func main() {
 	)
 
 	flag.StringVar(&from, "f", "syn", "from {syn}")
-	flag.StringVar(&to, "t", "math", "to {math}")
+	flag.StringVar(&to, "t", "math", "to {math|tex}")
 	flag.StringVar(&filename, "i", "", "input file")
 	flag.StringVar(&output, "o", "", "output file")
 	flag.Parse()
@@ -32,7 +32,13 @@ func main() {
 	}
 
 	if err == nil {
-		str := qeconv.ToMath(string(b))
+		var str string;
+		if to == "math" {
+			str = qeconv.ToMath(string(b))
+		} else if (to == "tex") {
+			str = qeconv.ToLaTeX(string(b))
+		}
+
 		if output == "" {
 			fmt.Printf("%s\n", str)
 		} else {
