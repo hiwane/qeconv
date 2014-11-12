@@ -11,8 +11,22 @@ type cnv_out struct {
 	comment []Node
 }
 
-type CnvInf interface {
+type CnvInfMathOp interface {
+	/* math op */
+	Plus(f Formula, co *cnv_out)
+	Minus(f Formula, co *cnv_out)
+	Mult(f Formula, co *cnv_out)
+	Div(f Formula, co *cnv_out)
+	Pow(f Formula, co *cnv_out)
 	Comment(str string) string
+
+	/* atom */
+	Ftrue() string
+	Ffalse() string
+}
+
+type CnvInf interface {
+	CnvInfMathOp
 
 	/* quantifier */
 	All(f Formula, co *cnv_out)
@@ -35,14 +49,12 @@ type CnvInf interface {
 	Eqop(f Formula, co *cnv_out)
 	Neop(f Formula, co *cnv_out)
 
-	/* atom */
-	Ftrue() string
-	Ffalse() string
 
-	/* math op */
 
 	List(f Formula, co *cnv_out)
+
 }
+
 
 type Formula struct {
 	cmd      int
@@ -88,28 +100,28 @@ func tofml(s *Stack) Formula {
 	return fml
 }
 
-func mop(fml Formula, cinf CnvInf, op string, co *cnv_out) {
+func mop(fml Formula, cinf CnvInfMathOp, op string, co *cnv_out) {
 	for i := 0; i < len(fml.args); i++ {
 		if i != 0 {
 			co.append(op)
 		}
 		if fml.priority > 0 && fml.priority < fml.args[i].priority {
 			co.append("(")
-			conv2(fml.args[i], cinf, co)
+			convm(fml.args[i], cinf, co)
 			co.append(")")
 		} else {
-			conv2(fml.args[i], cinf, co)
+			convm(fml.args[i], cinf, co)
 		}
 	}
 }
-func uniop(fml Formula, cinf CnvInf, op string, co *cnv_out) {
+func uniop(fml Formula, cinf CnvInfMathOp, op string, co *cnv_out) {
 	co.append(op)
 	if fml.priority > 0 && fml.priority < fml.args[0].priority {
 		co.append("(")
-		conv2(fml.args[0], cinf, co)
+		convm(fml.args[0], cinf, co)
 		co.append(")")
 	} else {
-		conv2(fml.args[0], cinf, co)
+		convm(fml.args[0], cinf, co)
 	}
 }
 
@@ -118,6 +130,42 @@ func conv(fml Formula, cinf CnvInf, comment []Node) string {
 	co = &cnv_out{str: "", lno: 1, comment: comment}
 	conv2(fml, cinf, co)
 	return co.str
+}
+
+func convm(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
+	for co.lno < fml.lineno {
+		if len(co.comment) > 0 && co.comment[0].lineno == co.lno {
+			co.append(cinf.Comment(co.comment[0].str))
+			co.comment = co.comment[1:len(co.comment)]
+		}
+		co.append("\n")
+		co.lno++
+	}
+
+	switch fml.cmd {
+	case PLUS:
+		cinf.Plus(fml, co)
+	case MINUS:
+		cinf.Minus(fml, co)
+	case MULT:
+		cinf.Mult(fml, co)
+	case DIV:
+		cinf.Div(fml, co)
+	case POW:
+		cinf.Pow(fml, co)
+	case NAME, NUMBER:
+		co.append(fml.str)
+	case F_TRUE:
+		co.append(cinf.Ftrue())
+	case F_FALSE:
+		co.append(cinf.Ffalse())
+	case UNARYMINUS:
+		uniop(fml, cinf, "-", co)
+	case UNARYPLUS:
+		uniop(fml, cinf, "+", co)
+	default:
+		errors.New("unknown type")
+	}
 }
 
 func conv2(fml Formula, cinf CnvInf, co *cnv_out) {
@@ -156,28 +204,8 @@ func conv2(fml Formula, cinf CnvInf, co *cnv_out) {
 		cinf.Neop(fml, co)
 	case LIST:
 		cinf.List(fml, co)
-	case PLUS:
-		mop(fml, cinf, "+", co)
-	case MINUS:
-		mop(fml, cinf, "-", co)
-	case MULT:
-		mop(fml, cinf, "*", co)
-	case DIV:
-		mop(fml, cinf, "/", co)
-	case POW:
-		mop(fml, cinf, "^", co)
-	case NAME, NUMBER:
-		co.append(fml.str)
-	case F_TRUE:
-		co.append(cinf.Ftrue())
-	case F_FALSE:
-		co.append(cinf.Ffalse())
-	case UNARYMINUS:
-		uniop(fml, cinf, "-", co)
-	case UNARYPLUS:
-		uniop(fml, cinf, "+", co)
 	default:
-		errors.New("unknown type")
+		convm(fml, cinf, co)
 	}
 }
 
@@ -205,4 +233,33 @@ func infix(fml Formula, cinf CnvInf, op string, co *cnv_out) {
 		}
 		sep = op
 	}
+}
+
+
+type CnvInfMathOpCAS struct {
+}
+
+func (m *CnvInfMathOpCAS) Plus(fml Formula, co *cnv_out) {
+	mop(fml, m, "+", co)
+}
+func (m *CnvInfMathOpCAS) Minus(fml Formula, co *cnv_out) {
+	mop(fml, m, "-", co)
+}
+func (m *CnvInfMathOpCAS) Mult(fml Formula, co *cnv_out) {
+	mop(fml, m, "*", co)
+}
+func (m *CnvInfMathOpCAS) Div(fml Formula, co *cnv_out) {
+	mop(fml, m, "/", co)
+}
+func (m *CnvInfMathOpCAS) Pow(fml Formula, co *cnv_out) {
+	mop(fml, m, "^", co)
+}
+func (m *CnvInfMathOpCAS) Comment(str string) string {
+	return "# " + str
+}
+func (m *CnvInfMathOpCAS) Ftrue() string {
+	return "T"
+}
+func (m *CnvInfMathOpCAS) Ffalse() string {
+	return "F"
 }
