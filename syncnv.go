@@ -132,7 +132,7 @@ func conv(fml Formula, cinf CnvInf, comment []Node) string {
 	return co.str
 }
 
-func convm(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
+func skipcomment(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
 	for co.lno < fml.lineno {
 		if len(co.comment) > 0 && co.comment[0].lineno == co.lno {
 			co.append(cinf.Comment(co.comment[0].str))
@@ -141,6 +141,12 @@ func convm(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
 		co.append("\n")
 		co.lno++
 	}
+}
+
+func convm(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
+
+	skipcomment(fml, cinf, co)
+
 
 	switch fml.cmd {
 	case PLUS:
@@ -170,14 +176,7 @@ func convm(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
 
 func conv2(fml Formula, cinf CnvInf, co *cnv_out) {
 	//	fmt.Printf("fml.cmd=%d,lineno=%d/%d str=%s\n", fml.cmd, fml.lineno, co.lno, fml.str)
-	for co.lno < fml.lineno {
-		if len(co.comment) > 0 && co.comment[0].lineno == co.lno {
-			co.append(cinf.Comment(co.comment[0].str))
-			co.comment = co.comment[1:len(co.comment)]
-		}
-		co.append("\n")
-		co.lno++
-	}
+	skipcomment(fml, cinf, co)
 
 	switch fml.cmd {
 	case ALL:
