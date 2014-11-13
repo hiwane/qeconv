@@ -19,6 +19,7 @@ type CnvInfMathOp interface {
 	Div(f Formula, co *cnv_out)
 	Pow(f Formula, co *cnv_out)
 	Comment(str string) string
+	Abs(f Formula, co *cnv_out)
 
 	/* atom */
 	Ftrue() string
@@ -49,10 +50,7 @@ type CnvInf interface {
 	Eqop(f Formula, co *cnv_out)
 	Neop(f Formula, co *cnv_out)
 
-
-
 	List(f Formula, co *cnv_out)
-
 }
 
 
@@ -147,7 +145,6 @@ func convm(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
 
 	skipcomment(fml, cinf, co)
 
-
 	switch fml.cmd {
 	case PLUS:
 		cinf.Plus(fml, co)
@@ -159,6 +156,8 @@ func convm(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
 		cinf.Div(fml, co)
 	case POW:
 		cinf.Pow(fml, co)
+	case ABS:
+		cinf.Abs(fml, co)
 	case NAME, NUMBER:
 		co.append(fml.str)
 	case F_TRUE:

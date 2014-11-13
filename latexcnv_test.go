@@ -47,6 +47,7 @@ func TestToLaTeX(t *testing.T) {
 		{"Ex(x, x^2=-1):", "\\exists x (x^{2}=-1)"},
 		{"All([x], a*x^2+b*x+c>0):", "\\forall x (0<a x^{2}+b x+c)"},
 		{"All([x], Ex([y], x+y+a=0)):", "\\forall x \\exists y(x+y+a=0)"},
+		{"abs(x)>0:", "0<|x|"},
 	}
 
 	for _, p := range data {

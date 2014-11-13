@@ -84,19 +84,19 @@ func TestToMath(t *testing.T) {
 		{"Not(y=0):", "Not[y == 0]"},
 		{"And(x<=0, y=0):", "x <= 0 && y == 0"},
 		{"Or(x<=0, y<>0):", "x<=0 || y!=0"},
+		{"And(Or(x*y>0,z>0),Or(x*y<=-z,+z>=0)):", "(0<x*y || 0<z) && (x*y<=-z ||  0<=+z)"},
 		{"Ex(x, x^2=-1):", "Exists[{x}, x^2==-1]"},
 		{"All([x], a*x^2+b*x+c>0):", "ForAll[{x}, 0<a*x^2+b*x+c]"},
 		{"All([x], Ex([y], x+y+a=0)):", "ForAll[{x},Exists[{y},x+y+a==0]]"},
+		{"# comment line\n(1+a)*x+(3+b)*y=0:", "(1+a)*x+(3+b)*y == 0"},
+		{"x+abs(y+z)=0:", "x+Abs[y+z]==0"},
 	}
 
-	for _, p := range data {
-		t.Log("inp=%s\n", p.input)
+	for i, p := range data {
 		actual0 := ToMath(p.input)
-		t.Log("ac0=%s\n", actual0)
 		actual := removeMathComment(actual0)
-		t.Log("rem=%s\n", actual)
 		if !cmpIgnoreSpace(actual, p.expect) {
-			t.Errorf("err actual=%s\nexpect=%s\ninput=%s\n", actual0, p.expect, p.input)
+			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)
 		}
 	}
 }

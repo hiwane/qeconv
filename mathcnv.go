@@ -35,6 +35,12 @@ func (m *MathConv) Equiv(f Formula, co *cnv_out) {
 	prefix(f, m, "Equivalent[", "]", co)
 }
 
+func (m *MathConv) Abs(f Formula, co *cnv_out) {
+	co.append("Abs[")
+	convm(f.args[0], m, co)
+	co.append("]")
+}
+
 func (m *MathConv) Leop(f Formula, co *cnv_out) {
 	infix(f, m, " <= ", co)
 }

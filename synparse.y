@@ -29,7 +29,7 @@ type Node struct {
 }
 
 %token NAME NUMBER F_TRUE F_FALSE
-%token ALL EX AND OR NOT
+%token ALL EX AND OR NOT ABS
 %token PLUS MINUS COMMA MULT DIV POW
 %token EOL LB RB LP RP LC RC
 %token INDEXED LIST
@@ -38,7 +38,7 @@ type Node struct {
 
 %type <num> seq_var seq_fof seq_mobj
 %type <node> NAME NUMBER var
-%type <node> ALL EX AND OR NOT IMPL REPL EQUIV
+%type <node> ALL EX AND OR NOT IMPL REPL EQUIV ABS
 %type <node> PLUS MINUS MULT DIV POW
 %type <node> LB LC
 
@@ -138,6 +138,7 @@ poly
 	: LP poly RP
 	| NUMBER	{ trace("num"); stack.push($1) }
 	| var
+	| ABS LP poly RP    { trace("abs"); $1.val = 1; stack.push($1); }
 	| poly PLUS poly	{ trace("+"); stack.push($2)}
 	| poly MINUS poly	{ trace("-"); stack.push($2)}
 	| poly MULT poly	{ trace("*"); stack.push($2)}
@@ -194,6 +195,7 @@ var sfuns = []SynLex1 {
 	{"Ex"   , EX     , 0, 2, 0},
 	{"true" , F_TRUE , 0, 0, 0},
 	{"false", F_FALSE, 0, 0, 0},
+	{"abs",   ABS    , 0, 0, 0},
 }
 
 func isupper(ch rune) bool {

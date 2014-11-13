@@ -51,6 +51,10 @@ func (m *LaTeXConv) Equiv(f Formula, co *cnv_out) {
 	infix(f, m, " \\leftrightarrow ", co)
 }
 
+func (m *LaTeXConv) Abs(f Formula, co *cnv_out) {
+	prefix(f, m, "|", "|", co)
+}
+
 func (m *LaTeXConv) Leop(f Formula, co *cnv_out) {
 	infix(f, m, " \\leq ", co)
 }
