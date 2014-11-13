@@ -235,30 +235,3 @@ func infix(fml Formula, cinf CnvInf, op string, co *cnv_out) {
 }
 
 
-type CnvInfMathOpCAS struct {
-}
-
-func (m *CnvInfMathOpCAS) Plus(fml Formula, co *cnv_out) {
-	mop(fml, m, "+", co)
-}
-func (m *CnvInfMathOpCAS) Minus(fml Formula, co *cnv_out) {
-	mop(fml, m, "-", co)
-}
-func (m *CnvInfMathOpCAS) Mult(fml Formula, co *cnv_out) {
-	mop(fml, m, "*", co)
-}
-func (m *CnvInfMathOpCAS) Div(fml Formula, co *cnv_out) {
-	mop(fml, m, "/", co)
-}
-func (m *CnvInfMathOpCAS) Pow(fml Formula, co *cnv_out) {
-	mop(fml, m, "^", co)
-}
-func (m *CnvInfMathOpCAS) Comment(str string) string {
-	return "# " + str
-}
-func (m *CnvInfMathOpCAS) Ftrue() string {
-	return "T"
-}
-func (m *CnvInfMathOpCAS) Ffalse() string {
-	return "F"
-}

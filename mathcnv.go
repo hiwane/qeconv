@@ -5,7 +5,6 @@ import (
 )
 
 type MathConv struct {
-	CnvInfMathOpCAS
 }
 
 func (m *MathConv) All(f Formula, co *cnv_out) {
@@ -54,6 +53,22 @@ func (m *MathConv) Neop(f Formula, co *cnv_out) {
 
 func (m *MathConv) List(f Formula, co *cnv_out) {
 	prefix(f, m, "{", "}", co)
+}
+
+func (m *MathConv) Plus(fml Formula, co *cnv_out) {
+	mop(fml, m, "+", co)
+}
+func (m *MathConv) Minus(fml Formula, co *cnv_out) {
+	mop(fml, m, "-", co)
+}
+func (m *MathConv) Mult(fml Formula, co *cnv_out) {
+	mop(fml, m, "*", co)
+}
+func (m *MathConv) Div(fml Formula, co *cnv_out) {
+	mop(fml, m, "/", co)
+}
+func (m *MathConv) Pow(fml Formula, co *cnv_out) {
+	mop(fml, m, "^", co)
 }
 
 func (m *MathConv) Ftrue() string {
