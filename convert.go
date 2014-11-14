@@ -53,13 +53,38 @@ type CnvInf interface {
 	List(f Formula, co *cnv_out)
 }
 
-
 type Formula struct {
 	cmd      int
 	str      string
 	args     []Formula
 	priority int
 	lineno   int
+}
+
+func (self *Formula) Cmd() int {
+	return self.cmd
+}
+func (self *Formula) IsList() bool {
+	return self.cmd == LIST
+}
+func (self *Formula) IsQuantifier() bool {
+	return self.cmd == ALL || self.cmd == EX
+}
+func (self *Formula) IsAtom() bool {
+	return self.cmd == LEOP || self.cmd == LTOP ||
+		self.cmd == EQOP || self.cmd == NEOP
+}
+func (self *Formula) IsBool() bool {
+	return self.cmd == F_TRUE || self.cmd == F_FALSE
+}
+func (self *Formula) String() string {
+	return self.str
+}
+func (self *Formula) Args() []Formula {
+	return self.args
+}
+func (self *Formula) Arg(id int) Formula {
+	return self.args[id]
 }
 
 func (c *cnv_out) append(s string) {
@@ -76,7 +101,7 @@ func SynToFml(str string) Formula {
 }
 
 func tofml(s *Stack) Formula {
-	n,_ := s.pop()
+	n, _ := s.pop()
 	fml := Formula{}
 	fml.cmd = n.cmd
 	fml.str = n.str
