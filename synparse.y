@@ -152,11 +152,15 @@ poly
 
 %%      /*  start  of  programs  */
 
+type Comment struct {
+	lineno int
+	str string
+}
 
 type SynLex struct {
 	scanner.Scanner
 	s string
-	comment []Node
+	comment []Comment
 }
 
 type SynLex1 struct {
@@ -237,7 +241,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 			str += string(l.Next())
 		}
 		if str != "" {
-			l.comment = append(l.comment, Node{str:str, lineno: lno})
+			l.comment = append(l.comment, Comment{str:str, lineno: lno})
 		}
 	}
 

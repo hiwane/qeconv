@@ -8,7 +8,7 @@ import (
 type cnv_out struct {
 	str     string
 	lno     int
-	comment []Node
+	comment []Comment
 }
 
 type CnvInfMathOp interface {
@@ -148,7 +148,7 @@ func uniop(fml Formula, cinf CnvInfMathOp, op string, co *cnv_out) {
 	}
 }
 
-func conv(fml Formula, cinf CnvInf, comment []Node) string {
+func conv(fml Formula, cinf CnvInf, comment []Comment) string {
 	var co *cnv_out
 	co = &cnv_out{str: "", lno: 1, comment: comment}
 	conv2(fml, cinf, co)
@@ -257,5 +257,3 @@ func infix(fml Formula, cinf CnvInf, op string, co *cnv_out) {
 		sep = op
 	}
 }
-
-
