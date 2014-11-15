@@ -78,7 +78,7 @@ func (self *Formula) IsBool() bool {
 	return self.cmd == F_TRUE || self.cmd == F_FALSE
 }
 func (self *Formula) String() string {
-	return self.str
+	return conv(*self, new(SynConv), make([]Comment, 0))
 }
 func (self *Formula) Args() []Formula {
 	return self.args
