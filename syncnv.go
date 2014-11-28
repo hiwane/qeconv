@@ -16,7 +16,7 @@ func (m *SynConv) Ex(f Formula, co *cnv_out) {
 }
 
 func (m *SynConv) And(f Formula, co *cnv_out) {
-	prefix(f, m, "All(", ")", co)
+	prefix(f, m, "And(", ")", co)
 }
 
 func (m *SynConv) Or(f Formula, co *cnv_out) {
