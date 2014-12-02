@@ -255,6 +255,12 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for i := 0; i < len(sfuns); i++ {
 			if lval.node.str == sfuns[i].val {
 				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
+
+				// Repl は Impl に変換する.
+				if lval.node.str == "Repl" {
+					lval.node.rev = true
+					lval.node.cmd = IMPL
+				}
 				return sfuns[i].label
 			}
 		}
