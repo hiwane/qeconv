@@ -92,6 +92,7 @@ func TestToMath(t *testing.T) {
 		{"All([x], Ex([y], x+y+a=0)):", "ForAll[{x},Exists[{y},x+y+a==0]]"},
 		{"Equiv(x<0, y=0):", "Equivalent[x<0, y==0]"},
 		{"Impl(x<0, y=0):", "Implies[x<0, y==0]"},
+		{"Repl(y=0, x<0):", "Implies[x<0, y==0]"},
 		{"# comment line\n(1+a)*x+(3+b)*y=0:", "(1+a)*x+(3+b)*y == 0"},
 		{"x+abs(y+z)=0:", "x+Abs[y+z]==0"},
 	}
