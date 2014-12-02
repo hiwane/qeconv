@@ -4,87 +4,87 @@ import (
 	"strings"
 )
 
-type MathConv struct {
+type mathConv struct {
 }
 
-func (m *MathConv) All(f Formula, co *cnv_out) {
+func (m *mathConv) All(f Formula, co *cnv_out) {
 	prefix(f, m, "ForAll[", "]", co)
 }
 
-func (m *MathConv) Ex(f Formula, co *cnv_out) {
+func (m *mathConv) Ex(f Formula, co *cnv_out) {
 	prefix(f, m, "Exists[", "]", co)
 }
 
-func (m *MathConv) And(f Formula, co *cnv_out) {
+func (m *mathConv) And(f Formula, co *cnv_out) {
 	infix(f, m, " && ", co)
 }
 
-func (m *MathConv) Or(f Formula, co *cnv_out) {
+func (m *mathConv) Or(f Formula, co *cnv_out) {
 	infix(f, m, " || ", co)
 }
 
-func (m *MathConv) Not(f Formula, co *cnv_out) {
+func (m *mathConv) Not(f Formula, co *cnv_out) {
 	prefix(f, m, "Not[", "]", co)
 }
 
-func (m *MathConv) Impl(f Formula, co *cnv_out) {
+func (m *mathConv) Impl(f Formula, co *cnv_out) {
 	prefix(f, m, "Implies[", "]", co)
 }
 
-func (m *MathConv) Equiv(f Formula, co *cnv_out) {
+func (m *mathConv) Equiv(f Formula, co *cnv_out) {
 	prefix(f, m, "Equivalent[", "]", co)
 }
 
-func (m *MathConv) Abs(f Formula, co *cnv_out) {
+func (m *mathConv) Abs(f Formula, co *cnv_out) {
 	co.append("Abs[")
 	convm(f.args[0], m, co)
 	co.append("]")
 }
 
-func (m *MathConv) Leop(f Formula, co *cnv_out) {
+func (m *mathConv) Leop(f Formula, co *cnv_out) {
 	infix(f, m, " <= ", co)
 }
 
-func (m *MathConv) Ltop(f Formula, co *cnv_out) {
+func (m *mathConv) Ltop(f Formula, co *cnv_out) {
 	infix(f, m, " < ", co)
 }
 
-func (m *MathConv) Eqop(f Formula, co *cnv_out) {
+func (m *mathConv) Eqop(f Formula, co *cnv_out) {
 	infix(f, m, " == ", co)
 }
 
-func (m *MathConv) Neop(f Formula, co *cnv_out) {
+func (m *mathConv) Neop(f Formula, co *cnv_out) {
 	infix(f, m, " != ", co)
 }
 
-func (m *MathConv) List(f Formula, co *cnv_out) {
+func (m *mathConv) List(f Formula, co *cnv_out) {
 	prefix(f, m, "{", "}", co)
 }
 
-func (m *MathConv) Plus(fml Formula, co *cnv_out) {
+func (m *mathConv) Plus(fml Formula, co *cnv_out) {
 	mop(fml, m, "+", co)
 }
-func (m *MathConv) Minus(fml Formula, co *cnv_out) {
+func (m *mathConv) Minus(fml Formula, co *cnv_out) {
 	mop(fml, m, "-", co)
 }
-func (m *MathConv) Mult(fml Formula, co *cnv_out) {
+func (m *mathConv) Mult(fml Formula, co *cnv_out) {
 	mop(fml, m, "*", co)
 }
-func (m *MathConv) Div(fml Formula, co *cnv_out) {
+func (m *mathConv) Div(fml Formula, co *cnv_out) {
 	mop(fml, m, "/", co)
 }
-func (m *MathConv) Pow(fml Formula, co *cnv_out) {
+func (m *mathConv) Pow(fml Formula, co *cnv_out) {
 	mop(fml, m, "^", co)
 }
 
-func (m *MathConv) Ftrue() string {
+func (m *mathConv) Ftrue() string {
 	return "True"
 }
 
-func (m *MathConv) Ffalse() string {
+func (m *mathConv) Ffalse() string {
 	return "False"
 }
-func (m *MathConv) Comment(str string) string {
+func (m *mathConv) Comment(str string) string {
 	return "(*" + str + "*)"
 }
 
@@ -94,5 +94,5 @@ func ToMath(str string) string {
 	l.Init(strings.NewReader(str))
 	yyParse(l)
 	fml := tofml(stack)
-	return conv(fml, new(MathConv), l.comment)
+	return conv(fml, new(mathConv), l.comment)
 }

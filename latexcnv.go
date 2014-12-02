@@ -4,10 +4,10 @@ import (
 	"strings"
 )
 
-type LaTeXConv struct {
+type latexConv struct {
 }
 
-func (m *LaTeXConv) q(f Formula, qop string, co *cnv_out) {
+func (m *latexConv) q(f Formula, qop string, co *cnv_out) {
 	vars := f.args[0]
 	for i := 0; i < len(vars.args); i++ {
 		co.append(" " + qop + " ")
@@ -23,82 +23,82 @@ func (m *LaTeXConv) q(f Formula, qop string, co *cnv_out) {
 	}
 }
 
-func (m *LaTeXConv) All(f Formula, co *cnv_out) {
+func (m *latexConv) All(f Formula, co *cnv_out) {
 	m.q(f, "\\forall", co)
 }
 
-func (m *LaTeXConv) Ex(f Formula, co *cnv_out) {
+func (m *latexConv) Ex(f Formula, co *cnv_out) {
 	m.q(f, "\\exists", co)
 }
 
-func (m *LaTeXConv) And(f Formula, co *cnv_out) {
+func (m *latexConv) And(f Formula, co *cnv_out) {
 	infix(f, m, " \\land ", co)
 }
 
-func (m *LaTeXConv) Or(f Formula, co *cnv_out) {
+func (m *latexConv) Or(f Formula, co *cnv_out) {
 	infix(f, m, " \\lor ", co)
 }
 
-func (m *LaTeXConv) Not(f Formula, co *cnv_out) {
+func (m *latexConv) Not(f Formula, co *cnv_out) {
 	prefix(f, m, "\\neg (", ")", co)
 }
 
-func (m *LaTeXConv) Impl(f Formula, co *cnv_out) {
+func (m *latexConv) Impl(f Formula, co *cnv_out) {
 	infix(f, m, " \\rightarrow ", co)
 }
 
-func (m *LaTeXConv) Equiv(f Formula, co *cnv_out) {
+func (m *latexConv) Equiv(f Formula, co *cnv_out) {
 	infix(f, m, " \\leftrightarrow ", co)
 }
 
-func (m *LaTeXConv) Abs(f Formula, co *cnv_out) {
+func (m *latexConv) Abs(f Formula, co *cnv_out) {
 	prefix(f, m, "|", "|", co)
 }
 
-func (m *LaTeXConv) Leop(f Formula, co *cnv_out) {
+func (m *latexConv) Leop(f Formula, co *cnv_out) {
 	infix(f, m, " \\leq ", co)
 }
 
-func (m *LaTeXConv) Ltop(f Formula, co *cnv_out) {
+func (m *latexConv) Ltop(f Formula, co *cnv_out) {
 	infix(f, m, " < ", co)
 }
 
-func (m *LaTeXConv) Eqop(f Formula, co *cnv_out) {
+func (m *latexConv) Eqop(f Formula, co *cnv_out) {
 	infix(f, m, " = ", co)
 }
 
-func (m *LaTeXConv) Neop(f Formula, co *cnv_out) {
+func (m *latexConv) Neop(f Formula, co *cnv_out) {
 	infix(f, m, " \\neq ", co)
 }
 
-func (m *LaTeXConv) List(f Formula, co *cnv_out) {
+func (m *latexConv) List(f Formula, co *cnv_out) {
 	prefix(f, m, "[", "]", co)
 }
 
-func (m *LaTeXConv) Ftrue() string {
+func (m *latexConv) Ftrue() string {
 	return "\\top"
 }
 
-func (m *LaTeXConv) Ffalse() string {
+func (m *latexConv) Ffalse() string {
 	return "\\bot"
 }
-func (m *LaTeXConv) Comment(str string) string {
+func (m *latexConv) Comment(str string) string {
 	return "% " + str
 }
 
-func (m *LaTeXConv) Plus(fml Formula, co *cnv_out) {
+func (m *latexConv) Plus(fml Formula, co *cnv_out) {
 	mop(fml, m, "+", co)
 }
-func (m *LaTeXConv) Minus(fml Formula, co *cnv_out) {
+func (m *latexConv) Minus(fml Formula, co *cnv_out) {
 	mop(fml, m, "-", co)
 }
-func (m *LaTeXConv) Mult(fml Formula, co *cnv_out) {
+func (m *latexConv) Mult(fml Formula, co *cnv_out) {
 	mop(fml, m, " ", co)
 }
-func (m *LaTeXConv) Div(fml Formula, co *cnv_out) {
+func (m *latexConv) Div(fml Formula, co *cnv_out) {
 	mop(fml, m, "/", co)
 }
-func (m *LaTeXConv) Pow(fml Formula, co *cnv_out) {
+func (m *latexConv) Pow(fml Formula, co *cnv_out) {
 	for i := 0; i < len(fml.args); i++ {
 		if i != 0 {
 			co.append("^{")
@@ -116,5 +116,5 @@ func ToLaTeX(str string) string {
 	l.Init(strings.NewReader(str))
 	yyParse(l)
 	fml := tofml(stack)
-	return conv(fml, new(LaTeXConv), l.comment)
+	return conv(fml, new(latexConv), l.comment)
 }
