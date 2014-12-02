@@ -50,7 +50,7 @@ func (m *synConv) Ltop(f Formula, co *cnv_out) {
 }
 
 func (m *synConv) Eqop(f Formula, co *cnv_out) {
-	infix(f, m, " == ", co)
+	infix(f, m, " = ", co)
 }
 
 func (m *synConv) Neop(f Formula, co *cnv_out) {
