@@ -37,6 +37,9 @@ func main() {
 			str = qeconv.ToMath(string(b))
 		} else if (to == "tex") {
 			str = qeconv.ToLaTeX(string(b))
+		} else {
+			fmt.Fprintln(os.Stderr, "unsupported -t " + to)
+			os.Exit(1)
 		}
 
 		if output == "" {
