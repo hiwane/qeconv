@@ -232,7 +232,6 @@ func conv2(fml Formula, cinf CnvInf, co *cnv_out) {
 	}
 }
 
-
 func prefixm(fml Formula, cinf CnvInf, left, mid, right string, co *cnv_out) {
 	co.append(left)
 	sep := ""
@@ -247,7 +246,6 @@ func prefixm(fml Formula, cinf CnvInf, left, mid, right string, co *cnv_out) {
 func prefix(fml Formula, cinf CnvInf, left, right string, co *cnv_out) {
 	prefixm(fml, cinf, left, ",", right, co)
 }
-
 
 func infixm(fml Formula, cinf CnvInf, op string, co *cnv_out, str, end string) {
 	sep := ""

@@ -32,21 +32,21 @@ func main() {
 	}
 
 	if err == nil {
-		var str string;
+		var str string
 		if to == "math" {
 			str = qeconv.ToMath(string(b))
-		} else if (to == "tex") {
+		} else if to == "tex" {
 			str = qeconv.ToLaTeX(string(b))
-		} else if (to == "syn") {
+		} else if to == "syn" {
 			str = qeconv.ToSyn(string(b))
-		} else if (to == "qep") {
+		} else if to == "qep" {
 			str, err = qeconv.ToQepcad(string(b))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 		} else {
-			fmt.Fprintln(os.Stderr, "unsupported -t " + to)
+			fmt.Fprintln(os.Stderr, "unsupported -t "+to)
 			os.Exit(1)
 		}
 
