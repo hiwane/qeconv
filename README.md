@@ -18,10 +18,10 @@ go get github.com/hiwane/qeconv/qeconv
 
 ```
 Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
-    -f: Use from for input format           [syn]
-    -t: Use to for output format {math|tex} [math]
-    -i: Use inputfile for input             [stdin]
-    -o: Use outputfile for outpuut          [stdout]
+    -f: Use from for input format                   [syn]
+    -t: Use to for output format {math|tex|qep|syn} [math]
+    -i: Use inputfile for input                     [stdin]
+    -o: Use outputfile for outpuut                  [stdout]
 ```
 
 # Example
@@ -48,4 +48,20 @@ x \neq 0 \land 0 \leq y
 > echo "Ex([y],And(x>0,y>=0)):" | qeconv -t tex
 \exists y(0 < x \land 0 \leq y)
 ```
+
+### SyNRAC to QEPCAD
+
+```
+> echo "x>0:" | qeconv -t qep
+0 < x
+> echo "And(x<>0,y>=0):" | qeconv -t qep
+x /= 0 /\ 0 <= y
+> echo "Ex([y],And(x>0,y>=0)):" | qeconv -t qep
+(E y)[0 < x /\ 0 <= y]
+```
+
+
+
+
+
 
