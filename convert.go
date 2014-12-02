@@ -232,28 +232,38 @@ func conv2(fml Formula, cinf CnvInf, co *cnv_out) {
 	}
 }
 
-func prefix(fml Formula, cinf CnvInf, left, right string, co *cnv_out) {
+
+func prefixm(fml Formula, cinf CnvInf, left, mid, right string, co *cnv_out) {
 	co.append(left)
 	sep := ""
 	for i := 0; i < len(fml.args); i++ {
 		co.append(sep)
 		conv2(fml.args[i], cinf, co)
-		sep = ","
+		sep = mid
 	}
 	co.append(right)
 }
 
-func infix(fml Formula, cinf CnvInf, op string, co *cnv_out) {
+func prefix(fml Formula, cinf CnvInf, left, right string, co *cnv_out) {
+	prefixm(fml, cinf, left, ",", right, co)
+}
+
+
+func infixm(fml Formula, cinf CnvInf, op string, co *cnv_out, str, end string) {
 	sep := ""
 	for i := 0; i < len(fml.args); i++ {
 		co.append(sep)
 		if fml.priority > 0 && fml.priority < fml.args[i].priority {
-			co.append("(")
+			co.append(str)
 			conv2(fml.args[i], cinf, co)
-			co.append(")")
+			co.append(end)
 		} else {
 			conv2(fml.args[i], cinf, co)
 		}
 		sep = op
 	}
+}
+
+func infix(fml Formula, cinf CnvInf, op string, co *cnv_out) {
+	infixm(fml, cinf, op, co, "(", ")")
 }
