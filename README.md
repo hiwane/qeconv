@@ -8,13 +8,14 @@ qeconv
 convert first-order formulas
 
 
-# install
+# Install
 
+After installing `golang` and setting up your `GOPATH`, execute follows: 
 ```sh
 go get github.com/hiwane/qeconv/qeconv
 ```
 
-# usage
+# Usage
 
 ```
 Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
@@ -24,7 +25,7 @@ Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
     -o: Use outputfile for outpuut                  [stdout]
 ```
 
-# Example
+# Examples
 
 
 ### SyNRAC to Mathematica (default)
