@@ -8,11 +8,19 @@ type synConv struct {
 }
 
 func (m *synConv) All(f Formula, co *cnv_out) {
-	prefix(f, m, "All(", ")", co)
+	if f.args[0].cmd == LIST {
+		prefix(f, m, "All(", ")", co)
+	} else {
+		prefixm(f, m, "All([", "], ", ")", co)
+	}
 }
 
 func (m *synConv) Ex(f Formula, co *cnv_out) {
-	prefix(f, m, "Ex(", ")", co)
+	if f.args[0].cmd == LIST {
+		prefix(f, m, "Ex(", ")", co)
+	} else {
+		prefixm(f, m, "Ex([", "], ", ")", co)
+	}
 }
 
 func (m *synConv) And(f Formula, co *cnv_out) {
