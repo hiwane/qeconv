@@ -20,7 +20,7 @@ go get github.com/hiwane/qeconv/qeconv
 ```
 Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
     -f: Use from for input format                       [syn]
-    -t: Use to for output format {math|tex|qep|red|syn} [math]
+    -t: Use to for output format {math|tex|qep|red|syn} [syn]
     -i: Use inputfile for input                         [stdin]
     -o: Use outputfile for outpuut                      [stdout]
 ```
@@ -28,14 +28,17 @@ Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
 # Examples
 
 
-### SyNRAC to Mathematica (default)
+### SyNRAC to SyNRAC (default)
+
+
+### SyNRAC to Mathematica
 
 ```
-% echo "x>0:" | qeconv
+% echo "x>0:" | qeconv -t math
 0 < x
-% echo "And(x<>0,y>=0):" | qeconv
+% echo "And(x<>0,y>=0):" | qeconv -t math
 x != 0 && 0 <= y
-% echo "Ex([y],And(x>0,y>=0)):" | qeconv
+% echo "Ex([y],And(x>0,y>=0)):" | qeconv -t math
 Exists[{y},0 < x && 0 <= y]
 ```
 
@@ -78,6 +81,4 @@ x <> 0 and 0 <= y
 % echo "Ex([y],And(x>0,y>=0)):" | qeconv -t red
 ex([y],0 < x and 0 <= y)
 ```
-
-
 

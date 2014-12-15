@@ -19,7 +19,7 @@ func main() {
 	)
 
 	flag.StringVar(&from, "f", "syn", "from {syn}")
-	flag.StringVar(&to, "t", "math", "to {math|tex|qep|red|syn}")
+	flag.StringVar(&to, "t", "syn", "to {math|tex|qep|red|syn}")
 	flag.StringVar(&filename, "i", "", "input file")
 	flag.StringVar(&output, "o", "", "output file")
 	flag.Parse()
