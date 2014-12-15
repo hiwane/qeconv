@@ -37,7 +37,7 @@ type Node struct {
 %token COMMENT
 
 %type <num> seq_var seq_fof seq_mobj
-%type <node> NAME NUMBER var
+%type <node> NAME NUMBER RATIONAL var
 %type <node> ALL EX AND OR NOT IMPL REPL EQUIV ABS
 %type <node> PLUS MINUS MULT DIV POW
 %type <node> LB LC
@@ -134,6 +134,19 @@ atom
 	;
 
 
+RATIONAL
+	: NUMBER	{ trace("num"); stack.push($1) }
+	| LP RATIONAL RP	{}
+	| RATIONAL PLUS RATIONAL	{ trace("+"); stack.push($2)}
+	| RATIONAL MINUS RATIONAL	{ trace("-"); stack.push($2)}
+	| RATIONAL MULT RATIONAL	{ trace("*"); stack.push($2)}
+	| RATIONAL DIV RATIONAL	{ trace("/"); stack.push($2)}
+	| MINUS RATIONAL %prec UNARYMINUS	{ trace("-");
+		$1.cmd = UNARYMINUS; $1.val = 1; $1.priority = 2; stack.push($1) }
+	| PLUS RATIONAL %prec UNARYPLUS	{ trace("+");
+		$1.cmd = UNARYPLUS; $1.val = 1; $1.priority = 2; stack.push($1) }
+	;
+
 poly
 	: LP poly RP
 	| NUMBER	{ trace("num"); stack.push($1) }
@@ -143,12 +156,13 @@ poly
 	| poly MINUS poly	{ trace("-"); stack.push($2)}
 	| poly MULT poly	{ trace("*"); stack.push($2)}
 	| poly DIV poly	{ trace("/"); stack.push($2)}
-	| poly POW NUMBER { trace("^"); stack.push($3); stack.push($2)}
+	| poly POW RATIONAL { trace("^"); stack.push($2)}
 	| MINUS poly %prec UNARYMINUS	{ trace("-");
 		$1.cmd = UNARYMINUS; $1.val = 1; $1.priority = 2; stack.push($1) }
 	| PLUS poly %prec UNARYPLUS	{ trace("+");
 		$1.cmd = UNARYPLUS; $1.val = 1; $1.priority = 2; stack.push($1) }
 	;
+
 
 %%      /*  start  of  programs  */
 
