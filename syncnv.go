@@ -98,9 +98,23 @@ func (m *synConv) Comment(str string) string {
 
 func ToSyn(str string) string {
 	stack = new(Stack)
-	l := new(SynLex)
-	l.Init(strings.NewReader(str))
-	yyParse(l)
-	fml := tofml(stack)
-	return conv(fml, new(synConv), l.comment)
+
+	var ret string
+
+	for {
+		idx := strings.Index(str, ":")
+		if idx < 0 {
+			break
+		}
+
+		l := new(SynLex)
+		l.Init(strings.NewReader(str[0 : idx+1]))
+		str = str[idx+1 : ]
+		yyParse(l)
+
+		fml := tofml(stack)
+		ret += conv(fml, new(synConv), l.comment)
+	}
+
+	return ret
 }
