@@ -114,7 +114,7 @@ func ToSyn(str string) string {
 
 		fml := tofml(stack)
 		ret += conv(fml, new(synConv), l.comment)
-		ret += "\n"
+		ret += ":"
 	}
 
 	return ret
