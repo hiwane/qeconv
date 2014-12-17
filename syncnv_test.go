@@ -51,13 +51,13 @@ func TestToSyn(t *testing.T) {
 		{"Ex({x}, x^2=-1):", "Ex([x], x^2 = -1):"},
 		{"Ex([x], x^2=-1):", "Ex([x], x^2 = -1):"},
 		{"Ex(x, And(x^2=-1, x>0)):", "Ex([x], And(x^2 = -1, 0<x)):"},
-		// {"All([x], a*x^2+b*x+c>0):", "ForAll[{x}, 0<a*x^2+b*x+c]:"},
-		// {"All([x], Ex([y], x+y+a=0)):", "ForAll[{x},Exists[{y},x+y+a = 0]]:"},
-		// {"Equiv(x<0, y=0):", "Equivalent[x<0, y = 0]:"},
-		// {"Impl(x<0, y=0):", "Implies[x<0, y = 0]:"},
-		// {"Repl(y=0, x<0):", "Implies[x<0, y = 0]:"},
-		// {"# comment line\n(1+a)*x+(3+b)*y=0:", "(1+a)*x+(3+b)*y  =  0:"},
-		// {"x+abs(y+z)=0:", "x+Abs[y+z] = 0:"},
+		{"All([x], a*x^2+b*x+c>0):", "All([x], 0<a*x^2+b*x+c):"},
+		{"All([x], Ex([y], x+y+a=0)):", "All([x],Ex([y],x+y+a = 0)):"},
+		{"Equiv(x<0, y=0):", "Equiv(x<0, y = 0):"},
+		{"Impl(x<0, y=0):", "Impl(x<0, y = 0):"},
+		{"Repl(y=0, x<0):", "Impl(x<0, y = 0):"},
+		{"# comment line\n(1+a)*x+(3+b)*y=0:", "(1+a)*x+(3+b)*y  =  0:"},
+		{"x+abs(y+z)=0:", "x+abs(y+z) = 0:"},
 	}
 
 	for i, p := range data {
