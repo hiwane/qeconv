@@ -1,0 +1,68 @@
+package qeconv
+
+import (
+	"strings"
+	"testing"
+	"text/scanner"
+)
+
+func removeMapleComment(s string) string {
+	var ret []rune
+	var l scanner.Scanner
+	l.Init(strings.NewReader(s))
+
+	for l.Peek() != scanner.EOF {
+		s := l.Next()
+		if s == '#' {
+			s = l.Next()
+			for s != '\n' && s != scanner.EOF {
+				s = l.Next()
+			}
+			continue
+		}
+		ret = append(ret, s)
+	}
+
+	return string(ret)
+}
+
+func TestToSyn(t *testing.T) {
+	var data = []struct {
+		input  string
+		expect string
+	}{
+		{"true:", "true:"},
+		{"false:", "false:"},
+		{"x>0:", "0<x:"},
+		{"x+y>0:", "0<x+y:"},
+		{"x-2*y<>0:", "x-2*y <> 0:"},
+		{"-x+y<=0:", "-x+y<=0:"},
+		{"-x+(y*2)<=0:", "-x+y*2<=0:"},
+		{"-(x+y/3)=0:", "-(x+y/3) = 0:"},
+		{"-(x+y)*2<=0:", "-(x+y)*2<=0:"},
+		{"Not(y=0):", "Not(y  =  0):"},
+		{"And(x<=0, y=0):", "And(x <= 0, y  =  0):"},
+		{"Or(x<=0, y<>0):", "Or(x<=0, y<>0):"},
+		{"And(Or(x*y>0,z>0),Or(x*y<=-z,+z>=0)):", "And(Or(0<x*y, 0<z), Or(x*y<=-z,  0<=+z)):"},
+		{"Or(And(x*y>0,z>0),And(x*y<=-z,+z>=0)):", "Or(And(0<x*y, 0<z), And(x*y<=-z,  0<=+z)):"},
+		{"Ex(x, x^2=-1):", "Ex([x], x^2 = -1):"},
+		{"Ex({x}, x^2=-1):", "Ex([x], x^2 = -1):"},
+		{"Ex([x], x^2=-1):", "Ex([x], x^2 = -1):"},
+		{"Ex(x, And(x^2=-1, x>0)):", "Ex([x], And(x^2 = -1, 0<x)):"},
+		// {"All([x], a*x^2+b*x+c>0):", "ForAll[{x}, 0<a*x^2+b*x+c]:"},
+		// {"All([x], Ex([y], x+y+a=0)):", "ForAll[{x},Exists[{y},x+y+a = 0]]:"},
+		// {"Equiv(x<0, y=0):", "Equivalent[x<0, y = 0]:"},
+		// {"Impl(x<0, y=0):", "Implies[x<0, y = 0]:"},
+		// {"Repl(y=0, x<0):", "Implies[x<0, y = 0]:"},
+		// {"# comment line\n(1+a)*x+(3+b)*y=0:", "(1+a)*x+(3+b)*y  =  0:"},
+		// {"x+abs(y+z)=0:", "x+Abs[y+z] = 0:"},
+	}
+
+	for i, p := range data {
+		actual0 := ToSyn(p.input)
+		actual := removeMapleComment(actual0)
+		if !cmpIgnoreSpace(actual, p.expect) {
+			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)
+		}
+	}
+}
