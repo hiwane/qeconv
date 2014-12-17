@@ -42,6 +42,8 @@ func TestToSyn(t *testing.T) {
 		{"-(x+y)*2<=0:", "-(x+y)*2<=0:"},
 		{"Not(y=0):", "Not(y  =  0):"},
 		{"And(x<=0, y=0):", "And(x <= 0, y  =  0):"},
+		{"And():", "true:"},
+		{"Or():", "false:"},
 		{"Or(x<=0, y<>0):", "Or(x<=0, y<>0):"},
 		{"And(Or(x*y>0,z>0),Or(x*y<=-z,+z>=0)):", "And(Or(0<x*y, 0<z), Or(x*y<=-z,  0<=+z)):"},
 		{"Or(And(x*y>0,z>0),And(x*y<=-z,+z>=0)):", "Or(And(0<x*y, 0<z), And(x*y<=-z,  0<=+z)):"},

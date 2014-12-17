@@ -67,7 +67,9 @@ fof
 	: ALL LP quantifiers COMMA fof RP { trace("ALL"); stack.push($1)}
 	| EX  LP quantifiers COMMA fof RP { trace("EX");  stack.push($1)}
 	| AND LP seq_fof RP { trace("and"); $1.val=$3; stack.push($1)}
+	| AND LP RP { trace("and()"); stack.push(Node{cmd: F_TRUE, val:0})}
 	| OR  LP seq_fof RP { trace("or"); $1.val=$3; stack.push($1)}
+	| OR LP RP { trace("or()"); stack.push(Node{cmd: F_FALSE, val:0})}
 	| NOT fof { trace("not"); stack.push($1)}
 	| IMPL LP fof COMMA fof RP { trace("IMPL"); stack.push($1)}
 	| REPL LP fof COMMA fof RP { trace("REPL"); stack.push($1)}
