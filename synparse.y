@@ -99,7 +99,7 @@ seq_fof
 
 quantifiers
 	: var {
-		trace("list")
+		trace("var")
 		stack.push(Node{cmd: LIST, val: 1})
 	}
 	| LB seq_var RB  /* [x,y,z] */ {
@@ -194,7 +194,7 @@ var sones = []SynLex1 {
 	{"[", LB   , '[', 0, 0},
 	{"]", RB   , ']', 0, 0},
 	{"{", LC   , '{', 0, 0},
-	{"}", RC   , '{', 0, 0},
+	{"}", RC   , '}', 0, 0},
 	{"(", LP   , '(', 0, 0},
 	{")", RP   , ')', 0, 0},
 	{",", COMMA, ',', 0, 0},
@@ -326,7 +326,6 @@ func (l *SynLex) Lex(lval *yySymType) int {
 func (l *SynLex) Error(s string) {
 	pos := l.Pos()
 	fmt.Printf("%s:Error:%s \n", pos.String(), s)
-	panic(s)
 }
 
 func parse(l *SynLex) *Stack {

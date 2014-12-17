@@ -142,7 +142,7 @@ var sones = []SynLex1{
 	{"[", LB, '[', 0, 0},
 	{"]", RB, ']', 0, 0},
 	{"{", LC, '{', 0, 0},
-	{"}", RC, '{', 0, 0},
+	{"}", RC, '}', 0, 0},
 	{"(", LP, '(', 0, 0},
 	{")", RP, ')', 0, 0},
 	{",", COMMA, ',', 0, 0},
@@ -274,7 +274,6 @@ func (l *SynLex) Lex(lval *yySymType) int {
 func (l *SynLex) Error(s string) {
 	pos := l.Pos()
 	fmt.Printf("%s:Error:%s \n", pos.String(), s)
-	panic(s)
 }
 
 func parse(l *SynLex) *Stack {
@@ -724,7 +723,7 @@ yydefault:
 	case 20:
 		//line synparse.y:101
 		{
-			trace("list")
+			trace("var")
 			stack.push(Node{cmd: LIST, val: 1})
 		}
 	case 21:
