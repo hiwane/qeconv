@@ -6,14 +6,14 @@ import (
 	"text/scanner"
 )
 
-func removeMapleComment(s string) string {
+func removeLineComment(s string, p rune) string {
 	var ret []rune
 	var l scanner.Scanner
 	l.Init(strings.NewReader(s))
 
 	for l.Peek() != scanner.EOF {
 		s := l.Next()
-		if s == '#' {
+		if s == p {
 			s = l.Next()
 			for s != '\n' && s != scanner.EOF {
 				s = l.Next()
@@ -62,7 +62,7 @@ func TestToSyn(t *testing.T) {
 
 	for i, p := range data {
 		actual0 := ToSyn(p.input)
-		actual := removeMapleComment(actual0)
+		actual := removeLineComment(actual0, '#')
 		if !cmpIgnoreSpace(actual, p.expect) {
 			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)
 		}
