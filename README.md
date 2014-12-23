@@ -30,10 +30,18 @@ Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
 
 ### SyNRAC to SyNRAC (default)
 
+```sh
+% echo "x>0:" | qeconv
+0 < x:
+% echo "And(x<>0,y>=0):" | qconv
+And(x <> 0,0 <= y):
+% echo "Ex([y],And(x>0,y>=0)):" | qconv
+Ex([y],And(0 < x,0 <= y)):
+```
 
 ### SyNRAC to Mathematica
 
-```
+```sh
 % echo "x>0:" | qeconv -t math
 0 < x
 % echo "And(x<>0,y>=0):" | qeconv -t math
@@ -44,7 +52,7 @@ Exists[{y},0 < x && 0 <= y]
 
 ### SyNRAC to LaTeX
 
-```
+```sh
 % echo "x>0:" | qeconv -t tex
 0 < x
 % echo "And(x<>0,y>=0):" | qeconv -t tex
@@ -58,7 +66,7 @@ x \neq 0 \land 0 \leq y
 - http://www.usna.edu/CS/qepcadweb/B/QEPCAD.html
 - https://github.com/hiwane/qepcad/
 
-```
+```sh
 % echo "x>0:" | qeconv -t qep
 0 < x
 % echo "And(x<>0,y>=0):" | qeconv -t qep
@@ -73,7 +81,7 @@ x /= 0 /\ 0 <= y
 - http://reduce-algebra.sourceforge.net/
 
 
-```
+```sh
 % echo "x>0:" | qeconv -t red
 0 < x
 % echo "And(x<>0,y>=0):" | qeconv -t red
