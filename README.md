@@ -18,11 +18,11 @@ go get github.com/hiwane/qeconv/qeconv
 # Usage
 
 ```
-Usage: qeconv [-f from][-t to][-i inputfile][-o outputfile]
-    -f: Use from for input format                       [syn]
-    -t: Use to for output format {math|tex|qep|red|syn} [syn]
-    -i: Use inputfile for input                         [stdin]
-    -o: Use outputfile for outpuut                      [stdout]
+Usage: qeconv [-f {from}][-t {to}][-i {inputfile}][-o {outputfile}]
+    -f: Use {from} for input format                       [syn]
+    -t: Use {to} for output format {math|tex|qep|red|syn} [syn]
+    -i: Use {inputfile} for input                         [stdin]
+    -o: Use {outputfile} for output                       [stdout]
 ```
 
 # Examples
@@ -90,3 +90,4 @@ x <> 0 and 0 <= y
 ex([y],0 < x and 0 <= y)
 ```
 
+<!-- vim: set spell: -->
