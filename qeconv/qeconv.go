@@ -47,6 +47,12 @@ func main() {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
+		} else if to == "rc" {
+			str, err = qeconv.ToRegularChains(string(b))
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
 		} else {
 			fmt.Fprintln(os.Stderr, "unsupported -t "+to)
 			os.Exit(1)

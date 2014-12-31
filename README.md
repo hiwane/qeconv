@@ -90,4 +90,18 @@ x <> 0 and 0 <= y
 ex([y],0 < x and 0 <= y)
 ```
 
+### SyNRAC to RegularChains
+
+- http://regularchains.org/
+
+```sh
+% echo "x>0:" | qeconv -t red
+0 < x
+% echo "And(x<>0,y>=0):" | qeconv -t red
+`&and`(x <> 0, 0 <= y)
+% echo "Ex([y],And(x>0,y>=0)):" | qeconv -t red
+`&E`([y]), `&and`(0 < x,0 <= y)
+```
+
+
 <!-- vim: set spell: -->
