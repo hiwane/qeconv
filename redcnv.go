@@ -69,7 +69,7 @@ func (m *redConv) Minus(fml Formula, co *cnv_out) {
 	mop(fml, m, "-", co)
 }
 func (m *redConv) Mult(fml Formula, co *cnv_out) {
-	mop(fml, m, " ", co)
+	mop(fml, m, "*", co)
 }
 func (m *redConv) Div(fml Formula, co *cnv_out) {
 	mop(fml, m, "/", co)
