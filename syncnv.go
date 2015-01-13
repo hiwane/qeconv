@@ -96,7 +96,7 @@ func (m *synConv) Comment(str string) string {
 	return "#" + str
 }
 
-func ToSyn(str string) string {
+func ToSyn(str string, dup bool) string {
 	stack = new(Stack)
 
 	var ret string
@@ -113,6 +113,9 @@ func ToSyn(str string) string {
 		yyParse(l)
 
 		fml := tofml(stack)
+		if dup {
+			fml = rmdup(fml)
+		}
 		ret += conv(fml, new(synConv), l.comment)
 		ret += ":"
 	}

@@ -100,6 +100,48 @@ func SynToFml(str string) Formula {
 	return tofml(stack)
 }
 
+func cmpfml(f1, f2 Formula) bool {
+	if f1.cmd != f2.cmd {
+		return false
+	}
+
+	if len(f1.args) != len(f2.args) {
+		return false
+	}
+
+	for i := 0; i < len(f1.args); i++ {
+		if !cmpfml(f1.args[i], f2.args[i]) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func rmdup(fml Formula) Formula {
+	if fml.cmd != LIST {
+		return fml
+	}
+
+	for i := 1; i < len(fml.args); i++ {
+		for j := 0; j < i; j++ {
+			if cmpfml(fml.args[i], fml.args[j]) {
+				args := fml.args
+				fml.args = make([]Formula, len(args) - 1)
+				for k := 0; k < i; k++ {
+					fml.args[k] = args[k]
+				}
+				for k := i+1; k < len(args); k++ {
+					fml.args[k] = args[k+1]
+				}
+				break
+			}
+		}
+	}
+
+	return fml
+}
+
 func tofml(s *Stack) Formula {
 	n, _ := s.pop()
 	fml := Formula{}

@@ -16,12 +16,14 @@ func main() {
 		output   string
 		from     string
 		to       string
+		dup      bool
 	)
 
 	flag.StringVar(&from, "f", "syn", "from {syn}")
 	flag.StringVar(&to, "t", "syn", "to {math|tex|qep|red|syn}")
 	flag.StringVar(&filename, "i", "", "input file")
 	flag.StringVar(&output, "o", "", "output file")
+	flag.BoolVar(&dup, "s", false, "dup")
 	flag.Parse()
 	var err error
 	var b []byte
@@ -38,7 +40,7 @@ func main() {
 		} else if to == "tex" {
 			str = qeconv.ToLaTeX(string(b))
 		} else if to == "syn" {
-			str = qeconv.ToSyn(string(b))
+			str = qeconv.ToSyn(string(b), dup)
 		} else if to == "red" {
 			str = qeconv.ToRedlog(string(b))
 		} else if to == "qep" {
