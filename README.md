@@ -5,7 +5,7 @@ qeconv
 [![Coverage Status](https://img.shields.io/coveralls/hiwane/qeconv.svg)](https://coveralls.io/r/hiwane/qeconv?branch=master)
 
 
-convert first-order formulas
+Convert first-order formulas
 
 
 # Install
