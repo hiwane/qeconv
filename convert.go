@@ -20,6 +20,7 @@ type CnvInfMathOp interface {
 	Pow(f Formula, co *cnv_out)
 	Comment(str string) string
 	Abs(f Formula, co *cnv_out)
+	uniop(f Formula, ope string, co *cnv_out)
 
 	/* atom */
 	Ftrue() string
@@ -232,9 +233,9 @@ func convm(fml Formula, cinf CnvInfMathOp, co *cnv_out) {
 	case F_FALSE:
 		co.append(cinf.Ffalse())
 	case UNARYMINUS:
-		uniop(fml, cinf, "-", co)
+		cinf.uniop(fml, "-", co)
 	case UNARYPLUS:
-		uniop(fml, cinf, "+", co)
+		cinf.uniop(fml, "+", co)
 	default:
 		errors.New("unknown type")
 	}

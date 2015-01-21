@@ -85,6 +85,10 @@ func (m *synConv) Pow(fml Formula, co *cnv_out) {
 	mop(fml, m, "^", co)
 }
 
+func (m *synConv) uniop(fml Formula, ope string, co *cnv_out) {
+	uniop(fml, m, ope, co)
+}
+
 func (m *synConv) Ftrue() string {
 	return "true"
 }

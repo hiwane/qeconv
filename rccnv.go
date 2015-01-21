@@ -84,6 +84,9 @@ func (m *regchainConv) Div(fml Formula, co *cnv_out) {
 func (m *regchainConv) Pow(fml Formula, co *cnv_out) {
 	mop(fml, m, "^", co)
 }
+func (m *regchainConv) uniop(fml Formula, ope string, co *cnv_out) {
+	uniop(fml, m, ope, co)
+}
 
 func (m *regchainConv) Ftrue() string {
 	return "true"

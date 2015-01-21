@@ -110,6 +110,10 @@ func (m *latexConv) Pow(fml Formula, co *cnv_out) {
 	}
 }
 
+func (m *latexConv) uniop(fml Formula, ope string, co *cnv_out) {
+	uniop(fml, m, ope, co)
+}
+
 func ToLaTeX(str string) string {
 	stack = new(Stack)
 	l := new(SynLex)

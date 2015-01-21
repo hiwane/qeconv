@@ -95,6 +95,11 @@ func (m *smt2Conv) Pow(fml Formula, co *cnv_out) {
 	}
 	co.append(")")
 }
+func (m *smt2Conv) uniop(fml Formula, ope string, co *cnv_out) {
+	co.append("(" + ope + " 0 ")
+	conv2(fml.args[0], m, co)
+	co.append(")")
+}
 
 func (m *smt2Conv) Ftrue() string {
 	return "true"

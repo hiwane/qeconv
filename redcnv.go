@@ -78,6 +78,10 @@ func (m *redConv) Pow(fml Formula, co *cnv_out) {
 	mop(fml, m, "^", co)
 }
 
+func (m *redConv) uniop(fml Formula, ope string, co *cnv_out) {
+	uniop(fml, m, ope, co)
+}
+
 func (m *redConv) Ftrue() string {
 	return "true"
 }
