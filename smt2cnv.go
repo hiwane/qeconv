@@ -3,6 +3,7 @@ package qeconv
 import (
 	"errors"
 	"strings"
+	"strconv"
 )
 
 type smt2Conv struct {
@@ -82,7 +83,17 @@ func (m *smt2Conv) Div(fml Formula, co *cnv_out) {
 	prefixm(fml, m, "(/ ", " ", ")", co)
 }
 func (m *smt2Conv) Pow(fml Formula, co *cnv_out) {
-	prefixm(fml, m, "(^ ", " ", ")", co)
+	exp := fml.args[1]
+	if exp.cmd != NUMBER {
+		m.err = errors.New("unsupport rational exponential")
+	}
+	co.append("(*")
+	n,_ := strconv.Atoi(exp.str)
+	for i := 0; i < n; i++ {
+		co.append(" ")
+		conv2(fml.args[0], m, co)
+	}
+	co.append(")")
 }
 
 func (m *smt2Conv) Ftrue() string {
