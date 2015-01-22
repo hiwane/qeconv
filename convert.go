@@ -89,6 +89,61 @@ func (self *Formula) Arg(id int) Formula {
 	return self.args[id]
 }
 
+func (self *Formula) IsQff() bool {
+	if self.IsQuantifier() {
+		return false
+	} else if self.IsAtom() || self.IsBool() {
+		return true
+	}
+	for _, v := range self.args {
+		if !v.IsQff() {
+			return false
+		}
+	}
+	return true
+}
+
+func (self *Formula) freeVarsAtom() varSet {
+	var vs varSet
+
+	if self.cmd == NAME {
+		vs.append(self.str)
+		return vs
+	} else if self.cmd == NUMBER {
+		return vs
+	}
+
+	for _, v := range self.args {
+		vs.union(v.freeVarsAtom())
+	}
+
+	return vs
+}
+
+func (self *Formula) FreeVars() varSet {
+
+	var vs varSet
+	if self.IsBool() {
+		return vs
+	} else if self.IsAtom() {
+		return self.freeVarsAtom()
+	} else if self.IsQuantifier() {
+		fv := self.args[1].FreeVars()
+		qv := self.args[0].FreeVars()
+		// arg[0] を削除.
+		fv.setminus(qv)
+		return fv
+	} else if self.cmd == NAME {
+		vs.append(self.str)
+		return vs
+	} else {
+		for _, v := range self.args {
+			vs.union(v.FreeVars())
+		}
+		return vs
+	}
+}
+
 func (c *cnv_out) append(s string) {
 	//	fmt.Printf("append [%s]\n", s)
 	c.str += s

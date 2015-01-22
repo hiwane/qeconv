@@ -72,28 +72,33 @@ func (m *smt2Conv) List(f Formula, co *cnv_out) {
 func (m *smt2Conv) Plus(fml Formula, co *cnv_out) {
 	prefixm(fml, m, "(+ ", " ", ")", co)
 }
+
 func (m *smt2Conv) Minus(fml Formula, co *cnv_out) {
 	prefixm(fml, m, "(- ", " ", ")", co)
 }
+
 func (m *smt2Conv) Mult(fml Formula, co *cnv_out) {
 	prefixm(fml, m, "(* ", " ", ")", co)
 }
+
 func (m *smt2Conv) Div(fml Formula, co *cnv_out) {
 	prefixm(fml, m, "(/ ", " ", ")", co)
 }
+
 func (m *smt2Conv) Pow(fml Formula, co *cnv_out) {
 	exp := fml.args[1]
 	if exp.cmd != NUMBER {
 		m.err = errors.New("unsupport rational exponential")
 	}
 	co.append("(*")
-	n,_ := strconv.Atoi(exp.str)
+	n, _ := strconv.Atoi(exp.str)
 	for i := 0; i < n; i++ {
 		co.append(" ")
 		conv2(fml.args[0], m, co)
 	}
 	co.append(")")
 }
+
 func (m *smt2Conv) uniop(fml Formula, ope string, co *cnv_out) {
 	co.append("(" + ope + " 0 ")
 	conv2(fml.args[0], m, co)
@@ -107,13 +112,42 @@ func (m *smt2Conv) Ftrue() string {
 func (m *smt2Conv) Ffalse() string {
 	return "false"
 }
+
 func (m *smt2Conv) Comment(str string) string {
 	return ";" + str
 }
 
+func smt2header(fml Formula) string {
+	var str string
+	if fml.IsQff() {
+		str = "(set logic NRA)\n"
+	} else {
+		str = "(set logic QF_NRA)\n"
+	}
+
+	vs := fml.FreeVars()
+	for i := 0; i < vs.Len(); i++ {
+		v := vs.Get(i)
+		str += "(declare-fun " + v + " () Real)\n"
+	}
+
+	return str
+}
+
+func smt2footer(fml Formula) string {
+	return "(check-sat)\n"
+}
+
 func ToSmt2(fml Formula, comment []Comment) (string, error) {
+	if fml.cmd == LIST {
+		return "", errors.New("unsupported input")
+	}
 	qc := new(smt2Conv)
 	qc.err = nil
+
+	header := smt2header(fml)
 	qstr := conv(fml, qc, comment)
-	return qstr, qc.err
+	header += "(assert " + qstr + ")\n"
+	header += smt2footer(fml)
+	return header, qc.err
 }

@@ -33,7 +33,7 @@ func TestToLaTeX(t *testing.T) {
 
 	for _, p := range data {
 		t.Log("inp=%s\n", p.input)
-		actual0,_ := Convert(p.input, "tex", false)
+		actual0,_ := Convert(p.input, "tex", false, 0)
 		t.Log("ac0=%s\n", actual0)
 		actual := removeLineComment(actual0, '%')
 		t.Log("rem=%s\n", actual)
