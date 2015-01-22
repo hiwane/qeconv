@@ -25,6 +25,10 @@ func main() {
 	flag.StringVar(&output, "o", "", "output file")
 	flag.BoolVar(&dup, "s", false, "dup")
 	flag.Parse()
+	if flag.NArg() > 0 {
+		flag.PrintDefaults()
+		os.Exit(2)
+	}
 	var err error
 	var b []byte
 	if filename == "" {
