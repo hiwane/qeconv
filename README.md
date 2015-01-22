@@ -18,12 +18,24 @@ go get github.com/hiwane/qeconv/qeconv
 # Usage
 
 ```
-Usage: qeconv [-f {from}][-t {to}][-i {inputfile}][-o {outputfile}]
+Usage: qeconv [-f {from}][-t {to}][-i {inputfile}][-o {outputfile}][-s][-n {{index}]
     -f: Use {from} for input format                       [syn]
-    -t: Use {to} for output format {math|tex|qep|red|syn} [syn]
+    -t: Use {to} for output format                        [syn]
+		 syn:  SyNRAC format
+		 tex:  LaTeX format
+         math: MATHEMATICA format
+		 qep:  QEPCAD format
+		 red:  Redlog format
+		 rc:   RegularChains format
+		 smt2: SMT2 format (-n option is reguired)
     -i: Use {inputfile} for input                         [stdin]
     -o: Use {outputfile} for output                       [stdout]
+	-s: Remove duplicate formulas
+	-n: Use {index}th formula                             [0]
+	      0:   Use all formula
+		 -1:   Get the number of first-order formulas in input
 ```
+
 
 # Examples
 
@@ -39,17 +51,6 @@ And(x <> 0,0 <= y):
 Ex([y],And(0 < x,0 <= y)):
 ```
 
-### SyNRAC to Mathematica
-
-```sh
-% echo "x>0:" | qeconv -t math
-0 < x
-% echo "And(x<>0,y>=0):" | qeconv -t math
-x != 0 && 0 <= y
-% echo "Ex([y],And(x>0,y>=0)):" | qeconv -t math
-Exists[{y},0 < x && 0 <= y]
-```
-
 ### SyNRAC to LaTeX
 
 ```sh
@@ -59,6 +60,17 @@ Exists[{y},0 < x && 0 <= y]
 x \neq 0 \land 0 \leq y
 % echo "Ex([y],And(x>0,y>=0)):" | qeconv -t tex
 \exists y(0 < x \land 0 \leq y)
+```
+
+### SyNRAC to Mathematica
+
+```sh
+% echo "x>0:" | qeconv -t math
+0 < x
+% echo "And(x<>0,y>=0):" | qeconv -t math
+x != 0 && 0 <= y
+% echo "Ex([y],And(x>0,y>=0)):" | qeconv -t math
+Exists[{y},0 < x && 0 <= y]
 ```
 
 ### SyNRAC to QEPCAD
@@ -95,11 +107,11 @@ ex([y],0 < x and 0 <= y)
 - http://regularchains.org/
 
 ```sh
-% echo "x>0:" | qeconv -t red
+% echo "x>0:" | qeconv -t rc
 0 < x
-% echo "And(x<>0,y>=0):" | qeconv -t red
+% echo "And(x<>0,y>=0):" | qeconv -t rc
 `&and`(x <> 0, 0 <= y)
-% echo "Ex([y],And(x>0,y>=0)):" | qeconv -t red
+% echo "Ex([y],And(x>0,y>=0)):" | qeconv -t rc
 `&E`([y]), `&and`(0 < x,0 <= y)
 ```
 
