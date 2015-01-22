@@ -100,7 +100,6 @@ func (m *qepConv) uniop(fml Formula, ope string, co *cnv_out) {
 	uniop(fml, m, ope, co)
 }
 
-
 func (m *qepConv) Ftrue() string {
 	return "true"
 }

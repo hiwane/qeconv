@@ -98,9 +98,9 @@ func TestToMath(t *testing.T) {
 	}
 
 	for i, p := range data {
-		actual0,_ := Convert(p.input, "math", false, 0)
+		actual0, _ := Convert(p.input, "math", false, 0)
 		actual := removeMathComment(actual0)
-		if !cmpIgnoreSpace(actual, p.expect + ";") {
+		if !cmpIgnoreSpace(actual, p.expect+";") {
 			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)
 		}
 	}
