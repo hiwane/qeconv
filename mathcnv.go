@@ -1,9 +1,5 @@
 package qeconv
 
-import (
-	"strings"
-)
-
 type mathConv struct {
 }
 
@@ -92,11 +88,6 @@ func (m *mathConv) Comment(str string) string {
 	return "(*" + str + "*)"
 }
 
-func ToMath(str string) string {
-	stack = new(Stack)
-	l := new(SynLex)
-	l.Init(strings.NewReader(str))
-	yyParse(l)
-	fml := tofml(stack)
-	return conv(fml, new(mathConv), l.comment)
+func ToMath(fml Formula, comment []Comment) string {
+	return conv(fml, new(mathConv), comment)
 }

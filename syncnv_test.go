@@ -61,7 +61,7 @@ func TestToSyn(t *testing.T) {
 	}
 
 	for i, p := range data {
-		actual0 := ToSyn(p.input)
+		actual0,_ := Convert(p.input, "syn", false)
 		actual := removeLineComment(actual0, '#')
 		if !cmpIgnoreSpace(actual, p.expect) {
 			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)

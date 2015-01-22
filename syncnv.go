@@ -1,9 +1,5 @@
 package qeconv
 
-import (
-	"strings"
-)
-
 type synConv struct {
 }
 
@@ -100,29 +96,6 @@ func (m *synConv) Comment(str string) string {
 	return "#" + str
 }
 
-func ToSyn(str string, dup bool) string {
-	stack = new(Stack)
-
-	var ret string
-
-	for {
-		idx := strings.Index(str, ":")
-		if idx < 0 {
-			break
-		}
-
-		l := new(SynLex)
-		l.Init(strings.NewReader(str[0 : idx+1]))
-		str = str[idx+1 : ]
-		yyParse(l)
-
-		fml := tofml(stack)
-		if dup {
-			fml = rmdup(fml)
-		}
-		ret += conv(fml, new(synConv), l.comment)
-		ret += ":"
-	}
-
-	return ret
+func ToSyn(fml Formula, comment []Comment) string {
+	return conv(fml, new(synConv), comment)
 }

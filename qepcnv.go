@@ -2,7 +2,6 @@ package qeconv
 
 import (
 	"errors"
-	"strings"
 )
 
 type qepConv struct {
@@ -113,14 +112,9 @@ func (m *qepConv) Comment(str string) string {
 	return ""
 }
 
-func ToQepcad(str string) (string, error) {
-	stack = new(Stack)
-	l := new(SynLex)
-	l.Init(strings.NewReader(str))
-	yyParse(l)
-	fml := tofml(stack)
+func ToQepcad(fml Formula, comment []Comment) (string, error) {
 	qc := new(qepConv)
 	qc.err = nil
-	qstr := conv(fml, qc, l.comment)
+	qstr := conv(fml, qc, comment)
 	return qstr, qc.err
 }

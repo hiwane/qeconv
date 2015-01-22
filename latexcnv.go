@@ -1,9 +1,5 @@
 package qeconv
 
-import (
-	"strings"
-)
-
 type latexConv struct {
 }
 
@@ -114,11 +110,6 @@ func (m *latexConv) uniop(fml Formula, ope string, co *cnv_out) {
 	uniop(fml, m, ope, co)
 }
 
-func ToLaTeX(str string) string {
-	stack = new(Stack)
-	l := new(SynLex)
-	l.Init(strings.NewReader(str))
-	yyParse(l)
-	fml := tofml(stack)
-	return conv(fml, new(latexConv), l.comment)
+func ToLaTeX(fml Formula, comment []Comment) string {
+	return conv(fml, new(latexConv), comment)
 }

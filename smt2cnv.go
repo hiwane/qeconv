@@ -2,7 +2,6 @@ package qeconv
 
 import (
 	"errors"
-	"strings"
 	"strconv"
 )
 
@@ -112,14 +111,9 @@ func (m *smt2Conv) Comment(str string) string {
 	return ";" + str
 }
 
-func ToSmt2(str string) (string, error) {
-	stack = new(Stack)
-	l := new(SynLex)
-	l.Init(strings.NewReader(str))
-	yyParse(l)
-	fml := tofml(stack)
+func ToSmt2(fml Formula, comment []Comment) (string, error) {
 	qc := new(smt2Conv)
 	qc.err = nil
-	qstr := conv(fml, qc, l.comment)
+	qstr := conv(fml, qc, comment)
 	return qstr, qc.err
 }

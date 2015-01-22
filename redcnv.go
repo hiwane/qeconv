@@ -1,9 +1,5 @@
 package qeconv
 
-import (
-	"strings"
-)
-
 type redConv struct {
 	err error
 }
@@ -93,13 +89,8 @@ func (m *redConv) Comment(str string) string {
 	return "%" + str
 }
 
-func ToRedlog(str string) string {
-	stack = new(Stack)
-	l := new(SynLex)
-	l.Init(strings.NewReader(str))
-	yyParse(l)
-	fml := tofml(stack)
+func ToRedlog(fml Formula, comment []Comment) string {
 	qc := new(redConv)
-	qstr := conv(fml, qc, l.comment)
+	qstr := conv(fml, qc, comment)
 	return qstr
 }

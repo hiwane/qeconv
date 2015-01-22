@@ -119,6 +119,7 @@ func cmpfml(f1, f2 Formula) bool {
 	return true
 }
 
+// 重複定義の削除
 func rmdup(fml Formula) Formula {
 	if fml.cmd != LIST {
 		return fml
@@ -128,11 +129,11 @@ func rmdup(fml Formula) Formula {
 		for j := 0; j < i; j++ {
 			if cmpfml(fml.args[i], fml.args[j]) {
 				args := fml.args
-				fml.args = make([]Formula, len(args) - 1)
+				fml.args = make([]Formula, len(args)-1)
 				for k := 0; k < i; k++ {
 					fml.args[k] = args[k]
 				}
-				for k := i+1; k < len(args); k++ {
+				for k := i + 1; k < len(args); k++ {
 					fml.args[k] = args[k+1]
 				}
 				break
@@ -141,6 +142,59 @@ func rmdup(fml Formula) Formula {
 	}
 
 	return fml
+}
+
+func Convert(str, to string, dup bool) (string, error) {
+	var ret string
+
+	for {
+		idx := strings.Index(str, ":")
+		if idx < 0 {
+			break
+		}
+
+		l := new(SynLex)
+		l.Init(strings.NewReader(str[0 : idx+1]))
+		str = str[idx+1:]
+		stack = parse(l)
+		cmt := l.comment
+
+		fml := tofml(stack)
+		if dup {
+			fml = rmdup(fml)
+		}
+
+		var str2 string
+		var err error
+		if to == "math" {
+			str2 = ToMath(fml, cmt)
+		} else if to == "tex" {
+			str2 = ToLaTeX(fml, cmt)
+		} else if to == "syn" {
+			str2 = ToSyn(fml, cmt)
+		} else if to == "red" {
+			str2 = ToRedlog(fml, cmt)
+		} else if to == "qep" {
+			str2, err = ToQepcad(fml, cmt)
+		} else if to == "smt2" {
+			str2, err = ToSmt2(fml, cmt)
+			if err != nil {
+				return str2, err
+			}
+		} else if to == "rc" {
+			str2, err = ToRegularChains(fml, cmt)
+			if err != nil {
+				return str2, err
+			}
+		} else {
+			//			fmt.Fprintln(os.Stderr, "unsupported -t "+to)
+			return "", nil
+		}
+
+		ret += str2 + ":"
+	}
+
+	return ret, nil
 }
 
 func tofml(s *Stack) Formula {

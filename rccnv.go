@@ -2,7 +2,6 @@ package qeconv
 
 import (
 	"errors"
-	"strings"
 )
 
 type regchainConv struct {
@@ -99,14 +98,9 @@ func (m *regchainConv) Comment(str string) string {
 	return "#" + str
 }
 
-func ToRegularChains(str string) (string, error) {
-	stack = new(Stack)
-	l := new(SynLex)
-	l.Init(strings.NewReader(str))
-	yyParse(l)
-	fml := tofml(stack)
+func ToRegularChains(fml Formula, comment []Comment) (string, error) {
 	qc := new(regchainConv)
 	qc.err = nil
-	qstr := conv(fml, qc, l.comment)
+	qstr := conv(fml, qc, comment)
 	return qstr, qc.err
 }

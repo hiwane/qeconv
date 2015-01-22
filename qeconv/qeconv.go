@@ -20,7 +20,7 @@ func main() {
 	)
 
 	flag.StringVar(&from, "f", "syn", "from {syn}")
-	flag.StringVar(&to, "t", "syn", "to {tex|math|qep|red|syn|smt2}")
+	flag.StringVar(&to, "t", "syn", "to {tex|math|qep|red|rc|syn|smt2}")
 	flag.StringVar(&filename, "i", "", "input file")
 	flag.StringVar(&output, "o", "", "output file")
 	flag.BoolVar(&dup, "s", false, "dup")
@@ -34,35 +34,9 @@ func main() {
 	}
 
 	if err == nil {
-		var str string
-		if to == "math" {
-			str = qeconv.ToMath(string(b))
-		} else if to == "tex" {
-			str = qeconv.ToLaTeX(string(b))
-		} else if to == "syn" {
-			str = qeconv.ToSyn(string(b), dup)
-		} else if to == "red" {
-			str = qeconv.ToRedlog(string(b))
-		} else if to == "qep" {
-			str, err = qeconv.ToQepcad(string(b))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-		} else if to == "smt2" {
-			str, err = qeconv.ToSmt2(string(b))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-		} else if to == "rc" {
-			str, err = qeconv.ToRegularChains(string(b))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-		} else {
-			fmt.Fprintln(os.Stderr, "unsupported -t "+to)
+		str,err := qeconv.Convert(string(b), to, dup)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
