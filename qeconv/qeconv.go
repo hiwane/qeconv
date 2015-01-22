@@ -17,6 +17,7 @@ func main() {
 		from     string
 		to       string
 		dup      bool
+		idx      int
 	)
 
 	flag.StringVar(&from, "f", "syn", "from {syn}")
@@ -24,6 +25,7 @@ func main() {
 	flag.StringVar(&filename, "i", "", "input file")
 	flag.StringVar(&output, "o", "", "output file")
 	flag.BoolVar(&dup, "s", false, "dup")
+	flag.IntVar(&idx, "n", 0, "index of fof")
 	flag.Parse()
 	if flag.NArg() > 0 {
 		flag.PrintDefaults()
@@ -38,7 +40,7 @@ func main() {
 	}
 
 	if err == nil {
-		str,err := qeconv.Convert(string(b), to, dup)
+		str,err := qeconv.Convert(string(b), to, dup, idx)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

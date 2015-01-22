@@ -2,6 +2,7 @@ package qeconv
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -144,11 +145,60 @@ func rmdup(fml Formula) Formula {
 	return fml
 }
 
-func Convert(str, to string, dup bool) (string, error) {
+func cntfml(fml Formula) int {
+	if fml.cmd != LIST {
+		return 1
+	}
+
+	count := 0
+	for _, v := range fml.args {
+		count += cntfml(v)
+	}
+
+	return count
+}
+
+func getfmlidx(fml Formula, idx int) Formula {
+
+	if fml.cmd != LIST {
+		return fml
+	}
+
+	count := 0
+	for _, v := range fml.args {
+		c := cntfml(v)
+		if c + count >= idx {
+			return getfmlidx(v, idx - count)
+		}
+		count += c
+	}
+
+	return fml
+}
+
+func charIndex(str string, sep uint8) int {
+	comment := false
+	for i := 0; i < len(str); i++ {
+		if str[i] == '#' {
+			comment = true
+		} else if str[i] == '\n' {
+			comment = false
+		} else if str[i] == sep && !comment {
+			return i
+		}
+	}
+
+	return -1
+}
+
+
+func Convert(str, to string, dup bool, index int) (string, error) {
 	var ret string
+	count := 0
 
 	for {
-		idx := strings.Index(str, ":")
+		// コメント行を無視して, separator である : を探索する.
+		idx := charIndex(str, ':')
 		if idx < 0 {
 			break
 		}
@@ -156,13 +206,29 @@ func Convert(str, to string, dup bool) (string, error) {
 		l := new(SynLex)
 		l.Init(strings.NewReader(str[0 : idx+1]))
 		str = str[idx+1:]
-		stack = parse(l)
+		stack := parse(l)
 		cmt := l.comment
 
 		fml := tofml(stack)
 		if dup {
 			fml = rmdup(fml)
 		}
+
+		if index != 0 {
+			cnt := cntfml(fml)
+			if index < 0 {
+				count += cnt
+				ret = strconv.Itoa(count)
+				continue
+			} else if count > index || index >= count + cnt {
+				count += cnt
+				continue
+			} else {
+				fml = getfmlidx(fml, index - count)
+				count += cnt
+			}
+		}
+
 
 		var str2 string
 		var err error
