@@ -222,8 +222,8 @@ func getfmlidx(fml Formula, idx int) Formula {
 	count := 0
 	for _, v := range fml.args {
 		c := cntfml(v)
-		if c + count >= idx {
-			return getfmlidx(v, idx - count)
+		if c+count >= idx {
+			return getfmlidx(v, idx-count)
 		}
 		count += c
 	}
@@ -245,7 +245,6 @@ func charIndex(str string, sep uint8) int {
 
 	return -1
 }
-
 
 func Convert(str, to string, dup bool, index int) (string, error) {
 	var ret string
@@ -275,15 +274,14 @@ func Convert(str, to string, dup bool, index int) (string, error) {
 				count += cnt
 				ret = strconv.Itoa(count)
 				continue
-			} else if count > index || index >= count + cnt {
+			} else if count > index || index >= count+cnt {
 				count += cnt
 				continue
 			} else {
-				fml = getfmlidx(fml, index - count)
+				fml = getfmlidx(fml, index-count)
 				count += cnt
 			}
 		}
-
 
 		var str2 string
 		var err error

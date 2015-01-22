@@ -9,12 +9,25 @@ type smt2Conv struct {
 	err error
 }
 
+func (m *smt2Conv) quantifier(f Formula, co *cnv_out, qstr string) {
+	q := f.args[0]
+	co.append("(" + qstr + " (")
+	for i := 0; i < len(q.args); i++ {
+		co.append(" (")
+		conv2(q.args[i], m, co)
+		co.append(" Real)")
+	}
+	co.append(" ) ")
+	conv2(f.args[1], m, co)
+	co.append(" )")
+}
+
 func (m *smt2Conv) All(f Formula, co *cnv_out) {
-	prefixm(f, m, "(forall ", " ", ")", co)
+	m.quantifier(f, co, "forall")
 }
 
 func (m *smt2Conv) Ex(f Formula, co *cnv_out) {
-	prefixm(f, m, "(exists ", " ", ")", co)
+	m.quantifier(f, co, "exists")
 }
 
 func (m *smt2Conv) And(f Formula, co *cnv_out) {
