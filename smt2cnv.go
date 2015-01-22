@@ -119,11 +119,11 @@ func (m *smt2Conv) uniop(fml Formula, ope string, co *cnv_out) {
 }
 
 func (m *smt2Conv) Ftrue() string {
-	return "true"
+	return "(= 0 0)"
 }
 
 func (m *smt2Conv) Ffalse() string {
-	return "false"
+	return "(= 0 1)"
 }
 
 func (m *smt2Conv) Comment(str string) string {
