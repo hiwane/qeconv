@@ -166,32 +166,40 @@ func Convert(str, to string, dup bool) (string, error) {
 
 		var str2 string
 		var err error
+		var sep string
+		sep = ":"
 		if to == "math" {
 			str2 = ToMath(fml, cmt)
+			sep = ";"
 		} else if to == "tex" {
 			str2 = ToLaTeX(fml, cmt)
+			sep = "\\\\"
 		} else if to == "syn" {
 			str2 = ToSyn(fml, cmt)
 		} else if to == "red" {
 			str2 = ToRedlog(fml, cmt)
+			sep = ";"
 		} else if to == "qep" {
 			str2, err = ToQepcad(fml, cmt)
+			sep = "."
 		} else if to == "smt2" {
 			str2, err = ToSmt2(fml, cmt)
 			if err != nil {
 				return str2, err
 			}
+			sep = ""
 		} else if to == "rc" {
 			str2, err = ToRegularChains(fml, cmt)
 			if err != nil {
 				return str2, err
 			}
+			sep = ":"
 		} else {
 			//			fmt.Fprintln(os.Stderr, "unsupported -t "+to)
 			return "", nil
 		}
 
-		ret += str2 + ":"
+		ret += str2 + sep
 	}
 
 	return ret, nil

@@ -38,7 +38,7 @@ func TestToLaTeX(t *testing.T) {
 		actual := removeLineComment(actual0, '%')
 		t.Log("rem=%s\n", actual)
 		t.Log("exp=%s\n", p.expect)
-		if !cmpIgnoreSpace(actual, p.expect + ":") {
+		if !cmpIgnoreSpace(actual, p.expect + "\\\\") {
 			t.Errorf("err actual=%s\nexpect=%s\ninput=%s\n", actual0, p.expect, p.input)
 		}
 	}
