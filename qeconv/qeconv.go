@@ -24,7 +24,7 @@ func main() {
 	flag.StringVar(&to, "t", "syn", "to {tex|math|qep|red|rc|syn|smt2}")
 	flag.StringVar(&filename, "i", "", "input file")
 	flag.StringVar(&output, "o", "", "output file")
-	flag.BoolVar(&dup, "s", false, "dup")
+	flag.BoolVar(&dup, "s", false, "remove duplicate formulas")
 	flag.IntVar(&idx, "n", 0, "index of fof")
 	flag.Parse()
 	if flag.NArg() > 0 {
@@ -40,7 +40,7 @@ func main() {
 	}
 
 	if err == nil {
-		str,err := qeconv.Convert(string(b), to, dup, idx)
+		str, err := qeconv.Convert(string(b), to, dup, idx)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

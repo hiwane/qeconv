@@ -280,6 +280,7 @@ func Convert(str, to string, dup bool, index int) (string, error) {
 			} else {
 				fml = getfmlidx(fml, index-count)
 				count += cnt
+				cmt = make([]Comment, 0)
 			}
 		}
 

@@ -65,5 +65,3 @@ func (self *varSet) union(vs varSet) {
 	}
 	self.valid()
 }
-
-
