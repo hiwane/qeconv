@@ -78,7 +78,7 @@ func getfmlidx(fml Formula, idx int) Formula {
 	count := 0
 	for _, v := range fml.Args() {
 		c := cntfml(v)
-		if c+count >= idx {
+		if c+count > idx {
 			return getfmlidx(v, idx-count)
 		}
 		count += c
@@ -138,11 +138,11 @@ func Convert(p Parser, cinf CnvInf, str string, dup bool, index int) (string, er
 				count += cnt
 				ret = strconv.Itoa(count)
 				continue
-			} else if count > index || index >= count+cnt {
+			} else if count > index-1 || index-1 >= count+cnt {
 				count += cnt
 				continue
 			} else {
-				fml = getfmlidx(fml, index-count)
+				fml = getfmlidx(fml, index-count-1)
 				count += cnt
 				cmts = make([]Comment, 0)
 			}

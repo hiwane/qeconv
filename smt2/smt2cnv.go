@@ -154,7 +154,7 @@ func smt2footer(fml Formula) string {
 
 func (m *Smt2Conv) Convert(fml Formula, co *CnvOut) (string, error) {
 	if fml.IsList() {
-		return "", errors.New("unsupported input")
+		return "", errors.New("unsupported input. use -n option")
 	}
 	qc := new(Smt2Conv)
 	qc.err = nil
