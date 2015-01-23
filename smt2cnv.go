@@ -151,7 +151,7 @@ func smt2footer(fml Formula) string {
 	return "(check-sat)\n"
 }
 
-func ToSmt2(fml Formula, comment []Comment) (string, error) {
+func (m *smt2Conv) Convert(fml Formula, co *cnv_out) (string, error) {
 	if fml.cmd == LIST {
 		return "", errors.New("unsupported input")
 	}
@@ -159,8 +159,13 @@ func ToSmt2(fml Formula, comment []Comment) (string, error) {
 	qc.err = nil
 
 	header := smt2header(fml)
-	qstr := conv(fml, qc, comment)
-	header += "(assert " + qstr + ")\n"
+	conv2(fml, qc, co)
+	header += "(assert " + co.str + ")\n"
 	header += smt2footer(fml)
 	return header, qc.err
+
+}
+
+func (m *smt2Conv) Sep() string {
+	return "\n"
 }

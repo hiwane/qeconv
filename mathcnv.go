@@ -88,6 +88,11 @@ func (m *mathConv) Comment(str string) string {
 	return "(*" + str + "*)"
 }
 
-func ToMath(fml Formula, comment []Comment) string {
-	return conv(fml, new(mathConv), comment)
+func (m *mathConv) Convert(fml Formula, co *cnv_out) (string, error) {
+	conv2(fml, m, co)
+	return co.str, nil
+}
+
+func (m *mathConv) Sep() string {
+	return ";"
 }

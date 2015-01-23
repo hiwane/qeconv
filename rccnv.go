@@ -98,9 +98,12 @@ func (m *regchainConv) Comment(str string) string {
 	return "#" + str
 }
 
-func ToRegularChains(fml Formula, comment []Comment) (string, error) {
-	qc := new(regchainConv)
-	qc.err = nil
-	qstr := conv(fml, qc, comment)
-	return qstr, qc.err
+func (m *regchainConv) Convert(fml Formula, co *cnv_out) (string, error) {
+	m.err = nil
+	conv2(fml, m, co)
+	return co.str, m.err
+}
+
+func (m *regchainConv) Sep() string {
+	return ":"
 }

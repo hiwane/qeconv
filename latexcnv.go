@@ -110,6 +110,11 @@ func (m *latexConv) uniop(fml Formula, ope string, co *cnv_out) {
 	uniop(fml, m, ope, co)
 }
 
-func ToLaTeX(fml Formula, comment []Comment) string {
-	return conv(fml, new(latexConv), comment)
+func (m *latexConv) Convert(fml Formula, co *cnv_out) (string, error) {
+	conv2(fml, m, co)
+	return co.str, nil
+}
+
+func (m *latexConv) Sep() string {
+	return "\\\\"
 }

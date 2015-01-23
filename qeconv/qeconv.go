@@ -9,6 +9,26 @@ import (
 	"github.com/hiwane/qeconv"
 )
 
+func str2cinf(to string) (ConvInf, error) {
+	if to == "math" {
+		return new(mathConv)
+	} else if to == "tex" {
+		return new(latexConv)
+	} else if to == "syn" {
+		return new(synConv)
+	} else if to == "red" {
+		return new(redConv)
+	} else if to == "qep" {
+		return new(qepConv)
+	} else if to == "smt2" {
+		return new(smt2Conv)
+	} else if to == "rc" {
+		return new(smt2Conv)
+	} else {
+		return nil, errors.New("unknown converter")
+	}
+}
+
 func main() {
 
 	var (
@@ -40,7 +60,12 @@ func main() {
 	}
 
 	if err == nil {
-		str, err := qeconv.Convert(string(b), to, dup, idx)
+		cinf, err := str2cinf(to)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		str, err := qeconv.Convert(cinf, string(b), dup, idx)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

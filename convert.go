@@ -10,6 +10,10 @@ type cnv_out struct {
 	str     string
 	lno     int
 	comment []Comment
+
+	// input info
+	//	input string
+	//	index int
 }
 
 type CnvInfMathOp interface {
@@ -30,6 +34,8 @@ type CnvInfMathOp interface {
 
 type CnvInf interface {
 	CnvInfMathOp
+	Convert(fml Formula, co *cnv_out) (string, error)
+	Sep() string
 
 	/* quantifier */
 	All(f Formula, co *cnv_out)
@@ -246,7 +252,27 @@ func charIndex(str string, sep uint8) int {
 	return -1
 }
 
-func Convert(str, to string, dup bool, index int) (string, error) {
+func Str2cinf(to string) (CnvInf, error) {
+	if to == "math" {
+		return new(mathConv), nil
+	} else if to == "tex" {
+		return new(latexConv), nil
+	} else if to == "syn" {
+		return new(synConv), nil
+	} else if to == "red" {
+		return new(redConv), nil
+	} else if to == "qep" {
+		return new(qepConv), nil
+	} else if to == "smt2" {
+		return new(smt2Conv), nil
+	} else if to == "rc" {
+		return new(regchainConv), nil
+	} else {
+		return nil, errors.New("unknown converter")
+	}
+}
+
+func Convert(cinf CnvInf, str string, dup bool, index int) (string, error) {
 	var ret string
 	count := 0
 
@@ -261,7 +287,6 @@ func Convert(str, to string, dup bool, index int) (string, error) {
 		l.Init(strings.NewReader(str[0 : idx+1]))
 		str = str[idx+1:]
 		stack := parse(l)
-		cmt := l.comment
 
 		fml := tofml(stack)
 		if dup {
@@ -280,45 +305,20 @@ func Convert(str, to string, dup bool, index int) (string, error) {
 			} else {
 				fml = getfmlidx(fml, index-count)
 				count += cnt
-				cmt = make([]Comment, 0)
+				l.comment = make([]Comment, 0)
 			}
 		}
 
 		var str2 string
 		var err error
 		var sep string
-		sep = ":"
-		if to == "math" {
-			str2 = ToMath(fml, cmt)
-			sep = ";"
-		} else if to == "tex" {
-			str2 = ToLaTeX(fml, cmt)
-			sep = "\\\\"
-		} else if to == "syn" {
-			str2 = ToSyn(fml, cmt)
-		} else if to == "red" {
-			str2 = ToRedlog(fml, cmt)
-			sep = ";"
-		} else if to == "qep" {
-			str2, err = ToQepcad(fml, cmt)
-			sep = "."
-		} else if to == "smt2" {
-			str2, err = ToSmt2(fml, cmt)
-			if err != nil {
-				return str2, err
-			}
-			sep = ""
-		} else if to == "rc" {
-			str2, err = ToRegularChains(fml, cmt)
-			if err != nil {
-				return str2, err
-			}
-			sep = ":"
-		} else {
-			//			fmt.Fprintln(os.Stderr, "unsupported -t "+to)
-			return "", nil
+		sep = cinf.Sep()
+		var co *cnv_out
+		co = &cnv_out{str: "", lno: 1, comment: l.comment}
+		str2, err = cinf.Convert(fml, co)
+		if err != nil {
+			return str2, err
 		}
-
 		ret += str2 + sep
 	}
 

@@ -96,6 +96,11 @@ func (m *synConv) Comment(str string) string {
 	return "#" + str
 }
 
-func ToSyn(fml Formula, comment []Comment) string {
-	return conv(fml, new(synConv), comment)
+func (m *synConv) Convert(fml Formula, co *cnv_out) (string, error) {
+	conv2(fml, m, co)
+	return co.str, nil
+}
+
+func (m *synConv) Sep() string {
+	return ":"
 }

@@ -94,3 +94,13 @@ func ToRedlog(fml Formula, comment []Comment) string {
 	qstr := conv(fml, qc, comment)
 	return qstr
 }
+
+func (m *redConv) Convert(fml Formula, co *cnv_out) (string, error) {
+	m.err = nil
+	conv2(fml, m, co)
+	return co.str, nil
+}
+
+func (m *redConv) Sep() string {
+	return ";"
+}

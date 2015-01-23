@@ -111,9 +111,12 @@ func (m *qepConv) Comment(str string) string {
 	return ""
 }
 
-func ToQepcad(fml Formula, comment []Comment) (string, error) {
-	qc := new(qepConv)
-	qc.err = nil
-	qstr := conv(fml, qc, comment)
-	return qstr, qc.err
+func (m *qepConv) Convert(fml Formula, co *cnv_out) (string, error) {
+	m.err = nil
+	conv2(fml, m, co)
+	return co.str, m.err
+}
+
+func (m *qepConv) Sep() string {
+	return ".\n"
 }
