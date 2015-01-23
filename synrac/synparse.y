@@ -9,10 +9,10 @@ import (
 	"fmt"
 )
 
-var stack *Stack
+var stack *synStack
 
 
-type Node struct {
+type synNode struct {
 	cmd int
 	val int
 	str string
@@ -25,7 +25,7 @@ type Node struct {
 
 
 %union{
-	node Node
+	node synNode
 	num int
 }
 
@@ -68,9 +68,9 @@ fof
 	: all lp quantifiers comma fof rp { trace("ALL"); stack.push($1)}
 	| ex  lp quantifiers comma fof rp { trace("EX");  stack.push($1)}
 	| and lp seq_fof rp { trace("and"); $1.val=$3; stack.push($1)}
-	| and lp rp { trace("and()"); stack.push(Node{cmd: F_TRUE, val:0})}
+	| and lp rp { trace("and()"); stack.push(synNode{cmd: F_TRUE, val:0})}
 	| or  lp seq_fof rp { trace("or"); $1.val=$3; stack.push($1)}
-	| or lp rp { trace("or()"); stack.push(Node{cmd: F_FALSE, val:0})}
+	| or lp rp { trace("or()"); stack.push(synNode{cmd: F_FALSE, val:0})}
 	| not fof { trace("not"); stack.push($1)}
 	| impl lp fof comma fof rp { trace("IMPL"); stack.push($1)}
 	| repl lp fof comma fof rp { trace("REPL"); stack.push($1)}
@@ -82,11 +82,11 @@ fof
 list_of_mobj
 	: lb seq_mobj rb {
 		trace("list")
-		stack.push(Node{cmd: LIST, val: $2, lineno: $1.lineno})
+		stack.push(synNode{cmd: LIST, val: $2, lineno: $1.lineno})
 	}
 	| lb rb {
 		trace("empty-list")
-		stack.push(Node{cmd: LIST, val: 0, lineno: $1.lineno})
+		stack.push(synNode{cmd: LIST, val: 0, lineno: $1.lineno})
 	}
 	;
 
@@ -103,15 +103,15 @@ seq_fof
 quantifiers
 	: var {
 		trace("var")
-		stack.push(Node{cmd: LIST, val: 1})
+		stack.push(synNode{cmd: LIST, val: 1})
 	}
 	| lb seq_var rb  /* [x,y,z] */ {
 		trace("list")
-		stack.push(Node{cmd: LIST, val: $2, lineno: $1.lineno})
+		stack.push(synNode{cmd: LIST, val: $2, lineno: $1.lineno})
 	}
 	| lc seq_var rc  /* {x,y,z} */ {
 		trace("set")
-		stack.push(Node{cmd: LIST, val: $2, lineno: $1.lineno})
+		stack.push(synNode{cmd: LIST, val: $2, lineno: $1.lineno})
 	}
 	;
 
@@ -122,18 +122,18 @@ seq_var
 
 var
 	: name  { trace("name");  stack.push($1)}
-	| var lb number rb  { trace("index");  stack.push(Node{cmd: INDEXED, val:2})}
+	| var lb number rb  { trace("index");  stack.push(synNode{cmd: INDEXED, val:2})}
 	;
 
 atom
-	: f_true  { trace("true");  stack.push(Node{cmd: F_TRUE, val:0})}
-	| f_false { trace("false"); stack.push(Node{cmd: F_FALSE, val:0})}
-	| poly ltop poly { trace("<");  stack.push(Node{cmd: LTOP, str: "<", val:2})}
-	| poly gtop poly { trace(">");  stack.push(Node{cmd: LTOP, str: ">", val:2, rev:true})}
-	| poly leop poly { trace("<="); stack.push(Node{cmd: LEOP, str: "<=", val:2})}
-	| poly geop poly { trace(">="); stack.push(Node{cmd: LEOP, str: ">=", val:2, rev:true})}
-	| poly eqop poly { trace("=");  stack.push(Node{cmd: EQOP, str: "=", val:2})}
-	| poly neop poly { trace("<>"); stack.push(Node{cmd: NEOP, str: "<>", val:2})}
+	: f_true  { trace("true");  stack.push(synNode{cmd: F_TRUE, val:0})}
+	| f_false { trace("false"); stack.push(synNode{cmd: F_FALSE, val:0})}
+	| poly ltop poly { trace("<");  stack.push(synNode{cmd: LTOP, str: "<", val:2})}
+	| poly gtop poly { trace(">");  stack.push(synNode{cmd: LTOP, str: ">", val:2, rev:true})}
+	| poly leop poly { trace("<="); stack.push(synNode{cmd: LEOP, str: "<=", val:2})}
+	| poly geop poly { trace(">="); stack.push(synNode{cmd: LEOP, str: ">=", val:2, rev:true})}
+	| poly eqop poly { trace("=");  stack.push(synNode{cmd: EQOP, str: "=", val:2})}
+	| poly neop poly { trace("<>"); stack.push(synNode{cmd: NEOP, str: "<>", val:2})}
 	;
 
 
@@ -262,7 +262,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 	for i := 0; i < len(sones); i++ {
 		if sones[i].v == c {
 			l.Next()
-			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
+			lval.node = synNode{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
 			return sones[i].label
 		}
 	}
@@ -292,7 +292,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
+		lval.node = synNode{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
 		return NUMBER
 	}
 
@@ -301,10 +301,10 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) || isletter(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NAME, val: 0, str: string(ret), lineno: lno}
+		lval.node = synNode{cmd: NAME, val: 0, str: string(ret), lineno: lno}
 		for i := 0; i < len(sfuns); i++ {
 			if lval.node.str == sfuns[i].val {
-				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
+				lval.node = synNode{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
 
 				// Repl は Impl に変換する.
 				if lval.node.str == "Repl" {
@@ -326,8 +326,8 @@ func (l *SynLex) Error(s string) {
 	fmt.Printf("%s:Error:%s \n", pos.String(), s)
 }
 
-func parse(l *SynLex) *Stack {
-	stack = new(Stack)
+func parse(l *SynLex) *synStack {
+	stack = new(synStack)
 	yyParse(l)
 	return stack
 }
@@ -337,7 +337,7 @@ func trace(s string) {
 }
 
 
-func tofml(s *Stack) Formula {
+func tofml(s *synStack) Formula {
 	n, _ := s.pop()
 	fml := NewFormula(n.cmd, n.str, n.lineno, n.priority)
 	fml.SetArgLen(n.val)

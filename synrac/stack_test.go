@@ -4,17 +4,17 @@ import (
 	"testing"
 )
 
-func TestStack(t *testing.T) {
-	var s *Stack
-	s = new(Stack)
+func TestsynStack(t *testing.T) {
+	var s *synStack
+	s = new(synStack)
 	if !s.empty() {
 		t.Error("empty0")
 	}
-	s.push(Node{cmd: 1})
+	s.push(synNode{cmd: 1})
 	if s.empty() {
 		t.Error("empty1")
 	}
-	s.push(Node{cmd: 2})
+	s.push(synNode{cmd: 2})
 	if s.empty() {
 		t.Error("empty2")
 	}
@@ -27,12 +27,12 @@ func TestStack(t *testing.T) {
 		t.Error("empty2-2")
 	}
 
-	s.push(Node{cmd: 3})
+	s.push(synNode{cmd: 3})
 	if s.empty() {
 		t.Error("empty3")
 	}
 
-	s.push(Node{cmd: 4})
+	s.push(synNode{cmd: 4})
 	if s.empty() {
 		t.Error("empty4")
 	}

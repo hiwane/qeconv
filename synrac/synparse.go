@@ -10,9 +10,9 @@ import (
 	"text/scanner"
 )
 
-var stack *Stack
+var stack *synStack
 
-type Node struct {
+type synNode struct {
 	cmd      int
 	val      int
 	str      string
@@ -24,7 +24,7 @@ type Node struct {
 //line synparse.y:27
 type yySymType struct {
 	yys  int
-	node Node
+	node synNode
 	num  int
 }
 
@@ -208,7 +208,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 	for i := 0; i < len(sones); i++ {
 		if sones[i].v == c {
 			l.Next()
-			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
+			lval.node = synNode{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
 			return sones[i].label
 		}
 	}
@@ -238,7 +238,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
+		lval.node = synNode{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
 		return NUMBER
 	}
 
@@ -247,10 +247,10 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) || isletter(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NAME, val: 0, str: string(ret), lineno: lno}
+		lval.node = synNode{cmd: NAME, val: 0, str: string(ret), lineno: lno}
 		for i := 0; i < len(sfuns); i++ {
 			if lval.node.str == sfuns[i].val {
-				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
+				lval.node = synNode{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
 
 				// Repl は Impl に変換する.
 				if lval.node.str == "Repl" {
@@ -272,8 +272,8 @@ func (l *SynLex) Error(s string) {
 	fmt.Printf("%s:Error:%s \n", pos.String(), s)
 }
 
-func parse(l *SynLex) *Stack {
-	stack = new(Stack)
+func parse(l *SynLex) *synStack {
+	stack = new(synStack)
 	yyParse(l)
 	return stack
 }
@@ -282,7 +282,7 @@ func trace(s string) {
 	//	fmt.Printf(s + "\n")
 }
 
-func tofml(s *Stack) Formula {
+func tofml(s *synStack) Formula {
 	n, _ := s.pop()
 	fml := NewFormula(n.cmd, n.str, n.lineno, n.priority)
 	fml.SetArgLen(n.val)
@@ -685,7 +685,7 @@ yydefault:
 		//line synparse.y:71
 		{
 			trace("and()")
-			stack.push(Node{cmd: F_TRUE, val: 0})
+			stack.push(synNode{cmd: F_TRUE, val: 0})
 		}
 	case 8:
 		//line synparse.y:72
@@ -698,7 +698,7 @@ yydefault:
 		//line synparse.y:73
 		{
 			trace("or()")
-			stack.push(Node{cmd: F_FALSE, val: 0})
+			stack.push(synNode{cmd: F_FALSE, val: 0})
 		}
 	case 10:
 		//line synparse.y:74
@@ -728,13 +728,13 @@ yydefault:
 		//line synparse.y:83
 		{
 			trace("list")
-			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
+			stack.push(synNode{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
 		}
 	case 17:
 		//line synparse.y:87
 		{
 			trace("empty-list")
-			stack.push(Node{cmd: LIST, val: 0, lineno: yyS[yypt-1].node.lineno})
+			stack.push(synNode{cmd: LIST, val: 0, lineno: yyS[yypt-1].node.lineno})
 		}
 	case 18:
 		//line synparse.y:94
@@ -760,19 +760,19 @@ yydefault:
 		//line synparse.y:104
 		{
 			trace("var")
-			stack.push(Node{cmd: LIST, val: 1})
+			stack.push(synNode{cmd: LIST, val: 1})
 		}
 	case 23:
 		//line synparse.y:108
 		{
 			trace("list")
-			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
+			stack.push(synNode{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
 		}
 	case 24:
 		//line synparse.y:112
 		{
 			trace("set")
-			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
+			stack.push(synNode{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
 		}
 	case 25:
 		//line synparse.y:119
@@ -794,55 +794,55 @@ yydefault:
 		//line synparse.y:125
 		{
 			trace("index")
-			stack.push(Node{cmd: INDEXED, val: 2})
+			stack.push(synNode{cmd: INDEXED, val: 2})
 		}
 	case 29:
 		//line synparse.y:129
 		{
 			trace("true")
-			stack.push(Node{cmd: F_TRUE, val: 0})
+			stack.push(synNode{cmd: F_TRUE, val: 0})
 		}
 	case 30:
 		//line synparse.y:130
 		{
 			trace("false")
-			stack.push(Node{cmd: F_FALSE, val: 0})
+			stack.push(synNode{cmd: F_FALSE, val: 0})
 		}
 	case 31:
 		//line synparse.y:131
 		{
 			trace("<")
-			stack.push(Node{cmd: LTOP, str: "<", val: 2})
+			stack.push(synNode{cmd: LTOP, str: "<", val: 2})
 		}
 	case 32:
 		//line synparse.y:132
 		{
 			trace(">")
-			stack.push(Node{cmd: LTOP, str: ">", val: 2, rev: true})
+			stack.push(synNode{cmd: LTOP, str: ">", val: 2, rev: true})
 		}
 	case 33:
 		//line synparse.y:133
 		{
 			trace("<=")
-			stack.push(Node{cmd: LEOP, str: "<=", val: 2})
+			stack.push(synNode{cmd: LEOP, str: "<=", val: 2})
 		}
 	case 34:
 		//line synparse.y:134
 		{
 			trace(">=")
-			stack.push(Node{cmd: LEOP, str: ">=", val: 2, rev: true})
+			stack.push(synNode{cmd: LEOP, str: ">=", val: 2, rev: true})
 		}
 	case 35:
 		//line synparse.y:135
 		{
 			trace("=")
-			stack.push(Node{cmd: EQOP, str: "=", val: 2})
+			stack.push(synNode{cmd: EQOP, str: "=", val: 2})
 		}
 	case 36:
 		//line synparse.y:136
 		{
 			trace("<>")
-			stack.push(Node{cmd: NEOP, str: "<>", val: 2})
+			stack.push(synNode{cmd: NEOP, str: "<>", val: 2})
 		}
 	case 37:
 		//line synparse.y:141
