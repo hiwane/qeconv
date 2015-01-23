@@ -1,6 +1,7 @@
 package qeconv
 
 import (
+	. "github.com/hiwane/qeconv"
 	"testing"
 )
 
@@ -40,7 +41,11 @@ func TestToRC(t *testing.T) {
 		if err != nil {
 			t.Errorf("err str2cnf: %d, str=%s\n", i, p.input)
 		}
-		actual0, _ := Convert(m, p.input, false, 0)
+		parser, err := Str2Parser("syn")
+		if err != nil {
+			t.Errorf("err str2parser: str=%s\n", p.input)
+		}
+		actual0, _ := Convert(parser, m, p.input, false, 0)
 		actual := removeLineComment(actual0, '#')
 		if !cmpIgnoreSpace(actual, p.expect+":") {
 			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)

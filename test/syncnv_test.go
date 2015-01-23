@@ -1,30 +1,10 @@
 package qeconv
 
 import (
-	"strings"
 	"testing"
-	"text/scanner"
+	. "github.com/hiwane/qeconv"
 )
 
-func removeLineComment(s string, p rune) string {
-	var ret []rune
-	var l scanner.Scanner
-	l.Init(strings.NewReader(s))
-
-	for l.Peek() != scanner.EOF {
-		s := l.Next()
-		if s == p {
-			s = l.Next()
-			for s != '\n' && s != scanner.EOF {
-				s = l.Next()
-			}
-			continue
-		}
-		ret = append(ret, s)
-	}
-
-	return string(ret)
-}
 
 func TestToSyn(t *testing.T) {
 	var data = []struct {
@@ -63,9 +43,13 @@ func TestToSyn(t *testing.T) {
 	for i, p := range data {
 		m, err := Str2cinf("syn")
 		if err != nil {
-			t.Errorf("err str2cnf: %d, str=%s\n", i, p.input)
+			t.Errorf("err str2cnf: str=%s\n", p.input)
 		}
-		actual0, _ := Convert(m, p.input, false, 0)
+		parser, err := Str2Parser("syn")
+		if err != nil {
+			t.Errorf("err str2parser: str=%s\n", p.input)
+		}
+		actual0, _ := Convert(parser, m, p.input, false, 0)
 		actual := removeLineComment(actual0, '#')
 		if !cmpIgnoreSpace(actual, p.expect) {
 			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)

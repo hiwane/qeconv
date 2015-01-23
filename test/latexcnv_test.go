@@ -2,6 +2,7 @@ package qeconv
 
 import (
 	"testing"
+	. "github.com/hiwane/qeconv"
 )
 
 func TestToLaTeX(t *testing.T) {
@@ -37,7 +38,11 @@ func TestToLaTeX(t *testing.T) {
 		if err != nil {
 			t.Errorf("err str2cnf: str=%s\n", p.input)
 		}
-		actual0, _ := Convert(m, p.input, false, 0)
+		parser, err := Str2Parser("syn")
+		if err != nil {
+			t.Errorf("err str2parser: str=%s\n", p.input)
+		}
+		actual0, _ := Convert(parser, m, p.input, false, 0)
 		t.Log("ac0=%s\n", actual0)
 		actual := removeLineComment(actual0, '%')
 		t.Log("rem=%s\n", actual)
