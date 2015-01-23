@@ -5,7 +5,6 @@ import (
 )
 
 type RedConv struct {
-	err error
 }
 
 func (m *RedConv) All(f Formula, co *CnvOut) {
@@ -94,7 +93,6 @@ func (m *RedConv) Comment(str string) string {
 }
 
 func (m *RedConv) Convert(fml Formula, co *CnvOut) (string, error) {
-	m.err = nil
 	Conv2(fml, m, co)
 	return co.String(), nil
 }

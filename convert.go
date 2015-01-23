@@ -95,7 +95,6 @@ func Str2Parser(to string) (Parser, error) {
 	}
 }
 
-
 func Str2cinf(to string) (CnvInf, error) {
 	if to == "math" {
 		return new(math.MathConv), nil
@@ -170,6 +169,3 @@ func conv(fml Formula, cinf CnvInf, comment []Comment) string {
 	Conv2(fml, cinf, co)
 	return co.String()
 }
-
-
-
