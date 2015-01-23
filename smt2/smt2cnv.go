@@ -168,5 +168,5 @@ func (m *Smt2Conv) Convert(fml Formula, co *CnvOut) (string, error) {
 }
 
 func (m *Smt2Conv) Sep() string {
-	return "\n"
+	return ""
 }
