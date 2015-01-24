@@ -134,9 +134,9 @@ func (m *Smt2Conv) Comment(str string) string {
 func smt2header(fml Formula) string {
 	var str string
 	if fml.IsQff() {
-		str = "(set logic NRA)\n"
+		str = "(set-logic QF_NRA)\n"
 	} else {
-		str = "(set logic QF_NRA)\n"
+		str = "(set-logic NRA)\n"
 	}
 
 	vs := fml.FreeVars()
