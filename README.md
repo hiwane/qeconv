@@ -14,6 +14,8 @@ After installing `golang` and setting up your `GOPATH`, execute follows:
 ```sh
 go get github.com/hiwane/qeconv/qeconv
 ```
+`qeconv` will be installed to the `${GOPATH}/bin` directory.
+For convenience, add the `${GOPATH}/bin` to your `PATH`.
 
 # Usage
 
