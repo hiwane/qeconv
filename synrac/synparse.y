@@ -337,23 +337,3 @@ func trace(s string) {
 }
 
 
-func tofml(s *synStack) Formula {
-	n, _ := s.pop()
-	// @TODO convert qeconv.synrac.cmd to qeconv.CMD
-	fml := NewFormula(n.cmd, n.str, n.lineno, n.priority)
-	fml.SetArgLen(n.val)
-	if (n.cmd == or || n.cmd == and) && n.val == 1 {
-		return tofml(s)
-	}
-	if n.rev {
-		for i := 0; i < n.val; i++ {
-			fml.SetArg(i, tofml(s))
-		}
-	} else {
-		for i := 0; i < n.val; i++ {
-			fml.SetArg(n.val-i-1, tofml(s))
-		}
-	}
-	return fml
-}
-
