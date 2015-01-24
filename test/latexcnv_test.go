@@ -1,8 +1,8 @@
 package qeconv
 
 import (
-	"testing"
 	. "github.com/hiwane/qeconv"
+	"testing"
 )
 
 func TestToLaTeX(t *testing.T) {

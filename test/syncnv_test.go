@@ -1,10 +1,9 @@
 package qeconv
 
 import (
-	"testing"
 	. "github.com/hiwane/qeconv"
+	"testing"
 )
-
 
 func TestToSyn(t *testing.T) {
 	var data = []struct {

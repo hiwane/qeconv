@@ -1,8 +1,8 @@
 package qeconv
 
 import (
-	"text/scanner"
 	"strings"
+	"text/scanner"
 )
 
 func removeLineComment(s string, p rune) string {
@@ -24,7 +24,6 @@ func removeLineComment(s string, p rune) string {
 
 	return string(ret)
 }
-
 
 func cmpIgnoreSpace(str1, str2 string) bool {
 	var l1 scanner.Scanner
@@ -52,5 +51,3 @@ func cmpIgnoreSpace(str1, str2 string) bool {
 
 	return l1.Peek() == l2.Peek()
 }
-
-

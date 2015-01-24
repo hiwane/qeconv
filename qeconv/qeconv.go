@@ -9,7 +9,6 @@ import (
 	"github.com/hiwane/qeconv"
 )
 
-
 func main() {
 
 	var (

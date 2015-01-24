@@ -172,6 +172,7 @@ func Convm(fml Formula, cinf CnvInfMathOp, co *CnvOut) {
 	}
 }
 
+// ほぼ Infix(). call Convm() instead of Conv2()
 func Mop(fml Formula, cinf CnvInfMathOp, op string, co *CnvOut) {
 	for i := 0; i < len(fml.Args()); i++ {
 		if i != 0 {
@@ -186,6 +187,7 @@ func Mop(fml Formula, cinf CnvInfMathOp, op string, co *CnvOut) {
 		}
 	}
 }
+
 func Uniop(fml Formula, cinf CnvInfMathOp, op string, co *CnvOut) {
 	co.Append(op)
 	if fml.priority > 0 && fml.priority < fml.Args()[0].priority {

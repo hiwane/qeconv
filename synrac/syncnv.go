@@ -15,7 +15,6 @@ func NewSynParse() *SynParse {
 	return p
 }
 
-
 func newConvDict() map[int]int {
 	return map[int]int{
 		name:       NAME,
@@ -57,7 +56,6 @@ func newConvDict() map[int]int {
 		unaryplus:  UNARYPLUS,
 	}
 }
-
 
 func (m *SynParse) charIndex(str string, sep uint8) int {
 	comment := false

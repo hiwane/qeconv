@@ -35,7 +35,6 @@ func (self *varSet) append(str string) {
 		v = append(v, self.v[idx:]...)
 		self.v = v
 	}
-	self.valid()
 }
 
 func (self *varSet) remove(str string) {
@@ -48,7 +47,6 @@ func (self *varSet) remove(str string) {
 		} else {
 			self.v = append(self.v[:idx], self.v[idx+1:]...)
 		}
-		self.valid()
 	}
 }
 
@@ -56,12 +54,10 @@ func (self *varSet) setminus(vs varSet) {
 	for _, v := range vs.v {
 		self.remove(v)
 	}
-	self.valid()
 }
 
 func (self *varSet) union(vs varSet) {
 	for _, v := range vs.v {
 		self.append(v)
 	}
-	self.valid()
 }

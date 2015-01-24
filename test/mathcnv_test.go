@@ -1,10 +1,10 @@
 package qeconv
 
 import (
-	"strings"
-	"text/scanner"
 	. "github.com/hiwane/qeconv"
+	"strings"
 	"testing"
+	"text/scanner"
 )
 
 func removeMathComment(s string) string {
@@ -40,7 +40,6 @@ func removeMathComment(s string) string {
 
 	return string(ret)
 }
-
 
 func TestToMath(t *testing.T) {
 	var data = []struct {

@@ -31,7 +31,7 @@ func cmpfml(f1, f2 Formula) bool {
 	return true
 }
 
-// $B=EJ#Dj5A$N:o=|(B
+// 重複定義の削除
 func rmdup(fml Formula) Formula {
 	if !fml.IsList() {
 		return fml
@@ -120,7 +120,7 @@ func Convert(p Parser, cinf CnvInf, str string, dup bool, index int) (string, er
 	count := 0
 
 	for {
-		// $B%3%a%s%H9T$rL5;k$7$F(B, separator $B$G$"$k(B : $B$rC5:w$9$k(B.
+		// コメント行を無視して, separator である : を探索する.
 		idx := p.Next(str)
 		if idx <= 0 {
 			break
@@ -163,9 +163,4 @@ func Convert(p Parser, cinf CnvInf, str string, dup bool, index int) (string, er
 	return ret, nil
 }
 
-func conv(fml Formula, cinf CnvInf, comment []Comment) string {
-	var co *CnvOut
-	co = NewCnvOut(comment)
-	Conv2(fml, cinf, co)
-	return co.String()
-}
+
