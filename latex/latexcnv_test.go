@@ -88,7 +88,11 @@ func TestToLaTeX(t *testing.T) {
 	parser := syn.NewSynParse()
 	for _, p := range data {
 		t.Log("inp=%s\n", p.input)
-		fml, cmts := parser.Parse(p.input)
+		fml, cmts, err := parser.Parse(p.input)
+		if err != nil {
+			t.Errorf("err invalid input=%s\n", p.input)
+		}
+
 		co := NewCnvOut(cmts)
 		actual0, _ := m.Convert(fml, co)
 		t.Log("ac0=%s\n", actual0)

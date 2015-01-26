@@ -102,7 +102,10 @@ func TestToMath(t *testing.T) {
 	m := new(MathConv)
 	parser := syn.NewSynParse()
 	for i, p := range data {
-		fml, cmts := parser.Parse(p.input)
+		fml, cmts, err := parser.Parse(p.input)
+		if err != nil {
+			t.Errorf("err invalid input=%s\n", p.input)
+		}
 		co := NewCnvOut(cmts)
 		actual0, _ := m.Convert(fml, co)
 		actual := removeMathComment(actual0)

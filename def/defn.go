@@ -103,7 +103,7 @@ type CnvInf interface {
 }
 
 type Parser interface {
-	Parse(str string) (Formula, []Comment)
+	Parse(str string) (Formula, []Comment, error)
 	Next(str string) int
 }
 
