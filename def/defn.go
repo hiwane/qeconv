@@ -71,6 +71,7 @@ type CnvInfMathOp interface {
 	/* atom */
 	Ftrue() string
 	Ffalse() string
+	LineAlign() bool
 }
 
 type CnvInf interface {
@@ -102,6 +103,13 @@ type CnvInf interface {
 	List(f Formula, co *CnvOut)
 }
 
+type CnvInfStrstruct struct {
+}
+
+func (self *CnvInfStrstruct) LineAlign() bool {
+	return true
+}
+
 type Parser interface {
 	Parse(str string) (Formula, []Comment, error)
 	Next(str string) int
@@ -130,13 +138,15 @@ func NewComment(str string, lno int) Comment {
 }
 
 func skipcomment(fml Formula, cinf CnvInfMathOp, co *CnvOut) {
-	for co.lno < fml.lineno {
-		if len(co.comment) > 0 && co.comment[0].lineno == co.lno {
-			co.Append(cinf.Comment(co.comment[0].str))
-			co.comment = co.comment[1:len(co.comment)]
+	if cinf.LineAlign() {
+		for co.lno < fml.lineno {
+			if len(co.comment) > 0 && co.comment[0].lineno == co.lno {
+				co.Append(cinf.Comment(co.comment[0].str))
+				co.comment = co.comment[1:len(co.comment)]
+			}
+			co.Append("\n")
+			co.lno++
 		}
-		co.Append("\n")
-		co.lno++
 	}
 }
 

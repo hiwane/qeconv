@@ -5,6 +5,7 @@ import (
 )
 
 type RedConv struct {
+	*CnvInfStrstruct
 }
 
 func (m *RedConv) All(f Formula, co *CnvOut) {

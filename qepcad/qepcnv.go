@@ -6,6 +6,7 @@ import (
 )
 
 type QepConv struct {
+	*CnvInfStrstruct
 	err error
 }
 

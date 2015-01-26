@@ -5,6 +5,7 @@ import (
 )
 
 type MathConv struct {
+	*CnvInfStrstruct
 }
 
 func (m *MathConv) All(f Formula, co *CnvOut) {

@@ -7,6 +7,7 @@ import (
 )
 
 type Smt2Conv struct {
+	*CnvInfStrstruct
 	err error
 }
 
@@ -169,4 +170,8 @@ func (m *Smt2Conv) Convert(fml Formula, co *CnvOut) (string, error) {
 
 func (m *Smt2Conv) Sep() string {
 	return ""
+}
+
+func (m *Smt2Conv) LineAlign() bool {
+	return false
 }

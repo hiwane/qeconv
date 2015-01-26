@@ -9,6 +9,7 @@ import (
 )
 
 type RegChainConv struct {
+	*CnvInfStrstruct
 	err error
 }
 

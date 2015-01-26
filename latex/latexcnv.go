@@ -5,6 +5,7 @@ import (
 )
 
 type LatexConv struct {
+	*CnvInfStrstruct
 }
 
 func (m *LatexConv) q(f Formula, qop string, co *CnvOut) {

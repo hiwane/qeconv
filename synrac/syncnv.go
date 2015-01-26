@@ -107,6 +107,7 @@ func (self *SynParse) tofml(s *synStack) Formula {
 }
 
 type SynConv struct {
+	*CnvInfStrstruct
 }
 
 func (m *SynConv) All(f Formula, co *CnvOut) {
