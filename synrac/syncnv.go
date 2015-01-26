@@ -80,11 +80,11 @@ func (self *SynParse) Next(str string) int {
 	return idx
 }
 
-func (self *SynParse) Parse(str string) (Formula, []Comment) {
+func (self *SynParse) Parse(str string) (Formula, []Comment, error) {
 	l := new(SynLex)
 	l.Init(strings.NewReader(str))
 	stack := parse(l)
-	return self.tofml(stack), l.comment
+	return self.tofml(stack), l.comment, l.err
 }
 
 func (self *SynParse) tofml(s *synStack) Formula {

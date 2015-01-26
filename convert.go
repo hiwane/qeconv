@@ -126,7 +126,10 @@ func Convert(p Parser, cinf CnvInf, str string, dup bool, index int) (string, er
 			break
 		}
 
-		fml, cmts := p.Parse(str[:idx])
+		fml, cmts, err := p.Parse(str[:idx])
+		if err != nil {
+			return "", err
+		}
 		str = str[idx:]
 		if dup {
 			fml = rmdup(fml)
@@ -149,7 +152,6 @@ func Convert(p Parser, cinf CnvInf, str string, dup bool, index int) (string, er
 		}
 
 		var str2 string
-		var err error
 		var sep string
 		sep = cinf.Sep()
 		co := NewCnvOut(cmts)

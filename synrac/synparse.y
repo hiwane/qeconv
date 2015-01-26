@@ -7,6 +7,7 @@ import (
 	. "github.com/hiwane/qeconv/def"
 	"text/scanner"
 	"fmt"
+	"errors"
 )
 
 var stack *synStack
@@ -173,6 +174,7 @@ type SynLex struct {
 	scanner.Scanner
 	s string
 	comment []Comment
+	err error
 }
 
 type SynLex1 struct {
@@ -323,7 +325,9 @@ func (l *SynLex) Lex(lval *yySymType) int {
 
 func (l *SynLex) Error(s string) {
 	pos := l.Pos()
-	fmt.Printf("%s:Error:%s \n", pos.String(), s)
+	if l.err == nil {
+		l.err = errors.New(fmt.Sprintf("%s:Error:%s \n", pos.String(), s))
+	}
 }
 
 func parse(l *SynLex) *synStack {
