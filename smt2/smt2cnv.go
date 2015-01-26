@@ -161,8 +161,16 @@ func (m *Smt2Conv) Convert(fml Formula, co *CnvOut) (string, error) {
 	qc.err = nil
 
 	header := smt2header(fml)
-	Conv2(fml, qc, co)
-	header += "(assert " + co.String() + ")\n"
+	if fml.Cmd() == AND {
+		for _, v := range fml.Args() {
+			co.Reset()
+			Conv2(v, qc, co)
+			header += "(assert " + co.String() + ")\n"
+		}
+	} else {
+		Conv2(fml, qc, co)
+		header += "(assert " + co.String() + ")\n"
+	}
 	header += smt2footer(fml)
 	return header, qc.err
 

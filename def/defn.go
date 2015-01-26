@@ -117,8 +117,7 @@ type Parser interface {
 
 func NewCnvOut(comment []Comment) *CnvOut {
 	co := new(CnvOut)
-	co.str = ""
-	co.lno = 1
+	co.Reset()
 	co.comment = comment
 	return co
 }
@@ -131,6 +130,11 @@ func (c *CnvOut) Append(s string) {
 func (c *CnvOut) String() string {
 	//	fmt.Printf("append [%s]\n", s)
 	return c.str
+}
+
+func (c *CnvOut) Reset() {
+	c.str = ""
+	c.lno = 1
 }
 
 func NewComment(str string, lno int) Comment {
