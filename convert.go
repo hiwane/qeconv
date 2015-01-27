@@ -90,9 +90,8 @@ func getfmlidx(fml Formula, idx int) Formula {
 func Str2Parser(to string) (Parser, error) {
 	if to == "syn" {
 		return syn.NewSynParse(), nil
-	} else {
-		return nil, errors.New("unknown converter")
 	}
+	return nil, errors.New("unknown converter")
 }
 
 func Str2cinf(to string) (CnvInf, error) {
@@ -110,9 +109,8 @@ func Str2cinf(to string) (CnvInf, error) {
 		return new(smt2.Smt2Conv), nil
 	} else if to == "rc" {
 		return new(rc.RegChainConv), nil
-	} else {
-		return nil, errors.New("unknown converter")
 	}
+	return nil, errors.New("unknown converter")
 }
 
 func Convert(p Parser, cinf CnvInf, str string, dup bool, index int) (string, error) {

@@ -93,11 +93,10 @@ func (self *Formula) FreeVars() varSet {
 		return fv
 	} else if self.cmd == NAME {
 		vs.append(self.str)
-		return vs
 	} else {
 		for _, v := range self.Args() {
 			vs.union(v.FreeVars())
 		}
-		return vs
 	}
+	return vs
 }
