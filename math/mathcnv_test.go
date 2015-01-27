@@ -1,6 +1,8 @@
 package qeconv
 
 import (
+	. "github.com/hiwane/qeconv/def"
+	syn "github.com/hiwane/qeconv/synrac"
 	"strings"
 	"testing"
 	"text/scanner"
@@ -97,8 +99,15 @@ func TestToMath(t *testing.T) {
 		{"x+abs(y+z)=0:", "x+Abs[y+z]==0"},
 	}
 
+	m := new(MathConv)
+	parser := syn.NewSynParse()
 	for i, p := range data {
-		actual0 := ToMath(p.input)
+		fml, cmts, err := parser.Parse(p.input)
+		if err != nil {
+			t.Errorf("err invalid input=%s\n", p.input)
+		}
+		co := NewCnvOut(cmts)
+		actual0, _ := m.Convert(fml, co)
 		actual := removeMathComment(actual0)
 		if !cmpIgnoreSpace(actual, p.expect) {
 			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)

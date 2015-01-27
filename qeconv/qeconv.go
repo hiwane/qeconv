@@ -17,14 +17,20 @@ func main() {
 		from     string
 		to       string
 		dup      bool
+		idx      int
 	)
 
 	flag.StringVar(&from, "f", "syn", "from {syn}")
-	flag.StringVar(&to, "t", "syn", "to {math|tex|qep|red|syn}")
+	flag.StringVar(&to, "t", "syn", "to {tex|math|qep|red|rc|syn|smt2}")
 	flag.StringVar(&filename, "i", "", "input file")
 	flag.StringVar(&output, "o", "", "output file")
-	flag.BoolVar(&dup, "s", false, "dup")
+	flag.BoolVar(&dup, "s", false, "remove duplicate formulas")
+	flag.IntVar(&idx, "n", 0, "index of fof")
 	flag.Parse()
+	if flag.NArg() > 0 {
+		flag.PrintDefaults()
+		os.Exit(2)
+	}
 	var err error
 	var b []byte
 	if filename == "" {
@@ -34,29 +40,19 @@ func main() {
 	}
 
 	if err == nil {
-		var str string
-		if to == "math" {
-			str = qeconv.ToMath(string(b))
-		} else if to == "tex" {
-			str = qeconv.ToLaTeX(string(b))
-		} else if to == "syn" {
-			str = qeconv.ToSyn(string(b), dup)
-		} else if to == "red" {
-			str = qeconv.ToRedlog(string(b))
-		} else if to == "qep" {
-			str, err = qeconv.ToQepcad(string(b))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-		} else if to == "rc" {
-			str, err = qeconv.ToRegularChains(string(b))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-		} else {
-			fmt.Fprintln(os.Stderr, "unsupported -t "+to)
+		cinf, err := qeconv.Str2cinf(to)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		parser, err := qeconv.Str2Parser("syn")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		str, err := qeconv.Convert(parser, cinf, string(b), dup, idx)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 

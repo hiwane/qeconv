@@ -1,6 +1,7 @@
 package qeconv
 
 import (
+	. "github.com/hiwane/qeconv/def"
 	"strings"
 	"testing"
 	"text/scanner"
@@ -24,6 +25,33 @@ func removeLineComment(s string, p rune) string {
 	}
 
 	return string(ret)
+}
+
+func cmpIgnoreSpace(str1, str2 string) bool {
+	var l1 scanner.Scanner
+	var l2 scanner.Scanner
+	l1.Init(strings.NewReader(str1))
+	l2.Init(strings.NewReader(str2))
+
+	for {
+		for l1.Peek() == ' ' || l1.Peek() == '\t' ||
+			l1.Peek() == '\r' || l1.Peek() == '\n' {
+			l1.Next()
+		}
+		for l2.Peek() == ' ' || l2.Peek() == '\t' ||
+			l2.Peek() == '\r' || l2.Peek() == '\n' {
+			l2.Next()
+		}
+		if l1.Peek() == scanner.EOF || l2.Peek() == scanner.EOF {
+			break
+		}
+
+		if l1.Next() != l2.Next() {
+			return false
+		}
+	}
+
+	return l1.Peek() == l2.Peek()
 }
 
 func TestToSyn(t *testing.T) {
@@ -60,9 +88,17 @@ func TestToSyn(t *testing.T) {
 		{"x+abs(y+z)=0:", "x+abs(y+z) = 0:"},
 	}
 
+	m := new(SynConv)
+	parser := NewSynParse()
+
 	for i, p := range data {
-		actual0 := ToSyn(p.input, false)
-		actual := removeLineComment(actual0, '#')
+		fml, cmts, err := parser.Parse(p.input)
+		if err != nil {
+			t.Errorf("err invalid input=%s\n", p.input)
+		}
+		co := NewCnvOut(cmts)
+		actual0, _ := m.Convert(fml, co)
+		actual := removeLineComment(actual0 + m.Sep(), '#')
 		if !cmpIgnoreSpace(actual, p.expect) {
 			t.Errorf("err %d\nactual=%s\nexpect=%s\ninput=%s\n", i, actual0, p.expect, p.input)
 		}

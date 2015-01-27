@@ -5,13 +5,15 @@ import __yyfmt__ "fmt"
 
 //line synparse.y:4
 import (
+	"errors"
 	"fmt"
+	. "github.com/hiwane/qeconv/def"
 	"text/scanner"
 )
 
-var stack *Stack
+var stack *synStack
 
-type Node struct {
+type synNode struct {
 	cmd      int
 	val      int
 	str      string
@@ -20,89 +22,89 @@ type Node struct {
 	lineno   int
 }
 
-//line synparse.y:26
+//line synparse.y:28
 type yySymType struct {
 	yys  int
-	node Node
+	node synNode
 	num  int
 }
 
-const NAME = 57346
-const NUMBER = 57347
-const F_TRUE = 57348
-const F_FALSE = 57349
-const ALL = 57350
-const EX = 57351
-const AND = 57352
-const OR = 57353
-const NOT = 57354
-const ABS = 57355
-const PLUS = 57356
-const MINUS = 57357
-const COMMA = 57358
-const MULT = 57359
-const DIV = 57360
-const POW = 57361
-const EOL = 57362
-const LB = 57363
-const RB = 57364
-const LP = 57365
-const RP = 57366
-const LC = 57367
-const RC = 57368
-const INDEXED = 57369
-const LIST = 57370
-const IMPL = 57371
-const REPL = 57372
-const EQUIV = 57373
-const COMMENT = 57374
-const LTOP = 57375
-const GTOP = 57376
-const LEOP = 57377
-const GEOP = 57378
-const NEOP = 57379
-const EQOP = 57380
-const UNARYMINUS = 57381
-const UNARYPLUS = 57382
+const name = 57346
+const number = 57347
+const f_true = 57348
+const f_false = 57349
+const all = 57350
+const ex = 57351
+const and = 57352
+const or = 57353
+const not = 57354
+const abs = 57355
+const plus = 57356
+const minus = 57357
+const comma = 57358
+const mult = 57359
+const div = 57360
+const pow = 57361
+const eol = 57362
+const lb = 57363
+const rb = 57364
+const lp = 57365
+const rp = 57366
+const lc = 57367
+const rc = 57368
+const indexed = 57369
+const list = 57370
+const impl = 57371
+const repl = 57372
+const equiv = 57373
+const comment = 57374
+const ltop = 57375
+const gtop = 57376
+const leop = 57377
+const geop = 57378
+const neop = 57379
+const eqop = 57380
+const unaryminus = 57381
+const unaryplus = 57382
 
 var yyToknames = []string{
-	"NAME",
-	"NUMBER",
-	"F_TRUE",
-	"F_FALSE",
-	"ALL",
-	"EX",
-	"AND",
-	"OR",
-	"NOT",
-	"ABS",
-	"PLUS",
-	"MINUS",
-	"COMMA",
-	"MULT",
-	"DIV",
-	"POW",
-	"EOL",
-	"LB",
-	"RB",
-	"LP",
-	"RP",
-	"LC",
-	"RC",
-	"INDEXED",
-	"LIST",
-	"IMPL",
-	"REPL",
-	"EQUIV",
-	"COMMENT",
-	"LTOP",
-	"GTOP",
-	"LEOP",
-	"GEOP",
-	"NEOP",
-	"EQOP",
-	"UNARYMINUS",
-	"UNARYPLUS",
+	"name",
+	"number",
+	"f_true",
+	"f_false",
+	"all",
+	"ex",
+	"and",
+	"or",
+	"not",
+	"abs",
+	"plus",
+	"minus",
+	"comma",
+	"mult",
+	"div",
+	"pow",
+	"eol",
+	"lb",
+	"rb",
+	"lp",
+	"rp",
+	"lc",
+	"rc",
+	"indexed",
+	"list",
+	"impl",
+	"repl",
+	"equiv",
+	"comment",
+	"ltop",
+	"gtop",
+	"leop",
+	"geop",
+	"neop",
+	"eqop",
+	"unaryminus",
+	"unaryplus",
 }
 var yyStatenames = []string{}
 
@@ -110,19 +112,15 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line synparse.y:169
+//line synparse.y:171
 
 /*  start  of  programs  */
-
-type Comment struct {
-	lineno int
-	str    string
-}
 
 type SynLex struct {
 	scanner.Scanner
 	s       string
 	comment []Comment
+	err     error
 }
 
 type SynLex1 struct {
@@ -134,34 +132,34 @@ type SynLex1 struct {
 }
 
 var sones = []SynLex1{
-	{"+", PLUS, '+', 2, 4},
-	{"-", MINUS, '-', 2, 4},
-	{"*", MULT, '*', 2, 3},
-	{"/", DIV, '/', 2, 3},
-	{"^", POW, '^', 2, 1},
-	{"[", LB, '[', 0, 0},
-	{"]", RB, ']', 0, 0},
-	{"{", LC, '{', 0, 0},
-	{"}", RC, '}', 0, 0},
-	{"(", LP, '(', 0, 0},
-	{")", RP, ')', 0, 0},
-	{",", COMMA, ',', 0, 0},
-	{":", EOL, ':', 0, 0},
-	{"=", EQOP, '=', 0, 0},
+	{"+", plus, '+', 2, 4},
+	{"-", minus, '-', 2, 4},
+	{"*", mult, '*', 2, 3},
+	{"/", div, '/', 2, 3},
+	{"^", pow, '^', 2, 1},
+	{"[", lb, '[', 0, 0},
+	{"]", rb, ']', 0, 0},
+	{"{", lc, '{', 0, 0},
+	{"}", rc, '}', 0, 0},
+	{"(", lp, '(', 0, 0},
+	{")", rp, ')', 0, 0},
+	{",", comma, ',', 0, 0},
+	{":", eol, ':', 0, 0},
+	{"=", eqop, '=', 0, 0},
 }
 
 var sfuns = []SynLex1{
-	{"And", AND, 0, 0, 1},
-	{"Or", OR, 0, 0, 2},
-	{"Impl", IMPL, 0, 2, 3},
-	{"Repl", REPL, 0, 2, 3},
-	{"Equiv", EQUIV, 0, 2, 3},
-	{"Not", NOT, 0, 1, 0},
-	{"All", ALL, 0, 2, 0},
-	{"Ex", EX, 0, 2, 0},
-	{"true", F_TRUE, 0, 0, 0},
-	{"false", F_FALSE, 0, 0, 0},
-	{"abs", ABS, 0, 0, 0},
+	{"And", and, 0, 0, 1},
+	{"Or", or, 0, 0, 2},
+	{"Impl", impl, 0, 2, 3},
+	{"Repl", repl, 0, 2, 3},
+	{"Equiv", equiv, 0, 2, 3},
+	{"Not", not, 0, 1, 0},
+	{"All", all, 0, 2, 0},
+	{"Ex", ex, 0, 2, 0},
+	{"true", f_true, 0, 0, 0},
+	{"false", f_false, 0, 0, 0},
+	{"abs", abs, 0, 0, 0},
 }
 
 func isupper(ch rune) bool {
@@ -203,7 +201,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 			str += string(l.Next())
 		}
 		if str != "" {
-			l.comment = append(l.comment, Comment{str: str, lineno: lno})
+			l.comment = append(l.comment, NewComment(str, lno))
 		}
 	}
 
@@ -212,7 +210,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 	for i := 0; i < len(sones); i++ {
 		if sones[i].v == c {
 			l.Next()
-			lval.node = Node{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
+			lval.node = synNode{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
 			return sones[i].label
 		}
 	}
@@ -242,7 +240,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
+		lval.node = synNode{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
 		return NUMBER
 	}
 
@@ -251,10 +249,10 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) || isletter(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = Node{cmd: NAME, val: 0, str: string(ret), lineno: lno}
+		lval.node = synNode{cmd: NAME, val: 0, str: string(ret), lineno: lno}
 		for i := 0; i < len(sfuns); i++ {
 			if lval.node.str == sfuns[i].val {
-				lval.node = Node{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
+				lval.node = synNode{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
 
 				// Repl は Impl に変換する.
 				if lval.node.str == "Repl" {
@@ -273,11 +271,13 @@ func (l *SynLex) Lex(lval *yySymType) int {
 
 func (l *SynLex) Error(s string) {
 	pos := l.Pos()
-	fmt.Printf("%s:Error:%s \n", pos.String(), s)
+	if l.err == nil {
+		l.err = errors.New(fmt.Sprintf("%s:Error:%s \n", pos.String(), s))
+	}
 }
 
-func parse(l *SynLex) *Stack {
-	stack = new(Stack)
+func parse(l *SynLex) *synStack {
+	stack = new(synStack)
 	yyParse(l)
 	return stack
 }
@@ -648,223 +648,223 @@ yydefault:
 	switch yynt {
 
 	case 4:
-		//line synparse.y:67
+		//line synparse.y:69
 		{
 			trace("ALL")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 5:
-		//line synparse.y:68
+		//line synparse.y:70
 		{
 			trace("EX")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 6:
-		//line synparse.y:69
+		//line synparse.y:71
 		{
 			trace("and")
 			yyS[yypt-3].node.val = yyS[yypt-1].num
 			stack.push(yyS[yypt-3].node)
 		}
 	case 7:
-		//line synparse.y:70
+		//line synparse.y:72
 		{
 			trace("and()")
-			stack.push(Node{cmd: F_TRUE, val: 0})
+			stack.push(synNode{cmd: F_TRUE, val: 0})
 		}
 	case 8:
-		//line synparse.y:71
+		//line synparse.y:73
 		{
 			trace("or")
 			yyS[yypt-3].node.val = yyS[yypt-1].num
 			stack.push(yyS[yypt-3].node)
 		}
 	case 9:
-		//line synparse.y:72
+		//line synparse.y:74
 		{
 			trace("or()")
-			stack.push(Node{cmd: F_FALSE, val: 0})
+			stack.push(synNode{cmd: F_FALSE, val: 0})
 		}
 	case 10:
-		//line synparse.y:73
+		//line synparse.y:75
 		{
 			trace("not")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 11:
-		//line synparse.y:74
+		//line synparse.y:76
 		{
 			trace("IMPL")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 12:
-		//line synparse.y:75
+		//line synparse.y:77
 		{
 			trace("REPL")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 13:
-		//line synparse.y:76
+		//line synparse.y:78
 		{
 			trace("EQUIV")
 			stack.push(yyS[yypt-5].node)
 		}
 	case 16:
-		//line synparse.y:82
+		//line synparse.y:84
 		{
 			trace("list")
-			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
+			stack.push(synNode{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
 		}
 	case 17:
-		//line synparse.y:86
+		//line synparse.y:88
 		{
 			trace("empty-list")
-			stack.push(Node{cmd: LIST, val: 0, lineno: yyS[yypt-1].node.lineno})
+			stack.push(synNode{cmd: LIST, val: 0, lineno: yyS[yypt-1].node.lineno})
 		}
 	case 18:
-		//line synparse.y:93
+		//line synparse.y:95
 		{
 			yyVAL.num = 1
 		}
 	case 19:
-		//line synparse.y:94
+		//line synparse.y:96
 		{
 			yyVAL.num = yyS[yypt-2].num + 1
 		}
 	case 20:
-		//line synparse.y:98
+		//line synparse.y:100
 		{
 			yyVAL.num = 1
 		}
 	case 21:
-		//line synparse.y:99
+		//line synparse.y:101
 		{
 			yyVAL.num = yyS[yypt-2].num + 1
 		}
 	case 22:
-		//line synparse.y:103
+		//line synparse.y:105
 		{
 			trace("var")
-			stack.push(Node{cmd: LIST, val: 1})
+			stack.push(synNode{cmd: LIST, val: 1})
 		}
 	case 23:
-		//line synparse.y:107
+		//line synparse.y:109
 		{
 			trace("list")
-			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
+			stack.push(synNode{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
 		}
 	case 24:
-		//line synparse.y:111
+		//line synparse.y:113
 		{
 			trace("set")
-			stack.push(Node{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
+			stack.push(synNode{cmd: LIST, val: yyS[yypt-1].num, lineno: yyS[yypt-2].node.lineno})
 		}
 	case 25:
-		//line synparse.y:118
+		//line synparse.y:120
 		{
 			yyVAL.num = 1
 		}
 	case 26:
-		//line synparse.y:119
+		//line synparse.y:121
 		{
 			yyVAL.num = yyS[yypt-2].num + 1
 		}
 	case 27:
-		//line synparse.y:123
+		//line synparse.y:125
 		{
 			trace("name")
 			stack.push(yyS[yypt-0].node)
 		}
 	case 28:
-		//line synparse.y:124
+		//line synparse.y:126
 		{
 			trace("index")
-			stack.push(Node{cmd: INDEXED, val: 2})
+			stack.push(synNode{cmd: INDEXED, val: 2})
 		}
 	case 29:
-		//line synparse.y:128
-		{
-			trace("true")
-			stack.push(Node{cmd: F_TRUE, val: 0})
-		}
-	case 30:
-		//line synparse.y:129
-		{
-			trace("false")
-			stack.push(Node{cmd: F_FALSE, val: 0})
-		}
-	case 31:
 		//line synparse.y:130
 		{
-			trace("<")
-			stack.push(Node{cmd: LTOP, str: "<", val: 2})
+			trace("true")
+			stack.push(synNode{cmd: F_TRUE, val: 0})
 		}
-	case 32:
+	case 30:
 		//line synparse.y:131
 		{
-			trace(">")
-			stack.push(Node{cmd: LTOP, str: ">", val: 2, rev: true})
+			trace("false")
+			stack.push(synNode{cmd: F_FALSE, val: 0})
 		}
-	case 33:
+	case 31:
 		//line synparse.y:132
 		{
-			trace("<=")
-			stack.push(Node{cmd: LEOP, str: "<=", val: 2})
+			trace("<")
+			stack.push(synNode{cmd: LTOP, str: "<", val: 2})
 		}
-	case 34:
+	case 32:
 		//line synparse.y:133
 		{
-			trace(">=")
-			stack.push(Node{cmd: LEOP, str: ">=", val: 2, rev: true})
+			trace(">")
+			stack.push(synNode{cmd: LTOP, str: ">", val: 2, rev: true})
 		}
-	case 35:
+	case 33:
 		//line synparse.y:134
 		{
-			trace("=")
-			stack.push(Node{cmd: EQOP, str: "=", val: 2})
+			trace("<=")
+			stack.push(synNode{cmd: LEOP, str: "<=", val: 2})
 		}
-	case 36:
+	case 34:
 		//line synparse.y:135
 		{
+			trace(">=")
+			stack.push(synNode{cmd: LEOP, str: ">=", val: 2, rev: true})
+		}
+	case 35:
+		//line synparse.y:136
+		{
+			trace("=")
+			stack.push(synNode{cmd: EQOP, str: "=", val: 2})
+		}
+	case 36:
+		//line synparse.y:137
+		{
 			trace("<>")
-			stack.push(Node{cmd: NEOP, str: "<>", val: 2})
+			stack.push(synNode{cmd: NEOP, str: "<>", val: 2})
 		}
 	case 37:
-		//line synparse.y:140
+		//line synparse.y:142
 		{
 			trace("num")
 			stack.push(yyS[yypt-0].node)
 		}
 	case 38:
-		//line synparse.y:141
+		//line synparse.y:143
 		{
 		}
 	case 39:
-		//line synparse.y:142
+		//line synparse.y:144
 		{
 			trace("+")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 40:
-		//line synparse.y:143
+		//line synparse.y:145
 		{
 			trace("-")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 41:
-		//line synparse.y:144
+		//line synparse.y:146
 		{
 			trace("*")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 42:
-		//line synparse.y:145
+		//line synparse.y:147
 		{
 			trace("/")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 43:
-		//line synparse.y:146
+		//line synparse.y:148
 		{
 			trace("-")
 			yyS[yypt-1].node.cmd = UNARYMINUS
@@ -873,7 +873,7 @@ yydefault:
 			stack.push(yyS[yypt-1].node)
 		}
 	case 44:
-		//line synparse.y:148
+		//line synparse.y:150
 		{
 			trace("+")
 			yyS[yypt-1].node.cmd = UNARYPLUS
@@ -882,50 +882,50 @@ yydefault:
 			stack.push(yyS[yypt-1].node)
 		}
 	case 46:
-		//line synparse.y:154
+		//line synparse.y:156
 		{
 			trace("num")
 			stack.push(yyS[yypt-0].node)
 		}
 	case 48:
-		//line synparse.y:156
+		//line synparse.y:158
 		{
 			trace("abs")
 			yyS[yypt-3].node.val = 1
 			stack.push(yyS[yypt-3].node)
 		}
 	case 49:
-		//line synparse.y:157
+		//line synparse.y:159
 		{
 			trace("+")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 50:
-		//line synparse.y:158
+		//line synparse.y:160
 		{
 			trace("-")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 51:
-		//line synparse.y:159
+		//line synparse.y:161
 		{
 			trace("*")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 52:
-		//line synparse.y:160
+		//line synparse.y:162
 		{
 			trace("/")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 53:
-		//line synparse.y:161
+		//line synparse.y:163
 		{
 			trace("^")
 			stack.push(yyS[yypt-1].node)
 		}
 	case 54:
-		//line synparse.y:162
+		//line synparse.y:164
 		{
 			trace("-")
 			yyS[yypt-1].node.cmd = UNARYMINUS
@@ -934,7 +934,7 @@ yydefault:
 			stack.push(yyS[yypt-1].node)
 		}
 	case 55:
-		//line synparse.y:164
+		//line synparse.y:166
 		{
 			trace("+")
 			yyS[yypt-1].node.cmd = UNARYPLUS
