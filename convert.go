@@ -46,7 +46,7 @@ func rmdup(fml Formula) Formula {
 					fml.SetArg(k, args[k])
 				}
 				for k := i + 1; k < len(args); k++ {
-					fml.SetArg(k, args[k+1])
+					fml.SetArg(k-1, args[k])
 				}
 				break
 			}
