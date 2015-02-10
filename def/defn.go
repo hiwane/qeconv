@@ -1,6 +1,7 @@
 package qeconv
 
 import (
+	"bytes"
 	"errors"
 )
 
@@ -48,7 +49,7 @@ type Comment struct {
 }
 
 type CnvOut struct {
-	str     string
+	strbuf  *bytes.Buffer
 	lno     int
 	comment []Comment
 
@@ -124,16 +125,16 @@ func NewCnvOut(comment []Comment) *CnvOut {
 
 func (c *CnvOut) Append(s string) {
 	//	fmt.Printf("append [%s]\n", s)
-	c.str += s
+	c.strbuf.WriteString(s)
 }
 
 func (c *CnvOut) String() string {
 	//	fmt.Printf("append [%s]\n", s)
-	return c.str
+	return c.strbuf.String()
 }
 
 func (c *CnvOut) Reset() {
-	c.str = ""
+	c.strbuf = new(bytes.Buffer)
 	c.lno = 1
 }
 
