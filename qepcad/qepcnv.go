@@ -20,11 +20,11 @@ func (m *QepConv) quantifier(f Formula, co *CnvOut, qstr string) {
 
 	q = f.Arg(1)
 	if q.IsQuantifier() {
+		Conv2(q, m, co)
+	} else {
 		co.Append("[")
 		Conv2(q, m, co)
 		co.Append("]")
-	} else {
-		Conv2(q, m, co)
 	}
 }
 
