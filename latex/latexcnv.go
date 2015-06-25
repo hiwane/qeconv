@@ -107,7 +107,13 @@ func (m *LatexConv) Pow(fml Formula, co *CnvOut) {
 			Conv2(fml.Arg(i), m, co)
 			co.Append("}")
 		} else {
+			if fml.Priority() > 0 && fml.Priority() < fml.Args()[i].Priority() {
+				co.Append("(")
+			}
 			Conv2(fml.Arg(i), m, co)
+			if fml.Priority() > 0 && fml.Priority() < fml.Args()[i].Priority() {
+				co.Append(")")
+			}
 		}
 	}
 }

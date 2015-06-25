@@ -18,6 +18,9 @@ func (self *Formula) Cmd() int {
 func (self *Formula) String() string {
 	return self.str
 }
+func (self *Formula) Priority() int {
+	return self.priority
+}
 func (self *Formula) IsList() bool {
 	return self.cmd == LIST
 }

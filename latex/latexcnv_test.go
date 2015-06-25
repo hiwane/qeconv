@@ -78,6 +78,7 @@ func TestToLaTeX(t *testing.T) {
 		{"Impl(x>0, y<=0):", "0 < x \\rightarrow y \\leq 0"},
 		{"Repl(x<0, y>=0):", "0 \\leq y \\rightarrow x < 0"},
 		{"Equiv(x>0, y<=0):", "0 < x \\leftrightarrow y \\leq 0"},
+		{"((x-1)^3+y)^(1/2) < 0:", "((x-1)^{3}+y)^{1/2} < 0"},
 		{"Ex(x, x^2=-1):", "\\exists x (x^{2}=-1)"},
 		{"All([x], a*x^2+b*x+c>0):", "\\forall x (0<a x^{2}+b x+c)"},
 		{"All([x], Ex([y], x+y+a=0)):", "\\forall x \\exists y(x+y+a=0)"},
