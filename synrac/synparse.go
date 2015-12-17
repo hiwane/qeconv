@@ -116,42 +116,40 @@ type SynLex struct {
 }
 
 type SynLex1 struct {
-	val      string
-	label    int
-	v        int
-	argn     int // 引数の数
-	priority int // 要素に () が必要かを判定するためのフラグ
+	val   string
+	label int
+	v     int
 }
 
 var sones = []SynLex1{
-	{"+", plus, '+', 2, 4},
-	{"-", minus, '-', 2, 4},
-	{"*", mult, '*', 2, 3},
-	{"/", div, '/', 2, 3},
-	{"^", pow, '^', 2, 1},
-	{"[", lb, '[', 0, 0},
-	{"]", rb, ']', 0, 0},
-	{"{", lc, '{', 0, 0},
-	{"}", rc, '}', 0, 0},
-	{"(", lp, '(', 0, 0},
-	{")", rp, ')', 0, 0},
-	{",", comma, ',', 0, 0},
-	{":", eol, ':', 0, 0},
-	{"=", eqop, '=', 0, 0},
+	{"+", plus, '+'},
+	{"-", minus, '-'},
+	{"*", mult, '*'},
+	{"/", div, '/'},
+	{"^", pow, '^'},
+	{"[", lb, '['},
+	{"]", rb, ']'},
+	{"{", lc, '{'},
+	{"}", rc, '}'},
+	{"(", lp, '('},
+	{")", rp, ')'},
+	{",", comma, ','},
+	{":", eol, ':'},
+	{"=", eqop, '='},
 }
 
 var sfuns = []SynLex1{
-	{"And", and, 0, 0, 1},
-	{"Or", or, 0, 0, 2},
-	{"Impl", impl, 0, 2, 3},
-	{"Repl", repl, 0, 2, 3},
-	{"Equiv", equiv, 0, 2, 3},
-	{"Not", not, 0, 1, 0},
-	{"All", all, 0, 2, 0},
-	{"Ex", ex, 0, 2, 0},
-	{"true", f_true, 0, 0, 0},
-	{"false", f_false, 0, 0, 0},
-	{"abs", abs, 0, 0, 0},
+	{"And", and, 0},
+	{"Or", or, 0},
+	{"Impl", impl, 0},
+	{"Repl", repl, 0},
+	{"Equiv", equiv, 0},
+	{"Not", not, 0},
+	{"All", all, 0},
+	{"Ex", ex, 0},
+	{"true", f_true, 0},
+	{"false", f_false, 0},
+	{"abs", abs, 0},
 }
 
 func isupper(ch rune) bool {
