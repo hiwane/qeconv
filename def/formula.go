@@ -8,10 +8,9 @@ type Formula struct {
 	lineno   int
 }
 
-func NewFormula(cmd int, str string, lno int, priority int) Formula {
-	return Formula{cmd: cmd, str: str, lineno: lno, priority: priority}
+func NewFormula(n QeNode) Formula {
+	return Formula{cmd: n.cmd, str: n.str, lineno: n.lineno, priority: n.priority}
 }
-
 func (self *Formula) Cmd() int {
 	return self.cmd
 }

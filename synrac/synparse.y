@@ -8,31 +8,24 @@ import (
 	"text/scanner"
 	"fmt"
 	"errors"
+	"strings"
 )
 
-var stack *synStack
+var stack *QeStack
 
-
-type synNode struct {
-	cmd int
-	val int
-	str string
-	rev bool
-	priority int
-	lineno int
-}
 
 %}
 
 
 %union{
-	node synNode
+	node QeNode
 	num int
 }
 
 %token name number f_true f_false
 %token all ex and or not abs
 %token plus minus comma mult div pow
+%token ltop gtop leop geop neop eqop
 %token eol lb rb lp rp lc rc
 %token indexed list
 %token impl repl equiv
@@ -41,8 +34,10 @@ type synNode struct {
 %type <num> seq_var seq_fof seq_mobj
 %type <node> name number rational var
 %type <node> all ex and or not impl repl equiv abs
+%type <node> ltop gtop leop geop neop eqop
 %type <node> plus minus mult div pow
 %type <node> lb lc
+%type <node> f_true f_false
 
 %left impl repl equiv
 %left or
@@ -66,16 +61,16 @@ mobj : fof
 	 ;
 
 fof
-	: all lp quantifiers comma fof rp { trace("ALL"); stack.push($1)}
-	| ex  lp quantifiers comma fof rp { trace("EX");  stack.push($1)}
-	| and lp seq_fof rp { trace("and"); $1.val=$3; stack.push($1)}
-	| and lp rp { trace("and()"); stack.push(synNode{cmd: F_TRUE, val:0})}
-	| or  lp seq_fof rp { trace("or"); $1.val=$3; stack.push($1)}
-	| or lp rp { trace("or()"); stack.push(synNode{cmd: F_FALSE, val:0})}
-	| not fof { trace("not"); stack.push($1)}
-	| impl lp fof comma fof rp { trace("IMPL"); stack.push($1)}
-	| repl lp fof comma fof rp { trace("REPL"); stack.push($1)}
-	| equiv lp fof comma fof rp { trace("EQUIV"); stack.push($1)}
+	: all lp quantifiers comma fof rp { trace("ALL"); stack.Push($1)}
+	| ex  lp quantifiers comma fof rp { trace("EX");  stack.Push($1)}
+	| and lp seq_fof rp { trace("and"); $1.SetVal($3); stack.Push($1)}
+	| and lp rp { trace("and()"); stack.Push(NewQeNodeBool(true, $1.GetLno()))}
+	| or  lp seq_fof rp { trace("or"); $1.SetVal($3); stack.Push($1)}
+	| or lp rp { trace("or()"); stack.Push(NewQeNodeBool(false, $1.GetLno()))}
+	| not fof { trace("not"); stack.Push($1)}
+	| impl lp fof comma fof rp { trace("IMPL"); stack.Push($1)}
+	| repl lp fof comma fof rp { trace("REPL"); stack.Push($1)}
+	| equiv lp fof comma fof rp { trace("EQUIV"); stack.Push($1)}
 	| lp fof rp
 	| atom
 	;
@@ -83,11 +78,11 @@ fof
 list_of_mobj
 	: lb seq_mobj rb {
 		trace("list")
-		stack.push(synNode{cmd: LIST, val: $2, lineno: $1.lineno})
+		stack.Push(NewQeNodeList($2, $1.GetLno()))
 	}
 	| lb rb {
 		trace("empty-list")
-		stack.push(synNode{cmd: LIST, val: 0, lineno: $1.lineno})
+		stack.Push(NewQeNodeList(0, $1.GetLno()))
 	}
 	;
 
@@ -104,15 +99,15 @@ seq_fof
 quantifiers
 	: var {
 		trace("var")
-		stack.push(synNode{cmd: LIST, val: 1})
+		stack.Push(NewQeNodeList(1,-1))
 	}
 	| lb seq_var rb  /* [x,y,z] */ {
 		trace("list")
-		stack.push(synNode{cmd: LIST, val: $2, lineno: $1.lineno})
+		stack.Push(NewQeNodeList($2, $1.GetLno()))
 	}
 	| lc seq_var rc  /* {x,y,z} */ {
 		trace("set")
-		stack.push(synNode{cmd: LIST, val: $2, lineno: $1.lineno})
+		stack.Push(NewQeNodeList($2, $1.GetLno()))
 	}
 	;
 
@@ -122,49 +117,45 @@ seq_var
 	;
 
 var
-	: name  { trace("name");  stack.push($1)}
-	| var lb number rb  { trace("index");  stack.push(synNode{cmd: INDEXED, val:2})}
+	: name  { trace("name");  stack.Push($1)}
+	| var lb number rb  { trace("index");  stack.Push(NewQeNode(INDEXED, 2, -1))}
 	;
 
 atom
-	: f_true  { trace("true");  stack.push(synNode{cmd: F_TRUE, val:0})}
-	| f_false { trace("false"); stack.push(synNode{cmd: F_FALSE, val:0})}
-	| poly ltop poly { trace("<");  stack.push(synNode{cmd: LTOP, str: "<", val:2})}
-	| poly gtop poly { trace(">");  stack.push(synNode{cmd: LTOP, str: ">", val:2, rev:true})}
-	| poly leop poly { trace("<="); stack.push(synNode{cmd: LEOP, str: "<=", val:2})}
-	| poly geop poly { trace(">="); stack.push(synNode{cmd: LEOP, str: ">=", val:2, rev:true})}
-	| poly eqop poly { trace("=");  stack.push(synNode{cmd: EQOP, str: "=", val:2})}
-	| poly neop poly { trace("<>"); stack.push(synNode{cmd: NEOP, str: "<>", val:2})}
+	: f_true  { trace("true");  stack.Push($1)}
+	| f_false { trace("false"); stack.Push($1)}
+	| poly ltop poly { trace("<");  stack.Push($2)}
+	| poly gtop poly { trace(">");  stack.Push($2)}
+	| poly leop poly { trace("<="); stack.Push($2)}
+	| poly geop poly { trace(">="); stack.Push($2)}
+	| poly eqop poly { trace("=");  stack.Push($2)}
+	| poly neop poly { trace("<>"); stack.Push($2)}
 	;
 
 
 rational
-	: number	{ trace("num"); stack.push($1) }
+	: number	{ trace("num"); stack.Push($1) }
 	| lp rational rp	{}
-	| rational plus rational	{ trace("+"); stack.push($2)}
-	| rational minus rational	{ trace("-"); stack.push($2)}
-	| rational mult rational	{ trace("*"); stack.push($2)}
-	| rational div rational	{ trace("/"); stack.push($2)}
-	| minus rational %prec unaryminus	{ trace("-");
-		$1.cmd = UNARYMINUS; $1.val = 1; $1.priority = 2; stack.push($1) }
-	| plus rational %prec unaryplus	{ trace("+");
-		$1.cmd = UNARYPLUS; $1.val = 1; $1.priority = 2; stack.push($1) }
+	| rational plus rational	{ trace("+"); stack.Push($2)}
+	| rational minus rational	{ trace("-"); stack.Push($2)}
+	| rational mult rational	{ trace("*"); stack.Push($2)}
+	| rational div rational	{ trace("/"); stack.Push($2)}
+	| minus rational %prec unaryminus	{ trace("-"); NewQeNodeStr("-.", $1.GetLno()) }
+	| plus rational %prec unaryplus	{ trace("+"); NewQeNodeStr("+.", $1.GetLno()) }
 	;
 
 poly
 	: lp poly rp
-	| number	{ trace("num"); stack.push($1) }
+	| number	{ trace("num"); stack.Push($1) }
 	| var
-	| abs lp poly rp    { trace("abs"); $1.val = 1; stack.push($1); }
-	| poly plus poly	{ trace("+"); stack.push($2)}
-	| poly minus poly	{ trace("-"); stack.push($2)}
-	| poly mult poly	{ trace("*"); stack.push($2)}
-	| poly div poly	{ trace("/"); stack.push($2)}
-	| poly pow rational { trace("^"); stack.push($2)}
-	| minus poly %prec unaryminus	{ trace("-");
-		$1.cmd = UNARYMINUS; $1.val = 1; $1.priority = 2; stack.push($1) }
-	| plus poly %prec unaryplus	{ trace("+");
-		$1.cmd = UNARYPLUS; $1.val = 1; $1.priority = 2; stack.push($1) }
+	| abs lp poly rp    { trace("abs"); stack.Push($1); }
+	| poly plus poly	{ trace("+"); stack.Push($2)}
+	| poly minus poly	{ trace("-"); stack.Push($2)}
+	| poly mult poly	{ trace("*"); stack.Push($2)}
+	| poly div poly	{ trace("/"); stack.Push($2)}
+	| poly pow rational { trace("^"); stack.Push($2)}
+	| minus poly %prec unaryminus	{ trace("-"); stack.Push(NewQeNodeStr("-.", $1.GetLno())) }
+	| plus poly %prec unaryplus	{ trace("+"); stack.Push(NewQeNodeStr("+.", $1.GetLno())) }
 	;
 
 
@@ -264,7 +255,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 	for i := 0; i < len(sones); i++ {
 		if sones[i].v == c {
 			l.Next()
-			lval.node = synNode{cmd: sones[i].label, val: sones[i].argn, str: sones[i].val, priority: sones[i].priority, lineno: lno}
+			lval.node = NewQeNodeStr(sones[i].val, lno)
 			return sones[i].label
 		}
 	}
@@ -272,20 +263,25 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		l.Next()
 		if l.Peek() == '=' {
 			l.Next()
-			return GEOP
+			lval.node = NewQeNodeStr(">=", lno)
+			return geop
 		} else {
-			return GTOP
+			lval.node = NewQeNodeStr(">", lno)
+			return gtop
 		}
 	} else if c == '<' {
 		l.Next()
 		if l.Peek() == '=' {
 			l.Next()
-			return LEOP
+			lval.node = NewQeNodeStr("<=", lno)
+			return leop
 		} else if l.Peek() == '>' {
 			l.Next()
-			return NEOP
+			lval.node = NewQeNodeStr("<>", lno)
+			return neop
 		} else {
-			return LTOP
+			lval.node = NewQeNodeStr("<", lno)
+			return ltop
 		}
 	}
 
@@ -294,8 +290,8 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = synNode{cmd: NUMBER, val: 0, str: string(ret), lineno: lno}
-		return NUMBER
+		lval.node = NewQeNodeNum(string(ret), lno)
+		return number
 	}
 
 	if isalnum(l.Peek()) || c == '_' {
@@ -303,21 +299,16 @@ func (l *SynLex) Lex(lval *yySymType) int {
 		for isdigit(l.Peek()) || isletter(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = synNode{cmd: NAME, val: 0, str: string(ret), lineno: lno}
+		str := string(ret)
 		for i := 0; i < len(sfuns); i++ {
-			if lval.node.str == sfuns[i].val {
-				lval.node = synNode{cmd: sfuns[i].label, val: sfuns[i].argn, str: sfuns[i].val, priority: sfuns[i].priority, lineno: lno}
-
-				// Repl は Impl に変換する.
-				if lval.node.str == "Repl" {
-					lval.node.rev = true
-					lval.node.cmd = IMPL
-				}
+			if str == sfuns[i].val {
+				lval.node = NewQeNodeStr(str, lno)
 				return sfuns[i].label
 			}
 		}
 
-		return NAME
+		lval.node = NewQeNodeStr(str, lno)
+		return name
 	}
 
 	return int(c)
@@ -330,10 +321,12 @@ func (l *SynLex) Error(s string) {
 	}
 }
 
-func parse(l *SynLex) *synStack {
-	stack = new(synStack)
+func parse(str string) (*QeStack, []Comment, error) {
+	l := new(SynLex)
+	l.Init(strings.NewReader(str))
+	stack = new(QeStack)
 	yyParse(l)
-	return stack
+	return stack, l.comment, l.err
 }
 
 func trace(s string) {

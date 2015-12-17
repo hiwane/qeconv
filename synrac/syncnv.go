@@ -2,60 +2,16 @@ package qeconv
 
 import (
 	. "github.com/hiwane/qeconv/def"
-	"strings"
 )
 
 type SynParse struct {
-	cnvdict map[int]int
 }
 
 func NewSynParse() *SynParse {
 	p := new(SynParse)
-	p.cnvdict = newConvDict()
 	return p
 }
 
-func newConvDict() map[int]int {
-	return map[int]int{
-		name:       NAME,
-		number:     NUMBER,
-		f_true:     F_TRUE,
-		f_false:    F_FALSE,
-		all:        ALL,
-		ex:         EX,
-		and:        AND,
-		or:         OR,
-		not:        NOT,
-		abs:        ABS,
-		plus:       PLUS,
-		minus:      MINUS,
-		comma:      COMMA,
-		mult:       MULT,
-		div:        DIV,
-		pow:        POW,
-		eol:        EOL,
-		lb:         LB,
-		rb:         RB,
-		lp:         LP,
-		rp:         RP,
-		lc:         LC,
-		rc:         RC,
-		indexed:    INDEXED,
-		list:       LIST,
-		impl:       IMPL,
-		repl:       REPL,
-		equiv:      EQUIV,
-		comment:    COMMENT,
-		ltop:       LTOP,
-		gtop:       GTOP,
-		leop:       LEOP,
-		geop:       GEOP,
-		neop:       NEOP,
-		eqop:       EQOP,
-		unaryminus: UNARYMINUS,
-		unaryplus:  UNARYPLUS,
-	}
-}
 
 func (m *SynParse) charIndex(str string, sep uint8) int {
 	comment := false
@@ -81,30 +37,10 @@ func (self *SynParse) Next(str string) int {
 }
 
 func (self *SynParse) Parse(str string) (Formula, []Comment, error) {
-	l := new(SynLex)
-	l.Init(strings.NewReader(str))
-	stack := parse(l)
-	return self.tofml(stack), l.comment, l.err
+	stack, c, e := parse(str)
+	return ToFml(stack), c, e
 }
 
-func (self *SynParse) tofml(s *synStack) Formula {
-	n, _ := s.pop()
-	fml := NewFormula(self.cnvdict[n.cmd], n.str, n.lineno, n.priority)
-	fml.SetArgLen(n.val)
-	if (n.cmd == or || n.cmd == and) && n.val == 1 {
-		return self.tofml(s)
-	}
-	if n.rev {
-		for i := 0; i < n.val; i++ {
-			fml.SetArg(i, self.tofml(s))
-		}
-	} else {
-		for i := 0; i < n.val; i++ {
-			fml.SetArg(n.val-i-1, self.tofml(s))
-		}
-	}
-	return fml
-}
 
 type SynConv struct {
 	*CnvInfStrstruct

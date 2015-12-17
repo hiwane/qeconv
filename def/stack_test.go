@@ -4,17 +4,17 @@ import (
 	"testing"
 )
 
-func TestsynStack(t *testing.T) {
-	var s *synStack
-	s = new(synStack)
+func TestQeStack(t *testing.T) {
+	var s *QeStack
+	s = new(QeStack)
 	if !s.empty() {
 		t.Error("empty0")
 	}
-	s.push(synNode{cmd: 1})
+	s.Push(QeNode{cmd: 1})
 	if s.empty() {
 		t.Error("empty1")
 	}
-	s.push(synNode{cmd: 2})
+	s.Push(QeNode{cmd: 2})
 	if s.empty() {
 		t.Error("empty2")
 	}
@@ -27,12 +27,12 @@ func TestsynStack(t *testing.T) {
 		t.Error("empty2-2")
 	}
 
-	s.push(synNode{cmd: 3})
+	s.Push(QeNode{cmd: 3})
 	if s.empty() {
 		t.Error("empty3")
 	}
 
-	s.push(synNode{cmd: 4})
+	s.Push(QeNode{cmd: 4})
 	if s.empty() {
 		t.Error("empty4")
 	}
