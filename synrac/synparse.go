@@ -108,20 +108,20 @@ const yyMaxDepth = 200
 
 /*  start  of  programs  */
 
-type SynLex struct {
+type synLex struct {
 	scanner.Scanner
 	s       string
 	comment []Comment
 	err     error
 }
 
-type SynLex1 struct {
+type synLex1 struct {
 	val   string
 	label int
 	v     int
 }
 
-var sones = []SynLex1{
+var sones = []synLex1{
 	{"+", plus, '+'},
 	{"-", minus, '-'},
 	{"*", mult, '*'},
@@ -138,7 +138,7 @@ var sones = []SynLex1{
 	{"=", eqop, '='},
 }
 
-var sfuns = []SynLex1{
+var sfuns = []synLex1{
 	{"And", and, 0},
 	{"Or", or, 0},
 	{"Impl", impl, 0},
@@ -174,7 +174,7 @@ func isspace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 }
 
-func (l *SynLex) Lex(lval *yySymType) int {
+func (l *synLex) Lex(lval *yySymType) int {
 
 	// skip space
 	for {
@@ -259,7 +259,7 @@ func (l *SynLex) Lex(lval *yySymType) int {
 	return int(c)
 }
 
-func (l *SynLex) Error(s string) {
+func (l *synLex) Error(s string) {
 	pos := l.Pos()
 	if l.err == nil {
 		l.err = errors.New(fmt.Sprintf("%s:Error:%s \n", pos.String(), s))
@@ -267,7 +267,7 @@ func (l *SynLex) Error(s string) {
 }
 
 func parse(str string) (*QeStack, []Comment, error) {
-	l := new(SynLex)
+	l := new(synLex)
 	l.Init(strings.NewReader(str))
 	stack = new(QeStack)
 	yyParse(l)
