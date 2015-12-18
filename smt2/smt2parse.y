@@ -31,7 +31,7 @@ type smt2node struct {
 
 %token number symbol keyword string_
 %token forall exists let as theory par
-%token assert check_sat declare_fun set_info set_logic exit
+%token assert check_sat declare_const declare_fun set_info set_logic exit
 %token set_option
 %token ltop gtop leop geop eqop
 %token plus minus mult div
@@ -237,6 +237,11 @@ command : '(' assert term ')' { assert_cnt += 1 }
 			decfun_cnt += 1
 		}
 		| '(' declare_fun symbol '(' sort1 ')' sort ')' { yylex.Error("unknown declare") }
+		| '(' declare_const symbol sort ')' {
+			stack.Push(NewQeNodeStr($3.str, $3.lno))
+			stack.Push(NewQeNodeList(1, $3.lno))
+			decfun_cnt += 1
+		}
 //		| '(' define_fun fun_def ')'
 		| '(' set_info attribute ')'
 		| '(' set_logic symbol ')' { if $3.str != "QF_NRA" && $3.str != "NRA" { yylex.Error("unknown logic") }}
@@ -269,6 +274,7 @@ var keywords_tbl = []smt2_lext {
 	{"check-sat", check_sat},
 	{"exit", exit},
 	{"declare-fun", declare_fun},
+	{"declare-const", declare_const},
 	{"set-info", set_info},
 	{"set-logic", set_logic},
 	{"set-option", set_option},
@@ -285,6 +291,7 @@ var keywords_tbl = []smt2_lext {
 	{"and", and},
 	{"or", or},
 	{"implies", implies},
+	{"=>", implies},
 }
 
 func isupper(ch rune) bool {
