@@ -113,6 +113,8 @@ func (self *CnvInfStrstruct) LineAlign() bool {
 
 type Parser interface {
 	Parse(str string) (Formula, []Comment, error)
+
+	// str を解析し、次に読むところまでの index を返す
 	Next(str string) int
 }
 
@@ -204,14 +206,14 @@ func Mop(fml Formula, cinf CnvInfMathOp, op string, co *CnvOut) {
 }
 
 func Uniop(fml Formula, cinf CnvInfMathOp, op string, co *CnvOut) {
+	co.Append("(")
 	co.Append(op)
-	if fml.priority > 0 && fml.priority < fml.Args()[0].priority {
-		co.Append("(")
-		Convm(fml.Args()[0], cinf, co)
-		co.Append(")")
-	} else {
-		Convm(fml.Args()[0], cinf, co)
-	}
+//	if fml.priority > 0 && fml.priority < fml.Args()[0].priority {
+	Convm(fml.Args()[0], cinf, co)
+	co.Append(")")
+	// } else {
+	// 	Convm(fml.Args()[0], cinf, co)
+	// }
 }
 
 func Conv2(fml Formula, cinf CnvInf, co *CnvOut) {

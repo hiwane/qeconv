@@ -6,6 +6,27 @@ import (
 	"strconv"
 )
 
+type Smt2Parse struct {
+}
+
+func NewSmt2Parse() *Smt2Parse {
+	p := new(Smt2Parse)
+	return p
+}
+
+func (self *Smt2Parse) Next(str string) int {
+	if str == "" {
+		return -1
+	}
+	return len(str)
+}
+
+func (self *Smt2Parse) Parse(str string) (Formula, []Comment, error) {
+	stack, c, e := parse(str)
+	return ToFml(stack), c, e
+}
+
+
 type Smt2Conv struct {
 	*CnvInfStrstruct
 	err error

@@ -17,6 +17,13 @@ func NewQeNodeBool(b bool, lno int) QeNode {
 	}
 }
 
+func NewQeNodeStrVal(str string, val, lno int) QeNode {
+	q := NewQeNodeStr(str, lno)
+	q.SetVal(val)
+	return q
+}
+
+
 func NewQeNodeStr(str string, lno int) QeNode {
 	if str == "<" {
 		return QeNode{cmd: LTOP, str: "<", val: 2}

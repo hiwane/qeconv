@@ -20,7 +20,7 @@ func main() {
 		idx      int
 	)
 
-	flag.StringVar(&from, "f", "syn", "from {syn}")
+	flag.StringVar(&from, "f", "syn", "from {syn|smt2}")
 	flag.StringVar(&to, "t", "syn", "to {tex|math|qep|red|rc|syn|smt2}")
 	flag.StringVar(&filename, "i", "", "input file")
 	flag.StringVar(&output, "o", "", "output file")
@@ -45,7 +45,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		parser, err := qeconv.Str2Parser("syn")
+		parser, err := qeconv.Str2Parser(from)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
