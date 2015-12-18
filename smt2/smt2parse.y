@@ -35,12 +35,12 @@ type smt2node struct {
 %token set_option
 %token ltop gtop leop geop eqop
 %token plus minus mult div
-%token not and or
+%token not and or implies
 
 %type <node> number symbol keyword id string_ spec_const
 %type <node> plus minus mult div
 %type <node> ltop gtop leop geop eqop
-%type <node> and or not
+%type <node> and or not implies
 %type <node> check_sat
 %type <num> s_exp0 term1 var_bind1 sorted_var1
 
@@ -139,6 +139,7 @@ term : spec_const { stack.Push(NewQeNodeNum($1.str, $1.lno)) }
 	  | '(' not term ')' { stack.Push(NewQeNodeStr("Not", $2.lno)) }
 	  | '(' and term1 ')' { stack.Push(NewQeNodeStrVal("And", $3, $2.lno)) }
 	  | '(' or term1 ')' { stack.Push(NewQeNodeStrVal("Or", $3, $2.lno)) }
+	  | '(' implies term term ')' { stack.Push(NewQeNodeStr("Impl", $2.lno)) }
 	 ;
 
 term1: term { $$ = 1}
@@ -283,6 +284,7 @@ var keywords_tbl = []smt2_lext {
 	{"not", not},
 	{"and", and},
 	{"or", or},
+	{"implies", implies},
 }
 
 func isupper(ch rune) bool {
