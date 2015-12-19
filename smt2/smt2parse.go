@@ -15,6 +15,7 @@ import (
 var stack *QeStack
 var assert_cnt int
 var decfun_cnt int
+var letmap map[string](*QeStack)
 
 type smt2node struct {
 	lno, col int
@@ -22,7 +23,7 @@ type smt2node struct {
 	str      string
 }
 
-//line smt2parse.y:27
+//line smt2parse.y:28
 type yySymType struct {
 	yys  int
 	node smt2node
@@ -60,12 +61,14 @@ const not = 57373
 const and = 57374
 const or = 57375
 const implies = 57376
-const impl = 57377
-const repl = 57378
-const equiv = 57379
-const unaryminus = 57380
-const unaryplus = 57381
-const pow = 57382
+const lp = 57377
+const rp = 57378
+const impl = 57379
+const repl = 57380
+const equiv = 57381
+const unaryminus = 57382
+const unaryplus = 57383
+const pow = 57384
 
 var yyToknames = []string{
 	"number",
@@ -99,6 +102,8 @@ var yyToknames = []string{
 	"and",
 	"or",
 	"implies",
+	"lp",
+	"rp",
 	"impl",
 	"repl",
 	"equiv",
@@ -112,7 +117,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line smt2parse.y:252
+//line smt2parse.y:266
 
 /*  start  of  programs  */
 
@@ -208,7 +213,12 @@ func (l *synLex) Lex(lval *yySymType) int {
 	col := l.Pos().Column
 	if c == '(' || c == ')' {
 		l.Next()
-		return c
+		lval.num = stack.Length()
+		if c == '(' {
+			return lp
+		} else {
+			return rp
+		}
 	}
 
 	if isdigit(l.Peek()) {
@@ -284,12 +294,18 @@ func (l *synLex) Error(s string) {
 	}
 }
 
+func update_letmap(s *QeStack, pos int, sym smt2node, lmap map[string](*QeStack)) {
+	nstack := s.Popn(s.Length() - pos)
+	lmap[sym.str] = nstack
+}
+
 func parse(str string) (*QeStack, []Comment, error) {
 	l := new(synLex)
 	l.Init(strings.NewReader(str))
 	stack = new(QeStack)
 	assert_cnt = 0
 	decfun_cnt = 0
+	letmap = make(map[string](*QeStack))
 	yyParse(l)
 	return stack, l.comment, l.err
 }
@@ -311,53 +327,52 @@ const yyPrivate = 57344
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 208
+const yyLast = 195
 
 var yyAct = []int{
 
-	56, 14, 19, 84, 81, 77, 47, 13, 17, 20,
-	83, 18, 136, 17, 106, 107, 18, 17, 106, 107,
-	18, 17, 20, 20, 18, 85, 115, 48, 51, 85,
-	112, 82, 109, 135, 134, 133, 132, 20, 64, 65,
-	66, 67, 68, 69, 130, 16, 72, 122, 121, 48,
-	108, 131, 120, 75, 108, 104, 79, 55, 16, 98,
-	102, 79, 79, 79, 79, 91, 92, 93, 94, 95,
-	86, 79, 79, 99, 73, 119, 48, 48, 118, 105,
-	100, 101, 117, 116, 96, 110, 76, 113, 54, 49,
-	113, 60, 61, 62, 63, 28, 22, 21, 85, 82,
-	59, 70, 71, 58, 57, 48, 46, 4, 26, 123,
-	125, 20, 126, 127, 124, 20, 129, 48, 31, 32,
-	30, 128, 17, 20, 114, 18, 105, 17, 20, 111,
-	18, 27, 40, 38, 39, 37, 41, 33, 34, 35,
-	36, 42, 43, 44, 45, 17, 20, 24, 18, 17,
-	20, 15, 18, 17, 20, 23, 18, 25, 3, 16,
-	97, 5, 50, 74, 16, 90, 17, 20, 29, 18,
-	17, 52, 103, 18, 6, 7, 10, 9, 11, 12,
-	8, 2, 16, 89, 1, 80, 16, 88, 0, 0,
-	16, 87, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 16, 78, 0, 0, 53,
+	56, 14, 19, 84, 81, 77, 47, 13, 85, 115,
+	83, 85, 112, 17, 106, 107, 18, 82, 109, 17,
+	106, 107, 18, 17, 20, 136, 18, 48, 51, 17,
+	20, 135, 18, 134, 133, 132, 130, 122, 64, 65,
+	66, 67, 68, 69, 108, 131, 72, 20, 121, 48,
+	108, 104, 20, 75, 16, 98, 79, 55, 120, 119,
+	16, 79, 79, 79, 79, 91, 92, 93, 94, 95,
+	86, 79, 79, 99, 118, 117, 48, 48, 102, 105,
+	100, 101, 116, 73, 96, 110, 76, 113, 54, 49,
+	113, 60, 61, 62, 63, 28, 17, 20, 22, 18,
+	21, 70, 71, 85, 82, 48, 59, 58, 57, 123,
+	125, 46, 126, 127, 124, 20, 129, 48, 31, 32,
+	30, 128, 17, 20, 4, 18, 105, 16, 97, 26,
+	15, 20, 40, 38, 39, 37, 41, 33, 34, 35,
+	36, 42, 43, 44, 45, 17, 20, 29, 18, 17,
+	20, 114, 18, 16, 90, 17, 20, 111, 18, 17,
+	20, 27, 18, 17, 52, 24, 18, 6, 7, 10,
+	9, 11, 12, 8, 23, 3, 16, 89, 5, 25,
+	16, 88, 50, 74, 103, 2, 16, 87, 1, 80,
+	16, 78, 0, 0, 53,
 }
 var yyPact = []int{
 
-	66, -1000, 66, -1000, 160, -1000, 4, 55, 54, 150,
-	142, 102, 126, 53, -1000, -1000, 110, -1000, -1000, -1000,
-	-1000, -1000, -1000, 65, 106, 47, 166, 46, -1000, 4,
-	63, 62, 59, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 32, 44, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, 162, -1000, 58, 57, 57,
-	149, 145, 141, 123, 4, 4, 4, 4, 4, 42,
-	118, 17, 4, 106, 18, -1000, -1000, 13, -1000, -1000,
-	-10, -1000, 124, -12, -1000, 119, -16, -1000, -1000, -1000,
-	-1000, 41, 40, 36, 33, 10, -1000, -1000, -1000, 6,
-	5, -1000, 106, -1000, -1000, -1000, -1000, -1000, -1000, 4,
-	-1000, 4, 4, -1000, 106, 4, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, 2, 9, -6, -7, -8, -9, -30,
+	89, -1000, 89, -1000, 153, -1000, 25, 64, 62, 169,
+	160, 123, 156, 59, -1000, -1000, 110, -1000, -1000, -1000,
+	-1000, -1000, -1000, 76, 126, 53, 159, 52, -1000, 25,
+	73, 72, 71, 25, 25, 25, 25, 25, 25, 25,
+	25, 25, 25, 25, 25, 25, 47, 50, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, 155, -1000, 69, 68, 68,
+	151, 145, 141, 118, 25, 25, 25, 25, 25, 48,
+	92, 19, 25, 126, 42, -1000, -1000, 15, -1000, -1000,
+	-18, -1000, 152, -24, -1000, 146, -27, -1000, -1000, -1000,
+	-1000, 46, 39, 38, 23, 22, -1000, -1000, -1000, 12,
+	1, -1000, 126, -1000, -1000, -1000, -1000, -1000, -1000, 25,
+	-1000, 25, 25, -1000, 126, 25, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, 0, 9, -1, -2, -3, -5, -11,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 2, 1, 5, 57, 185, 10, 184, 181, 158,
-	172, 6, 163, 162, 157, 157, 0, 151, 3, 4,
+	0, 2, 1, 5, 57, 189, 10, 188, 185, 175,
+	184, 6, 183, 182, 179, 179, 0, 130, 3, 4,
 }
 var yyR1 = []int{
 
@@ -379,20 +394,20 @@ var yyR2 = []int{
 }
 var yyChk = []int{
 
-	-1000, -7, -8, -9, 41, -9, 14, 15, 20, 17,
-	16, 18, 19, -16, -2, -17, 41, 4, 7, -1,
-	5, 42, 42, 5, 5, -14, 6, 5, 42, -17,
+	-1000, -7, -8, -9, 35, -9, 14, 15, 20, 17,
+	16, 18, 19, -16, -2, -17, 35, 4, 7, -1,
+	5, 36, 36, 5, 5, -14, 6, 5, 36, -17,
 	10, 8, 9, 27, 28, 29, 30, 25, 23, 24,
-	22, 26, 31, 32, 33, 34, 41, -11, -1, 42,
-	-13, -2, 5, 41, 42, -4, -16, 41, 41, 41,
+	22, 26, 31, 32, 33, 34, 35, -11, -1, 36,
+	-13, -2, 5, 35, 36, -4, -16, 35, 35, 35,
 	-4, -4, -4, -4, -16, -16, -16, -16, -16, -16,
-	-4, -4, -16, 42, -12, -11, 42, -3, 42, -16,
-	-5, -19, 41, -6, -18, 41, -6, 42, 42, 42,
-	42, -16, -16, -16, -16, -16, 42, 42, 42, -16,
-	-11, -11, 42, -10, 42, -2, 5, 6, 41, 42,
-	-19, 5, 42, -18, 5, 42, 42, 42, 42, 42,
-	42, 42, 42, -11, -3, -16, -16, -16, -11, -16,
-	42, 42, 42, 42, 42, 42, 42,
+	-4, -4, -16, 36, -12, -11, 36, -3, 36, -16,
+	-5, -19, 35, -6, -18, 35, -6, 36, 36, 36,
+	36, -16, -16, -16, -16, -16, 36, 36, 36, -16,
+	-11, -11, 36, -10, 36, -2, 5, 6, 35, 36,
+	-19, 5, 36, -18, 5, 36, 36, 36, 36, 36,
+	36, 36, 36, -11, -3, -16, -16, -16, -11, -16,
+	36, 36, 36, 36, 36, 36, 36,
 }
 var yyDef = []int{
 
@@ -413,18 +428,15 @@ var yyDef = []int{
 }
 var yyTok1 = []int{
 
-	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	41, 42,
+	1,
 }
 var yyTok2 = []int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-	32, 33, 34, 35, 36, 37, 38, 39, 40,
+	32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
+	42,
 }
 var yyTok3 = []int{
 	0,
@@ -656,66 +668,80 @@ yydefault:
 	switch yynt {
 
 	case 1:
-		//line smt2parse.y:60
+		//line smt2parse.y:64
 		{
 			trace("eof")
 		}
 	case 2:
-		//line smt2parse.y:64
+		//line smt2parse.y:68
 		{
 			trace("command")
 		}
 	case 3:
-		//line smt2parse.y:65
+		//line smt2parse.y:69
 		{
 			trace("commands")
 		}
 	case 8:
-		//line smt2parse.y:76
+		//line smt2parse.y:80
 		{
 			yyVAL.num = 0
 		}
 	case 9:
-		//line smt2parse.y:77
+		//line smt2parse.y:81
 		{
 			yyVAL.num = yyS[yypt-1].num + 1
 		}
 	case 10:
-		//line smt2parse.y:81
+		//line smt2parse.y:85
 		{
 			yyVAL.node = yyS[yypt-0].node
 		}
 	case 11:
-		//line smt2parse.y:82
+		//line smt2parse.y:86
 		{
 			yyVAL.node = yyS[yypt-0].node
 		}
 	case 12:
-		//line smt2parse.y:90
+		//line smt2parse.y:94
 		{
 			yyVAL.node = yyS[yypt-0].node
 		}
 	case 13:
-		//line smt2parse.y:92
+		//line smt2parse.y:96
 		{
 			if yyS[yypt-0].node.str != "Real" {
 				yylex.Error("unknown sort")
 			}
 		}
 	case 23:
-		//line smt2parse.y:115
+		//line smt2parse.y:119
 		{
 			stack.Push(NewQeNodeNum(yyS[yypt-0].node.str, yyS[yypt-0].node.lno))
 		}
-	case 29:
+	case 26:
 		//line smt2parse.y:122
+		{
+		}
+	case 27:
+		//line smt2parse.y:124
+		{
+			yylex.Error("unsupported " + yyS[yypt-5].node.str)
+		}
+	case 28:
+		//line smt2parse.y:125
+		{
+			yylex.Error("unsupported " + yyS[yypt-5].node.str)
+		}
+	case 29:
+		//line smt2parse.y:127
 		{
 			if yyS[yypt-1].num > 1 {
 				stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
 			}
 		}
 	case 30:
-		//line smt2parse.y:126
+		//line smt2parse.y:131
 		{
 			if yyS[yypt-1].num == 1 {
 				stack.Push(NewQeNodeStr("-.", yyS[yypt-2].node.lno))
@@ -724,131 +750,141 @@ yydefault:
 			}
 		}
 	case 31:
-		//line smt2parse.y:132
+		//line smt2parse.y:137
 		{
 			stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
 		}
 	case 32:
-		//line smt2parse.y:133
+		//line smt2parse.y:138
 		{
 			stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
 		}
 	case 33:
-		//line smt2parse.y:134
+		//line smt2parse.y:139
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
 		}
 	case 34:
-		//line smt2parse.y:135
+		//line smt2parse.y:140
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
 		}
 	case 35:
-		//line smt2parse.y:136
+		//line smt2parse.y:141
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
 		}
 	case 36:
-		//line smt2parse.y:137
+		//line smt2parse.y:142
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
 		}
 	case 37:
-		//line smt2parse.y:138
+		//line smt2parse.y:143
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
 		}
 	case 38:
-		//line smt2parse.y:139
+		//line smt2parse.y:144
 		{
 			stack.Push(NewQeNodeStr("Not", yyS[yypt-2].node.lno))
 		}
 	case 39:
-		//line smt2parse.y:140
+		//line smt2parse.y:145
 		{
 			stack.Push(NewQeNodeStrVal("And", yyS[yypt-1].num, yyS[yypt-2].node.lno))
 		}
 	case 40:
-		//line smt2parse.y:141
+		//line smt2parse.y:146
 		{
 			stack.Push(NewQeNodeStrVal("Or", yyS[yypt-1].num, yyS[yypt-2].node.lno))
 		}
 	case 41:
-		//line smt2parse.y:142
+		//line smt2parse.y:147
 		{
 			stack.Push(NewQeNodeStr("Impl", yyS[yypt-3].node.lno))
 		}
 	case 42:
-		//line smt2parse.y:145
-		{
-			yyVAL.num = 1
-		}
-	case 43:
-		//line smt2parse.y:146
-		{
-			yyVAL.num = yyS[yypt-1].num + 1
-		}
-	case 44:
 		//line smt2parse.y:150
 		{
 			yyVAL.num = 1
 		}
-	case 45:
+	case 43:
 		//line smt2parse.y:151
 		{
 			yyVAL.num = yyS[yypt-1].num + 1
 		}
-	case 46:
+	case 44:
 		//line smt2parse.y:155
 		{
 			yyVAL.num = 1
 		}
-	case 47:
+	case 45:
 		//line smt2parse.y:156
 		{
 			yyVAL.num = yyS[yypt-1].num + 1
 		}
-	case 50:
-		//line smt2parse.y:164
+	case 46:
+		//line smt2parse.y:160
 		{
-			stack.Push(NewQeNodeStr(yyS[yypt-0].node.str, yyS[yypt-0].node.lno))
+			yyVAL.num = 1
+		}
+	case 47:
+		//line smt2parse.y:161
+		{
+			yyVAL.num = yyS[yypt-1].num + 1
+		}
+	case 49:
+		//line smt2parse.y:166
+		{
+			update_letmap(stack, yyS[yypt-3].num, yyS[yypt-2].node, letmap)
+		}
+	case 50:
+		//line smt2parse.y:171
+		{
+			v, ok := letmap[yyS[yypt-0].node.str]
+			if ok {
+				// letmap の内容を挿入する.
+				stack.Pushn(v)
+			} else {
+				stack.Push(NewQeNodeStr(yyS[yypt-0].node.str, yyS[yypt-0].node.lno))
+			}
 		}
 	case 51:
-		//line smt2parse.y:225
+		//line smt2parse.y:240
 		{
 			assert_cnt += 1
 		}
 	case 52:
-		//line smt2parse.y:226
+		//line smt2parse.y:241
 		{
 			trace("go check-sat")
 			stack.Push(NewQeNodeStrVal("And", assert_cnt, 0))
 			for i := 0; i < decfun_cnt; i++ {
 				stack.Push(NewQeNodeStr("Ex", 0))
 			}
-
 		}
 	case 54:
-		//line smt2parse.y:234
+		//line smt2parse.y:248
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-4].node.str, yyS[yypt-4].node.lno))
 			stack.Push(NewQeNodeList(1, yyS[yypt-4].node.lno))
 			decfun_cnt += 1
 		}
 	case 55:
-		//line smt2parse.y:239
+		//line smt2parse.y:253
 		{
 			yylex.Error("unknown declare")
 		}
 	case 56:
-		//line smt2parse.y:240
+		//line smt2parse.y:254
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-2].node.str, yyS[yypt-2].node.lno))
 			stack.Push(NewQeNodeList(1, yyS[yypt-2].node.lno))
 			decfun_cnt += 1
 		}
 	case 58:
-		//line smt2parse.y:247
+		//line smt2parse.y:261
 		{
 			if yyS[yypt-1].node.str != "QF_NRA" && yyS[yypt-1].node.str != "NRA" {
 				yylex.Error("unknown logic")

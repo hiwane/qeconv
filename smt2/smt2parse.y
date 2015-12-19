@@ -6,14 +6,15 @@ package qeconv
 import (
 	. "github.com/hiwane/qeconv/def"
 	"text/scanner"
-	"fmt"
 	"errors"
+	"fmt"
 	"strings"
 )
 
 var stack *QeStack
 var assert_cnt int
 var decfun_cnt int
+var letmap map[string](*QeStack)
 
 type smt2node struct {
 	lno, col int
@@ -36,13 +37,16 @@ type smt2node struct {
 %token ltop gtop leop geop eqop
 %token plus minus mult div
 %token not and or implies
+%token lp rp
 
 %type <node> number symbol keyword id string_ spec_const
+%type <node> forall exists let
 %type <node> plus minus mult div
 %type <node> ltop gtop leop geop eqop
 %type <node> and or not implies
 %type <node> check_sat
 %type <num> s_exp0 term1 var_bind1 sorted_var1
+%type <num> lp rp
 
 %left impl repl equiv
 %left or
@@ -69,7 +73,7 @@ commands
 s_exp : spec_const
 	  | symbol
 	  | keyword
-	  | '(' s_exp0 ')'
+	  | lp s_exp0 rp
 	 ;
 
 
@@ -90,7 +94,7 @@ spec_const
 id : symbol { $$ = $1 }
 
 sort : id	{ if $1.str != "Real" {yylex.Error("unknown sort") }}
-//	 | '(' id sort1 ')' 
+//	 | lp id sort1 rp 
 	 ;
 
 sort1 : sort
@@ -100,7 +104,7 @@ sort1 : sort
 attribute_value
 	: spec_const
 	| symbol
-	| '(' s_exp0 ')'
+	| lp s_exp0 rp
 	;
 
 attribute
@@ -114,32 +118,33 @@ attribute1
 
 term : spec_const { stack.Push(NewQeNodeNum($1.str, $1.lno)) }
 	 | qual_id
-	 | '(' qual_id term1 ')'
-	 | '(' let '(' var_bind1 ')' term ')'
-	 | '(' forall '(' sorted_var1 ')' term ')'
-	 | '(' exists '(' sorted_var1 ')' term ')'
-//	 | '(' '!' term attribute1 ')'
-	  | '(' plus term1 ')'	{
+	 | lp qual_id term1 rp
+	 | lp let lp var_bind1 rp term rp {
+	 }
+	 | lp forall lp sorted_var1 rp term rp {yylex.Error("unsupported " + $2.str)}
+	 | lp exists lp sorted_var1 rp term rp {yylex.Error("unsupported " + $2.str)}
+//	 | lp '!' term attribute1 rp {yylex.Error("unsupported !")}
+	  | lp plus term1 rp	{
 	  	if $3 > 1 {
 	  		stack.Push(NewQeNodeStrVal($2.str, $3, $2.lno))
 		}}
-	  | '(' minus term1 ')'{
+	  | lp minus term1 rp{
 	  	if $3 == 1 {
 	  		stack.Push(NewQeNodeStr("-.", $2.lno))
 		} else {
 	  		stack.Push(NewQeNodeStrVal($2.str, $3, $2.lno))
 		}}
-	  | '(' mult term1 ')'	{ stack.Push(NewQeNodeStrVal($2.str, $3, $2.lno)) }
-	  | '(' div term1 ')'	{ stack.Push(NewQeNodeStrVal($2.str, $3, $2.lno)) }
-	  | '(' geop term term ')' { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
-	  | '(' gtop term term ')' { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
-	  | '(' leop term term ')' { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
-	  | '(' ltop term term ')' { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
-	  | '(' eqop term term ')' { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
-	  | '(' not term ')' { stack.Push(NewQeNodeStr("Not", $2.lno)) }
-	  | '(' and term1 ')' { stack.Push(NewQeNodeStrVal("And", $3, $2.lno)) }
-	  | '(' or term1 ')' { stack.Push(NewQeNodeStrVal("Or", $3, $2.lno)) }
-	  | '(' implies term term ')' { stack.Push(NewQeNodeStr("Impl", $2.lno)) }
+	  | lp mult term1 rp	{ stack.Push(NewQeNodeStrVal($2.str, $3, $2.lno)) }
+	  | lp div term1 rp	{ stack.Push(NewQeNodeStrVal($2.str, $3, $2.lno)) }
+	  | lp geop term term rp { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
+	  | lp gtop term term rp { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
+	  | lp leop term term rp { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
+	  | lp ltop term term rp { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
+	  | lp eqop term term rp { stack.Push(NewQeNodeStr($2.str, $2.lno)) }
+	  | lp not term rp { stack.Push(NewQeNodeStr("Not", $2.lno)) }
+	  | lp and term1 rp { stack.Push(NewQeNodeStrVal("And", $3, $2.lno)) }
+	  | lp or term1 rp { stack.Push(NewQeNodeStrVal("Or", $3, $2.lno)) }
+	  | lp implies term term rp { stack.Push(NewQeNodeStr("Impl", $2.lno)) }
 	 ;
 
 term1: term { $$ = 1}
@@ -156,36 +161,46 @@ var_bind1
 	| var_bind1 var_bind { $$ = $1 + 1 }
 	;
 
-sorted_var : '(' symbol sort ')' ;
+sorted_var : lp symbol sort rp ;
 
-var_bind   : '(' symbol term ')' ;
+var_bind   : lp symbol term rp {
+		   update_letmap(stack, $1, $2, letmap)
+	};
 
 qual_id
-	: id { stack.Push(NewQeNodeStr($1.str, $1.lno)) }
-//	| '(' as id sort ')'
+	: id {
+		v, ok := letmap[$1.str]
+		if ok {
+			// letmap の内容を挿入する.
+			stack.Pushn(v)
+		} else {
+			stack.Push(NewQeNodeStr($1.str, $1.lno))
+		}
+	}
+//	| lp as id sort rp
 	;
 
 
 //sort_sym_decl
-//	: '(' id number ')'
-//	| '(' id number attribute1 ')'
+//	: lp id number rp
+//	| lp id number attribute1 rp
 //	;
 
 //meta_spec_const : NUM | DEC | STR ;
 
 //fun_sym_decl
-//	: '(' spec_const sort ')'
-//	| '(' spec_const sort attribute1 ')'
-//	| '(' meta_spec_const sort ')'
-//	| '(' meta_spec_const sort attribute1 ')'
-//	| '(' id sort1 ')'
-//	| '(' id sort1 attribute1 ')'
+//	: lp spec_const sort rp
+//	| lp spec_const sort attribute1 rp
+//	| lp meta_spec_const sort rp
+//	| lp meta_spec_const sort attribute1 rp
+//	| lp id sort1 rp
+//	| lp id sort1 attribute1 rp
 //	;
 
 //par_fun_sym_decl
 //	: fun_sym_decl
-//	| '(' par '(' symbol1 ')' '(' id sort1 ')' ')'
-//	| '(' par '(' symbol1 ')' '(' id sort1 attribute1 ')' ')'
+//	| lp par lp symbol1 rp lp id sort1 rp rp
+//	| lp par lp symbol1 rp lp id sort1 attribute1 rp rp
 //				 ;
 //
 //symbol1
@@ -198,8 +213,8 @@ qual_id
 //	| sort1 sort
 //	;
 
-//theory_attribute : :sort '(' sort_sym_decl+ ')'
-//				 | :funs '(' par_fun_sym_decl+ ')'
+//theory_attribute : :sort lp sort_sym_decl+ rp
+//				 | :funs lp par_fun_sym_decl+ rp
 //				 | :sorts-description str_ing
 //				 | :funs-description str_ing
 //				 | :definition str_ing
@@ -208,44 +223,43 @@ qual_id
 //				 | attribute
 //				 ;
 
-//theory_decl : '(' theory symbol theory_attribute+ ')'
+//theory_decl : lp theory symbol theory_attribute+ rp
 
 //fun_dec
-//	: '(' symbol '(' ')' sort ')'
-//	| '(' symbol '(' sorted_var1 ')' sort ')'
+//	: lp symbol lp rp sort rp
+//	| lp symbol lp sorted_var1 rp sort rp
 //	;
 //
 //fun_def
-//	: symbol '(' ')' sort term
-//	| symbol '(' sorted_var1 ')' sort term
+//	: symbol lp rp sort term
+//	| symbol lp sorted_var1 rp sort term
 //	;
 
-//prop_literal : symbol | '('not symbol')' ;
+//prop_literal : symbol | lpnot symbolrp ;
 
-command : '(' assert term ')' { assert_cnt += 1 }
-		| '(' check_sat ')' { trace("go check-sat"); 
+command : lp assert term rp { assert_cnt += 1 }
+		| lp check_sat rp { trace("go check-sat"); 
 			stack.Push(NewQeNodeStrVal("And", assert_cnt, 0)) 
 			for i := 0; i < decfun_cnt; i++ {
 				stack.Push(NewQeNodeStr("Ex", 0))
 			}
-			
 		}
-		| '(' exit ')'
-		| '(' declare_fun symbol '(' ')' sort ')' {
+		| lp exit rp
+		| lp declare_fun symbol lp rp sort rp {
 			stack.Push(NewQeNodeStr($3.str, $3.lno))
 			stack.Push(NewQeNodeList(1, $3.lno))
 			decfun_cnt += 1
 		}
-		| '(' declare_fun symbol '(' sort1 ')' sort ')' { yylex.Error("unknown declare") }
-		| '(' declare_const symbol sort ')' {
+		| lp declare_fun symbol lp sort1 rp sort rp { yylex.Error("unknown declare") }
+		| lp declare_const symbol sort rp {
 			stack.Push(NewQeNodeStr($3.str, $3.lno))
 			stack.Push(NewQeNodeList(1, $3.lno))
 			decfun_cnt += 1
 		}
-//		| '(' define_fun fun_def ')'
-		| '(' set_info attribute ')'
-		| '(' set_logic symbol ')' { if $3.str != "QF_NRA" && $3.str != "NRA" { yylex.Error("unknown logic") }}
-//		| '(' set_option option ')'
+//		| lp define_fun fun_def rp
+		| lp set_info attribute rp
+		| lp set_logic symbol rp { if $3.str != "QF_NRA" && $3.str != "NRA" { yylex.Error("unknown logic") }}
+//		| lp set_option option rp
 		;
 
 
@@ -343,7 +357,12 @@ func (l *synLex) Lex(lval *yySymType) int {
 	col := l.Pos().Column
 	if c == '(' || c == ')' {
 		l.Next()
-		return c
+		lval.num = stack.Length()
+		if c == '(' {
+			return lp
+		} else {
+			return rp
+		}
 	}
 
 	if isdigit(l.Peek()) {
@@ -422,12 +441,18 @@ func (l *synLex) Error(s string) {
 	}
 }
 
+func update_letmap(s *QeStack, pos int, sym smt2node, lmap map[string](*QeStack)) {
+	nstack := s.Popn(s.Length() - pos)
+	lmap[sym.str] = nstack
+}
+
 func parse(str string) (*QeStack, []Comment, error) {
 	l := new(synLex)
 	l.Init(strings.NewReader(str))
 	stack = new(QeStack)
 	assert_cnt = 0
 	decfun_cnt = 0
+	letmap = make(map[string](*QeStack))
 	yyParse(l)
 	return stack, l.comment, l.err
 }

@@ -1,5 +1,9 @@
 package qeconv
 
+import (
+	"strconv"
+)
+
 type QeNode struct {
 	cmd      int
 	val      int
@@ -11,9 +15,9 @@ type QeNode struct {
 
 func NewQeNodeBool(b bool, lno int) QeNode {
 	if b {
-		return QeNode{cmd: F_TRUE, val: 0, lineno: lno}
+		return QeNode{cmd: F_TRUE, val: 0, lineno: lno, str: "true"}
 	} else {
-		return QeNode{cmd: F_FALSE, val: 0, lineno: lno}
+		return QeNode{cmd: F_FALSE, val: 0, lineno: lno, str: "false"}
 	}
 }
 
@@ -22,7 +26,6 @@ func NewQeNodeStrVal(str string, val, lno int) QeNode {
 	q.SetVal(val)
 	return q
 }
-
 
 func NewQeNodeStr(str string, lno int) QeNode {
 	if str == "<" {
@@ -74,17 +77,17 @@ func NewQeNodeStr(str string, lno int) QeNode {
 	} else if str == "Or" {
 		return QeNode{cmd: OR, str: str, lineno: lno, priority: 2}
 	} else if str == "Impl" {
-		return QeNode{cmd: IMPL, val:2, str: str, lineno: lno, priority: 3}
+		return QeNode{cmd: IMPL, val: 2, str: str, lineno: lno, priority: 3}
 	} else if str == "Repl" {
-		return QeNode{cmd: IMPL, val:2, str: str, lineno: lno, priority: 3, rev: true}
+		return QeNode{cmd: IMPL, val: 2, str: str, lineno: lno, priority: 3, rev: true}
 	} else if str == "Equiv" {
-		return QeNode{cmd: EQUIV, val:2, str: str, lineno: lno, priority: 3}
+		return QeNode{cmd: EQUIV, val: 2, str: str, lineno: lno, priority: 3}
 	} else if str == "Not" {
-		return QeNode{cmd: NOT, val:1, str: str, lineno: lno, priority: 0}
+		return QeNode{cmd: NOT, val: 1, str: str, lineno: lno, priority: 0}
 	} else if str == "All" {
-		return QeNode{cmd: ALL, val:2, str: str, lineno: lno, priority: 0}
+		return QeNode{cmd: ALL, val: 2, str: str, lineno: lno, priority: 0}
 	} else if str == "Ex" {
-		return QeNode{cmd: EX, val:2, str: str, lineno: lno, priority: 0}
+		return QeNode{cmd: EX, val: 2, str: str, lineno: lno, priority: 0}
 	} else if str == "true" {
 		return NewQeNodeBool(true, lno)
 	} else if str == "false" {
@@ -98,9 +101,9 @@ func NewQeNodeStr(str string, lno int) QeNode {
 
 func NewQeNodeList(val, lno int) QeNode {
 	if lno <= 0 {
-		return QeNode{cmd: LIST, val: val}
+		return QeNode{cmd: LIST, val: val, str: "LIST0"}
 	} else {
-		return QeNode{cmd: LIST, val: val, lineno: lno}
+		return QeNode{cmd: LIST, val: val, lineno: lno, str: "LIST" + strconv.Itoa(val)}
 	}
 }
 
@@ -121,8 +124,12 @@ func (n *QeNode) SetVal(v int) {
 	n.val = v
 }
 
-func (n *QeNode) GetLno() int{
+func (n *QeNode) GetLno() int {
 	return n.lineno
+}
+
+func (n *QeNode) String() string {
+	return n.str + ":" + strconv.Itoa(n.cmd)
 }
 
 func ToFml(s *QeStack) Formula {
