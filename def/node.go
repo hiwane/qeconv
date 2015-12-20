@@ -133,7 +133,7 @@ func (n *QeNode) String() string {
 }
 
 func ToFml(s *QeStack) Formula {
-	n, _ := s.pop()
+	n, _ := s.Pop()
 	fml := NewFormula(n)
 	fml.SetArgLen(n.val)
 	if (n.cmd == OR || n.cmd == AND) && n.val == 1 {

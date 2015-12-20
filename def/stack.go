@@ -8,7 +8,7 @@ type QeStack struct {
 	v []QeNode
 }
 
-func (s *QeStack) pop() (QeNode, error) {
+func (s *QeStack) Pop() (QeNode, error) {
 	if len(s.v) <= 0 {
 		return QeNode{}, errors.New("empty stack")
 	}
@@ -33,7 +33,7 @@ func (s *QeStack) Pushn(v *QeStack) {
 	s.v = append(s.v, v.v...)
 }
 
-func (s *QeStack) empty() bool {
+func (s *QeStack) Empty() bool {
 	return len(s.v) == 0
 }
 

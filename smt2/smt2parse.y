@@ -14,7 +14,10 @@ import (
 var stack *QeStack
 var assert_cnt int
 var decfun_cnt int
-var letmap map[string](*QeStack)
+
+
+var letmap smt2letdat
+
 
 type smt2node struct {
 	lno, col int
@@ -120,7 +123,7 @@ term : spec_const { stack.Push(NewQeNodeNum($1.str, $1.lno)) }
 	 | qual_id
 	 | lp qual_id term1 rp
 	 | lp let lp var_bind1 rp term rp {
-		letmap = make(map[string](*QeStack))
+	 	letmap.popn($4)
 	 }
 	 | lp forall lp quantifiers rp term rp {stack.Push(NewQeNodeStr("All", $2.lno))}
 	 | lp exists lp quantifiers rp term rp {stack.Push(NewQeNodeStr("Ex", $2.lno))}
@@ -170,12 +173,12 @@ sorted_var : lp symbol sort rp {
 	};
 
 var_bind   : lp symbol term rp {
-		   update_letmap(stack, $1, $2, letmap)
+		   letmap.update_letmap(stack, $1, $2)
 	};
 
 qual_id
 	: id {
-		v, ok := letmap[$1.str]
+		v, ok := letmap.get($1.str)
 		if ok {
 			// letmap の内容を挿入する.
 			stack.Pushn(v)
@@ -447,10 +450,6 @@ func (l *synLex) Error(s string) {
 	}
 }
 
-func update_letmap(s *QeStack, pos int, sym smt2node, lmap map[string](*QeStack)) {
-	nstack := s.Popn(s.Length() - pos)
-	lmap[sym.str] = nstack
-}
 
 func parse(str string) (*QeStack, []Comment, error) {
 	l := new(synLex)
@@ -458,7 +457,7 @@ func parse(str string) (*QeStack, []Comment, error) {
 	stack = new(QeStack)
 	assert_cnt = 0
 	decfun_cnt = 0
-	letmap = make(map[string](*QeStack))
+	letmap.reset()
 	yyParse(l)
 	return stack, l.comment, l.err
 }

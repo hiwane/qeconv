@@ -15,7 +15,8 @@ import (
 var stack *QeStack
 var assert_cnt int
 var decfun_cnt int
-var letmap map[string](*QeStack)
+
+var letmap smt2letdat
 
 type smt2node struct {
 	lno, col int
@@ -23,7 +24,7 @@ type smt2node struct {
 	str      string
 }
 
-//line smt2parse.y:28
+//line smt2parse.y:31
 type yySymType struct {
 	yys  int
 	node smt2node
@@ -117,7 +118,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line smt2parse.y:272
+//line smt2parse.y:275
 
 /*  start  of  programs  */
 
@@ -294,18 +295,13 @@ func (l *synLex) Error(s string) {
 	}
 }
 
-func update_letmap(s *QeStack, pos int, sym smt2node, lmap map[string](*QeStack)) {
-	nstack := s.Popn(s.Length() - pos)
-	lmap[sym.str] = nstack
-}
-
 func parse(str string) (*QeStack, []Comment, error) {
 	l := new(synLex)
 	l.Init(strings.NewReader(str))
 	stack = new(QeStack)
 	assert_cnt = 0
 	decfun_cnt = 0
-	letmap = make(map[string](*QeStack))
+	letmap.reset()
 	yyParse(l)
 	return stack, l.comment, l.err
 }
@@ -669,81 +665,81 @@ yydefault:
 	switch yynt {
 
 	case 1:
-		//line smt2parse.y:64
+		//line smt2parse.y:67
 		{
 			trace("eof")
 		}
 	case 2:
-		//line smt2parse.y:68
+		//line smt2parse.y:71
 		{
 			trace("command")
 		}
 	case 3:
-		//line smt2parse.y:69
+		//line smt2parse.y:72
 		{
 			trace("commands")
 		}
 	case 8:
-		//line smt2parse.y:80
+		//line smt2parse.y:83
 		{
 			yyVAL.num = 0
 		}
 	case 9:
-		//line smt2parse.y:81
+		//line smt2parse.y:84
 		{
 			yyVAL.num = yyS[yypt-1].num + 1
 		}
 	case 10:
-		//line smt2parse.y:85
+		//line smt2parse.y:88
 		{
 			yyVAL.node = yyS[yypt-0].node
 		}
 	case 11:
-		//line smt2parse.y:86
+		//line smt2parse.y:89
 		{
 			yyVAL.node = yyS[yypt-0].node
 		}
 	case 12:
-		//line smt2parse.y:94
+		//line smt2parse.y:97
 		{
 			yyVAL.node = yyS[yypt-0].node
 		}
 	case 13:
-		//line smt2parse.y:96
+		//line smt2parse.y:99
 		{
 			if yyS[yypt-0].node.str != "Real" {
 				yylex.Error("unknown sort")
 			}
 		}
 	case 23:
-		//line smt2parse.y:119
+		//line smt2parse.y:122
 		{
 			stack.Push(NewQeNodeNum(yyS[yypt-0].node.str, yyS[yypt-0].node.lno))
 		}
 	case 26:
-		//line smt2parse.y:122
+		//line smt2parse.y:125
 		{
-			letmap = make(map[string](*QeStack))
+			letmap.popn(yyS[yypt-3].num)
 		}
 	case 27:
-		//line smt2parse.y:125
+		//line smt2parse.y:128
 		{
 			stack.Push(NewQeNodeStr("All", yyS[yypt-5].node.lno))
 		}
 	case 28:
-		//line smt2parse.y:126
+		//line smt2parse.y:129
 		{
 			stack.Push(NewQeNodeStr("Ex", yyS[yypt-5].node.lno))
 		}
 	case 29:
-		//line smt2parse.y:128
+		//line smt2parse.y:131
 		{
 			if yyS[yypt-1].num > 1 {
 				stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
 			}
 		}
 	case 30:
-		//line smt2parse.y:132
+		//line smt2parse.y:135
 		{
 			if yyS[yypt-1].num == 1 {
 				stack.Push(NewQeNodeStr("-.", yyS[yypt-2].node.lno))
@@ -752,109 +748,109 @@ yydefault:
 			}
 		}
 	case 31:
-		//line smt2parse.y:138
+		//line smt2parse.y:141
 		{
 			stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
 		}
 	case 32:
-		//line smt2parse.y:139
+		//line smt2parse.y:142
 		{
 			stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
 		}
 	case 33:
-		//line smt2parse.y:140
-		{
-			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
-		}
-	case 34:
-		//line smt2parse.y:141
-		{
-			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
-		}
-	case 35:
-		//line smt2parse.y:142
-		{
-			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
-		}
-	case 36:
 		//line smt2parse.y:143
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
 		}
-	case 37:
+	case 34:
 		//line smt2parse.y:144
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
 		}
-	case 38:
+	case 35:
 		//line smt2parse.y:145
+		{
+			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
+		}
+	case 36:
+		//line smt2parse.y:146
+		{
+			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
+		}
+	case 37:
+		//line smt2parse.y:147
+		{
+			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
+		}
+	case 38:
+		//line smt2parse.y:148
 		{
 			stack.Push(NewQeNodeStr("Not", yyS[yypt-2].node.lno))
 		}
 	case 39:
-		//line smt2parse.y:146
+		//line smt2parse.y:149
 		{
 			stack.Push(NewQeNodeStrVal("And", yyS[yypt-1].num, yyS[yypt-2].node.lno))
 		}
 	case 40:
-		//line smt2parse.y:147
+		//line smt2parse.y:150
 		{
 			stack.Push(NewQeNodeStrVal("Or", yyS[yypt-1].num, yyS[yypt-2].node.lno))
 		}
 	case 41:
-		//line smt2parse.y:148
+		//line smt2parse.y:151
 		{
 			stack.Push(NewQeNodeStr("Impl", yyS[yypt-3].node.lno))
 		}
 	case 42:
-		//line smt2parse.y:151
+		//line smt2parse.y:154
 		{
 			yyVAL.num = 1
 		}
 	case 43:
-		//line smt2parse.y:152
+		//line smt2parse.y:155
 		{
 			yyVAL.num = yyS[yypt-1].num + 1
 		}
 	case 44:
-		//line smt2parse.y:154
+		//line smt2parse.y:157
 		{
 			stack.Push(NewQeNodeList(yyS[yypt-0].num, 0))
 		}
 	case 45:
-		//line smt2parse.y:159
+		//line smt2parse.y:162
 		{
 			yyVAL.num = 1
 		}
 	case 46:
-		//line smt2parse.y:160
+		//line smt2parse.y:163
 		{
 			yyVAL.num = yyS[yypt-1].num + 1
 		}
 	case 47:
-		//line smt2parse.y:164
+		//line smt2parse.y:167
 		{
 			yyVAL.num = 1
 		}
 	case 48:
-		//line smt2parse.y:165
+		//line smt2parse.y:168
 		{
 			yyVAL.num = yyS[yypt-1].num + 1
 		}
 	case 49:
-		//line smt2parse.y:168
+		//line smt2parse.y:171
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-2].node.str, yyS[yypt-2].node.lno))
 		}
 	case 50:
-		//line smt2parse.y:172
+		//line smt2parse.y:175
 		{
-			update_letmap(stack, yyS[yypt-3].num, yyS[yypt-2].node, letmap)
+			letmap.update_letmap(stack, yyS[yypt-3].num, yyS[yypt-2].node)
 		}
 	case 51:
-		//line smt2parse.y:177
+		//line smt2parse.y:180
 		{
-			v, ok := letmap[yyS[yypt-0].node.str]
+			v, ok := letmap.get(yyS[yypt-0].node.str)
 			if ok {
 				// letmap の内容を挿入する.
 				stack.Pushn(v)
@@ -863,12 +859,12 @@ yydefault:
 			}
 		}
 	case 52:
-		//line smt2parse.y:246
+		//line smt2parse.y:249
 		{
 			assert_cnt += 1
 		}
 	case 53:
-		//line smt2parse.y:247
+		//line smt2parse.y:250
 		{
 			trace("go check-sat")
 			stack.Push(NewQeNodeStrVal("And", assert_cnt, 0))
@@ -877,26 +873,26 @@ yydefault:
 			}
 		}
 	case 55:
-		//line smt2parse.y:254
+		//line smt2parse.y:257
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-4].node.str, yyS[yypt-4].node.lno))
 			stack.Push(NewQeNodeList(1, yyS[yypt-4].node.lno))
 			decfun_cnt += 1
 		}
 	case 56:
-		//line smt2parse.y:259
+		//line smt2parse.y:262
 		{
 			yylex.Error("unknown declare")
 		}
 	case 57:
-		//line smt2parse.y:260
+		//line smt2parse.y:263
 		{
 			stack.Push(NewQeNodeStr(yyS[yypt-2].node.str, yyS[yypt-2].node.lno))
 			stack.Push(NewQeNodeList(1, yyS[yypt-2].node.lno))
 			decfun_cnt += 1
 		}
 	case 59:
-		//line smt2parse.y:267
+		//line smt2parse.y:270
 		{
 			if yyS[yypt-1].node.str != "QF_NRA" && yyS[yypt-1].node.str != "NRA" {
 				yylex.Error("unknown logic")

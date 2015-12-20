@@ -26,7 +26,6 @@ func (self *Smt2Parse) Parse(str string) (Formula, []Comment, error) {
 	return ToFml(stack), c, e
 }
 
-
 type Smt2Conv struct {
 	*CnvInfStrstruct
 	err error
@@ -204,3 +203,35 @@ func (m *Smt2Conv) Sep() string {
 func (m *Smt2Conv) LineAlign() bool {
 	return false
 }
+
+type smt2letdat struct {
+	name []string
+	data []*QeStack
+}
+
+func (lmap *smt2letdat) update_letmap(s *QeStack, pos int, sym smt2node) {
+	nstack := s.Popn(s.Length() - pos)
+	lmap.name = append(lmap.name, sym.str)
+	lmap.data = append(lmap.data, nstack)
+}
+
+func (lmap *smt2letdat) get(str string) (*QeStack, bool) {
+	for i := len(lmap.data) - 1; i >= 0; i-- {
+		if lmap.name[i] == str {
+			return lmap.data[i], true
+		}
+	}
+	return nil, false
+}
+
+func (lmap *smt2letdat) reset() {
+	lmap.name = make([]string, 0)
+	lmap.data = make([]*QeStack, 0)
+}
+
+func (lmap *smt2letdat) popn(n int) {
+	m := len(lmap.name) - n
+	lmap.name = lmap.name[:m]
+	lmap.data = lmap.data[:m]
+}
+
