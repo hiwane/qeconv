@@ -59,7 +59,7 @@ func (m *RedConv) Neop(f Formula, co *CnvOut) {
 }
 
 func (m *RedConv) List(f Formula, co *CnvOut) {
-	Prefix(f, m, "[", "]", co)
+	Prefix(f, m, "{", "}", co)
 }
 
 func (m *RedConv) Plus(fml Formula, co *CnvOut) {
