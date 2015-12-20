@@ -122,8 +122,8 @@ term : spec_const { stack.Push(NewQeNodeNum($1.str, $1.lno)) }
 	 | lp let lp var_bind1 rp term rp {
 		letmap = make(map[string](*QeStack))
 	 }
-	 | lp forall lp sorted_var1 rp term rp {yylex.Error("unsupported " + $2.str)}
-	 | lp exists lp sorted_var1 rp term rp {yylex.Error("unsupported " + $2.str)}
+	 | lp forall lp quantifiers rp term rp {stack.Push(NewQeNodeStr("All", $2.lno))}
+	 | lp exists lp quantifiers rp term rp {stack.Push(NewQeNodeStr("Ex", $2.lno))}
 //	 | lp '!' term attribute1 rp {yylex.Error("unsupported !")}
 	  | lp plus term1 rp	{
 	  	if $3 > 1 {
@@ -151,6 +151,9 @@ term : spec_const { stack.Push(NewQeNodeNum($1.str, $1.lno)) }
 term1: term { $$ = 1}
 	 | term1 term { $$ = $1 + 1}
 	 ;
+quantifiers: sorted_var1 {
+		   stack.Push(NewQeNodeList($1, 0))
+	}
 
 sorted_var1
 	: sorted_var { $$ = 1 }
@@ -162,7 +165,9 @@ var_bind1
 	| var_bind1 var_bind { $$ = $1 + 1 }
 	;
 
-sorted_var : lp symbol sort rp ;
+sorted_var : lp symbol sort rp {
+		stack.Push(NewQeNodeStr($2.str, $2.lno))
+	};
 
 var_bind   : lp symbol term rp {
 		   update_letmap(stack, $1, $2, letmap)

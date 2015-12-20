@@ -100,7 +100,7 @@ func NewQeNodeStr(str string, lno int) QeNode {
 }
 
 func NewQeNodeList(val, lno int) QeNode {
-	if lno <= 0 {
+	if val <= 0 {
 		return QeNode{cmd: LIST, val: val, str: "LIST0"}
 	} else {
 		return QeNode{cmd: LIST, val: val, lineno: lno, str: "LIST" + strconv.Itoa(val)}
