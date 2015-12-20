@@ -102,3 +102,18 @@ func (self *Formula) FreeVars() varSet {
 	}
 	return vs
 }
+
+func (s *Formula) Equals(f Formula) bool {
+	if s.cmd != f.cmd || s.cmd != f.cmd || s.priority != f.priority {
+		return false
+	}
+	if len(s.args) != len(f.args) {
+		return false
+	}
+	for i := 0; i < len(s.args); i++ {
+		if !s.args[i].Equals(f.args[i]) {
+			return false
+		}
+	}
+	return true
+}
