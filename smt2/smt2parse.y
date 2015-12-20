@@ -120,6 +120,7 @@ term : spec_const { stack.Push(NewQeNodeNum($1.str, $1.lno)) }
 	 | qual_id
 	 | lp qual_id term1 rp
 	 | lp let lp var_bind1 rp term rp {
+		letmap = make(map[string](*QeStack))
 	 }
 	 | lp forall lp sorted_var1 rp term rp {yylex.Error("unsupported " + $2.str)}
 	 | lp exists lp sorted_var1 rp term rp {yylex.Error("unsupported " + $2.str)}
