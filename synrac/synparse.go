@@ -59,7 +59,10 @@ const comment = 57380
 const unaryminus = 57381
 const unaryplus = 57382
 
-var yyToknames = []string{
+var yyToknames = [...]string{
+	"$end",
+	"error",
+	"$unk",
 	"name",
 	"number",
 	"f_true",
@@ -98,7 +101,7 @@ var yyToknames = []string{
 	"unaryminus",
 	"unaryplus",
 }
-var yyStatenames = []string{}
+var yyStatenames = [...]string{}
 
 const yyEofCode = 1
 const yyErrCode = 2
@@ -108,20 +111,20 @@ const yyMaxDepth = 200
 
 /*  start  of  programs  */
 
-type synLex struct {
+type SynLex struct {
 	scanner.Scanner
 	s       string
 	comment []Comment
 	err     error
 }
 
-type synLex1 struct {
+type SynLex1 struct {
 	val   string
 	label int
 	v     int
 }
 
-var sones = []synLex1{
+var sones = []SynLex1{
 	{"+", plus, '+'},
 	{"-", minus, '-'},
 	{"*", mult, '*'},
@@ -138,7 +141,7 @@ var sones = []synLex1{
 	{"=", eqop, '='},
 }
 
-var sfuns = []synLex1{
+var sfuns = []SynLex1{
 	{"And", and, 0},
 	{"Or", or, 0},
 	{"Impl", impl, 0},
@@ -174,7 +177,7 @@ func isspace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 }
 
-func (l *synLex) Lex(lval *yySymType) int {
+func (l *SynLex) Lex(lval *yySymType) int {
 
 	// skip space
 	for {
@@ -259,7 +262,7 @@ func (l *synLex) Lex(lval *yySymType) int {
 	return int(c)
 }
 
-func (l *synLex) Error(s string) {
+func (l *SynLex) Error(s string) {
 	pos := l.Pos()
 	if l.err == nil {
 		l.err = errors.New(fmt.Sprintf("%s:Error:%s \n", pos.String(), s))
@@ -267,7 +270,7 @@ func (l *synLex) Error(s string) {
 }
 
 func parse(str string) (*QeStack, []Comment, error) {
-	l := new(synLex)
+	l := new(SynLex)
 	l.Init(strings.NewReader(str))
 	stack = new(QeStack)
 	yyParse(l)
@@ -279,7 +282,7 @@ func trace(s string) {
 }
 
 //line yacctab:1
-var yyExca = []int{
+var yyExca = [...]int{
 	-1, 1,
 	1, -1,
 	-2, 0,
@@ -293,7 +296,7 @@ var yyStates []string
 
 const yyLast = 301
 
-var yyAct = []int{
+var yyAct = [...]int{
 
 	20, 3, 82, 2, 45, 46, 130, 47, 48, 49,
 	113, 30, 129, 91, 128, 34, 24, 127, 96, 38,
@@ -327,7 +330,7 @@ var yyAct = []int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	53,
 }
-var yyPact = []int{
+var yyPact = [...]int{
 
 	145, -1000, 64, -1000, -1000, 55, 50, 26, 22, 225,
 	21, 20, 0, 225, -1000, 111, -1000, -1000, 249, -1000,
@@ -344,12 +347,12 @@ var yyPact = []int{
 	77, 77, -1000, -1000, -1000, -1000, 59, -1000, -1000, -1000,
 	-1000,
 }
-var yyPgo = []int{
+var yyPgo = [...]int{
 
 	0, 13, 24, 137, 2, 0, 136, 3, 1, 135,
 	57, 134, 22,
 }
-var yyR1 = []int{
+var yyR1 = [...]int{
 
 	0, 6, 7, 7, 8, 8, 8, 8, 8, 8,
 	8, 8, 8, 8, 8, 8, 9, 9, 3, 3,
@@ -358,7 +361,7 @@ var yyR1 = []int{
 	4, 4, 4, 4, 4, 12, 12, 12, 12, 12,
 	12, 12, 12, 12, 12, 12,
 }
-var yyR2 = []int{
+var yyR2 = [...]int{
 
 	0, 2, 1, 1, 6, 6, 4, 3, 4, 3,
 	2, 6, 6, 6, 3, 1, 3, 2, 1, 3,
@@ -367,7 +370,7 @@ var yyR2 = []int{
 	3, 3, 3, 2, 2, 3, 1, 1, 4, 3,
 	3, 3, 3, 3, 2, 2,
 }
-var yyChk = []int{
+var yyChk = [...]int{
 
 	-1000, -6, -7, -8, -9, 8, 9, 10, 11, 12,
 	35, 36, 37, 29, -11, 27, 6, 7, -12, 5,
@@ -384,7 +387,7 @@ var yyChk = []int{
 	-4, -4, -4, -4, 30, 30, -5, 30, 30, 30,
 	30,
 }
-var yyDef = []int{
+var yyDef = [...]int{
 
 	0, -2, 0, 2, 3, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 15, 0, 29, 30, 0, 46,
@@ -401,39 +404,67 @@ var yyDef = []int{
 	39, 40, 41, 42, 38, 4, 26, 5, 11, 12,
 	13,
 }
-var yyTok1 = []int{
+var yyTok1 = [...]int{
 
 	1,
 }
-var yyTok2 = []int{
+var yyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
 	32, 33, 34, 35, 36, 37, 38, 39, 40,
 }
-var yyTok3 = []int{
+var yyTok3 = [...]int{
 	0,
 }
+
+var yyErrorMessages = [...]struct {
+	state int
+	token int
+	msg   string
+}{}
 
 //line yaccpar:1
 
 /*	parser for yacc output	*/
 
-var yyDebug = 0
+var (
+	yyDebug        = 0
+	yyErrorVerbose = false
+)
 
 type yyLexer interface {
 	Lex(lval *yySymType) int
 	Error(s string)
 }
 
+type yyParser interface {
+	Parse(yyLexer) int
+	Lookahead() int
+}
+
+type yyParserImpl struct {
+	lookahead func() int
+}
+
+func (p *yyParserImpl) Lookahead() int {
+	return p.lookahead()
+}
+
+func yyNewParser() yyParser {
+	p := &yyParserImpl{
+		lookahead: func() int { return -1 },
+	}
+	return p
+}
+
 const yyFlag = -1000
 
 func yyTokname(c int) string {
-	// 4 is TOKSTART above
-	if c >= 4 && c-4 < len(yyToknames) {
-		if yyToknames[c-4] != "" {
-			return yyToknames[c-4]
+	if c >= 1 && c-1 < len(yyToknames) {
+		if yyToknames[c-1] != "" {
+			return yyToknames[c-1]
 		}
 	}
 	return __yyfmt__.Sprintf("tok-%v", c)
@@ -448,51 +479,129 @@ func yyStatname(s int) string {
 	return __yyfmt__.Sprintf("state-%v", s)
 }
 
-func yylex1(lex yyLexer, lval *yySymType) int {
-	c := 0
-	char := lex.Lex(lval)
+func yyErrorMessage(state, lookAhead int) string {
+	const TOKSTART = 4
+
+	if !yyErrorVerbose {
+		return "syntax error"
+	}
+
+	for _, e := range yyErrorMessages {
+		if e.state == state && e.token == lookAhead {
+			return "syntax error: " + e.msg
+		}
+	}
+
+	res := "syntax error: unexpected " + yyTokname(lookAhead)
+
+	// To match Bison, suggest at most four expected tokens.
+	expected := make([]int, 0, 4)
+
+	// Look for shiftable tokens.
+	base := yyPact[state]
+	for tok := TOKSTART; tok-1 < len(yyToknames); tok++ {
+		if n := base + tok; n >= 0 && n < yyLast && yyChk[yyAct[n]] == tok {
+			if len(expected) == cap(expected) {
+				return res
+			}
+			expected = append(expected, tok)
+		}
+	}
+
+	if yyDef[state] == -2 {
+		i := 0
+		for yyExca[i] != -1 || yyExca[i+1] != state {
+			i += 2
+		}
+
+		// Look for tokens that we accept or reduce.
+		for i += 2; yyExca[i] >= 0; i += 2 {
+			tok := yyExca[i]
+			if tok < TOKSTART || yyExca[i+1] == 0 {
+				continue
+			}
+			if len(expected) == cap(expected) {
+				return res
+			}
+			expected = append(expected, tok)
+		}
+
+		// If the default action is to accept or reduce, give up.
+		if yyExca[i+1] != 0 {
+			return res
+		}
+	}
+
+	for i, tok := range expected {
+		if i == 0 {
+			res += ", expecting "
+		} else {
+			res += " or "
+		}
+		res += yyTokname(tok)
+	}
+	return res
+}
+
+func yylex1(lex yyLexer, lval *yySymType) (char, token int) {
+	token = 0
+	char = lex.Lex(lval)
 	if char <= 0 {
-		c = yyTok1[0]
+		token = yyTok1[0]
 		goto out
 	}
 	if char < len(yyTok1) {
-		c = yyTok1[char]
+		token = yyTok1[char]
 		goto out
 	}
 	if char >= yyPrivate {
 		if char < yyPrivate+len(yyTok2) {
-			c = yyTok2[char-yyPrivate]
+			token = yyTok2[char-yyPrivate]
 			goto out
 		}
 	}
 	for i := 0; i < len(yyTok3); i += 2 {
-		c = yyTok3[i+0]
-		if c == char {
-			c = yyTok3[i+1]
+		token = yyTok3[i+0]
+		if token == char {
+			token = yyTok3[i+1]
 			goto out
 		}
 	}
 
 out:
-	if c == 0 {
-		c = yyTok2[1] /* unknown char */
+	if token == 0 {
+		token = yyTok2[1] /* unknown char */
 	}
 	if yyDebug >= 3 {
-		__yyfmt__.Printf("lex %s(%d)\n", yyTokname(c), uint(char))
+		__yyfmt__.Printf("lex %s(%d)\n", yyTokname(token), uint(char))
 	}
-	return c
+	return char, token
 }
 
 func yyParse(yylex yyLexer) int {
+	return yyNewParser().Parse(yylex)
+}
+
+func (yyrcvr *yyParserImpl) Parse(yylex yyLexer) int {
 	var yyn int
 	var yylval yySymType
 	var yyVAL yySymType
+	var yyDollar []yySymType
+	_ = yyDollar // silence set and not used
 	yyS := make([]yySymType, yyMaxDepth)
 
 	Nerrs := 0   /* number of errors */
 	Errflag := 0 /* error recovery flag */
 	yystate := 0
 	yychar := -1
+	yytoken := -1 // yychar translated into internal numbering
+	yyrcvr.lookahead = func() int { return yychar }
+	defer func() {
+		// Make sure we report no lookahead when not parsing.
+		yystate = -1
+		yychar = -1
+		yytoken = -1
+	}()
 	yyp := -1
 	goto yystack
 
@@ -505,7 +614,7 @@ ret1:
 yystack:
 	/* put a state and value onto the stack */
 	if yyDebug >= 4 {
-		__yyfmt__.Printf("char %v in %v\n", yyTokname(yychar), yyStatname(yystate))
+		__yyfmt__.Printf("char %v in %v\n", yyTokname(yytoken), yyStatname(yystate))
 	}
 
 	yyp++
@@ -523,15 +632,16 @@ yynewstate:
 		goto yydefault /* simple state */
 	}
 	if yychar < 0 {
-		yychar = yylex1(yylex, &yylval)
+		yychar, yytoken = yylex1(yylex, &yylval)
 	}
-	yyn += yychar
+	yyn += yytoken
 	if yyn < 0 || yyn >= yyLast {
 		goto yydefault
 	}
 	yyn = yyAct[yyn]
-	if yyChk[yyn] == yychar { /* valid shift */
+	if yyChk[yyn] == yytoken { /* valid shift */
 		yychar = -1
+		yytoken = -1
 		yyVAL = yylval
 		yystate = yyn
 		if Errflag > 0 {
@@ -545,7 +655,7 @@ yydefault:
 	yyn = yyDef[yystate]
 	if yyn == -2 {
 		if yychar < 0 {
-			yychar = yylex1(yylex, &yylval)
+			yychar, yytoken = yylex1(yylex, &yylval)
 		}
 
 		/* look through exception table */
@@ -558,7 +668,7 @@ yydefault:
 		}
 		for xi += 2; ; xi += 2 {
 			yyn = yyExca[xi+0]
-			if yyn < 0 || yyn == yychar {
+			if yyn < 0 || yyn == yytoken {
 				break
 			}
 		}
@@ -571,11 +681,11 @@ yydefault:
 		/* error ... attempt to resume parsing */
 		switch Errflag {
 		case 0: /* brand new error */
-			yylex.Error("syntax error")
+			yylex.Error(yyErrorMessage(yystate, yytoken))
 			Nerrs++
 			if yyDebug >= 1 {
 				__yyfmt__.Printf("%s", yyStatname(yystate))
-				__yyfmt__.Printf(" saw %s\n", yyTokname(yychar))
+				__yyfmt__.Printf(" saw %s\n", yyTokname(yytoken))
 			}
 			fallthrough
 
@@ -603,12 +713,13 @@ yydefault:
 
 		case 3: /* no shift yet; clobber input char */
 			if yyDebug >= 2 {
-				__yyfmt__.Printf("error recovery discards %s\n", yyTokname(yychar))
+				__yyfmt__.Printf("error recovery discards %s\n", yyTokname(yytoken))
 			}
-			if yychar == yyEofCode {
+			if yytoken == yyEofCode {
 				goto ret1
 			}
 			yychar = -1
+			yytoken = -1
 			goto yynewstate /* try again in the same state */
 		}
 	}
@@ -623,6 +734,13 @@ yydefault:
 	_ = yypt // guard against "declared and not used"
 
 	yyp -= yyR2[yyn]
+	// yyp is now the index of $0. Perform the default action. Iff the
+	// reduced production is ε, $1 is possibly out of range.
+	if yyp+1 >= len(yyS) {
+		nyys := make([]yySymType, len(yyS)*2)
+		copy(nyys, yyS)
+		yyS = nyys
+	}
 	yyVAL = yyS[yyp+1]
 
 	/* consult goto table to find next state */
@@ -642,286 +760,334 @@ yydefault:
 	switch yynt {
 
 	case 4:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line synparse.y:64
 		{
 			trace("ALL")
-			stack.Push(yyS[yypt-5].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 5:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line synparse.y:65
 		{
 			trace("EX")
-			stack.Push(yyS[yypt-5].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 6:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line synparse.y:66
 		{
 			trace("and")
-			yyS[yypt-3].node.SetVal(yyS[yypt-1].num)
-			stack.Push(yyS[yypt-3].node)
+			yyDollar[1].node.SetVal(yyDollar[3].num)
+			stack.Push(yyDollar[1].node)
 		}
 	case 7:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:67
 		{
 			trace("and()")
-			stack.Push(NewQeNodeBool(true, yyS[yypt-2].node.GetLno()))
+			stack.Push(NewQeNodeBool(true, yyDollar[1].node.GetLno()))
 		}
 	case 8:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line synparse.y:68
 		{
 			trace("or")
-			yyS[yypt-3].node.SetVal(yyS[yypt-1].num)
-			stack.Push(yyS[yypt-3].node)
+			yyDollar[1].node.SetVal(yyDollar[3].num)
+			stack.Push(yyDollar[1].node)
 		}
 	case 9:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:69
 		{
 			trace("or()")
-			stack.Push(NewQeNodeBool(false, yyS[yypt-2].node.GetLno()))
+			stack.Push(NewQeNodeBool(false, yyDollar[1].node.GetLno()))
 		}
 	case 10:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line synparse.y:70
 		{
 			trace("not")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 11:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line synparse.y:71
 		{
 			trace("IMPL")
-			stack.Push(yyS[yypt-5].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 12:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line synparse.y:72
 		{
 			trace("REPL")
-			stack.Push(yyS[yypt-5].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 13:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line synparse.y:73
 		{
 			trace("EQUIV")
-			stack.Push(yyS[yypt-5].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 16:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:79
 		{
 			trace("list")
-			stack.Push(NewQeNodeList(yyS[yypt-1].num, yyS[yypt-2].node.GetLno()))
+			stack.Push(NewQeNodeList(yyDollar[2].num, yyDollar[1].node.GetLno()))
 		}
 	case 17:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line synparse.y:83
 		{
 			trace("empty-list")
-			stack.Push(NewQeNodeList(0, yyS[yypt-1].node.GetLno()))
+			stack.Push(NewQeNodeList(0, yyDollar[1].node.GetLno()))
 		}
 	case 18:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:90
 		{
 			yyVAL.num = 1
 		}
 	case 19:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:91
 		{
-			yyVAL.num = yyS[yypt-2].num + 1
+			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 20:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:95
 		{
 			yyVAL.num = 1
 		}
 	case 21:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:96
 		{
-			yyVAL.num = yyS[yypt-2].num + 1
+			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 22:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:100
 		{
 			trace("var")
 			stack.Push(NewQeNodeList(1, -1))
 		}
 	case 23:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:104
 		{
 			trace("list")
-			stack.Push(NewQeNodeList(yyS[yypt-1].num, yyS[yypt-2].node.GetLno()))
+			stack.Push(NewQeNodeList(yyDollar[2].num, yyDollar[1].node.GetLno()))
 		}
 	case 24:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:108
 		{
 			trace("set")
-			stack.Push(NewQeNodeList(yyS[yypt-1].num, yyS[yypt-2].node.GetLno()))
+			stack.Push(NewQeNodeList(yyDollar[2].num, yyDollar[1].node.GetLno()))
 		}
 	case 25:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:115
 		{
 			yyVAL.num = 1
 		}
 	case 26:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:116
 		{
-			yyVAL.num = yyS[yypt-2].num + 1
+			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 27:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:120
 		{
 			trace("name")
-			stack.Push(yyS[yypt-0].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 28:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line synparse.y:121
 		{
 			trace("index")
 			stack.Push(NewQeNode(INDEXED, 2, -1))
 		}
 	case 29:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:125
 		{
 			trace("true")
-			stack.Push(yyS[yypt-0].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 30:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:126
 		{
 			trace("false")
-			stack.Push(yyS[yypt-0].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 31:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:127
 		{
 			trace("<")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 32:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:128
 		{
 			trace(">")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 33:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:129
 		{
 			trace("<=")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 34:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:130
 		{
 			trace(">=")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 35:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:131
 		{
 			trace("=")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 36:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:132
 		{
 			trace("<>")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 37:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:137
 		{
 			trace("num")
-			stack.Push(yyS[yypt-0].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 38:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:138
 		{
 		}
 	case 39:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:139
 		{
 			trace("+")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 40:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:140
 		{
 			trace("-")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 41:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:141
 		{
 			trace("*")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 42:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:142
 		{
 			trace("/")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 43:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line synparse.y:143
 		{
 			trace("-")
-			NewQeNodeStr("-.", yyS[yypt-1].node.GetLno())
+			NewQeNodeStr("-.", yyDollar[1].node.GetLno())
 		}
 	case 44:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line synparse.y:144
 		{
 			trace("+")
-			NewQeNodeStr("+.", yyS[yypt-1].node.GetLno())
+			NewQeNodeStr("+.", yyDollar[1].node.GetLno())
 		}
 	case 46:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line synparse.y:149
 		{
 			trace("num")
-			stack.Push(yyS[yypt-0].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 48:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line synparse.y:151
 		{
 			trace("abs")
-			stack.Push(yyS[yypt-3].node)
+			stack.Push(yyDollar[1].node)
 		}
 	case 49:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:152
 		{
 			trace("+")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 50:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:153
 		{
 			trace("-")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 51:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:154
 		{
 			trace("*")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 52:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:155
 		{
 			trace("/")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 53:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line synparse.y:156
 		{
 			trace("^")
-			stack.Push(yyS[yypt-1].node)
+			stack.Push(yyDollar[2].node)
 		}
 	case 54:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line synparse.y:157
 		{
 			trace("-")
-			stack.Push(NewQeNodeStr("-.", yyS[yypt-1].node.GetLno()))
+			stack.Push(NewQeNodeStr("-.", yyDollar[1].node.GetLno()))
 		}
 	case 55:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line synparse.y:158
 		{
 			trace("+")
-			stack.Push(NewQeNodeStr("+.", yyS[yypt-1].node.GetLno()))
+			stack.Push(NewQeNodeStr("+.", yyDollar[1].node.GetLno()))
 		}
 	}
 	goto yystack /* stack new state and value */
