@@ -436,6 +436,12 @@ func (l *synLex) Lex(lval *yySymType) int {
 				return keywords_tbl[i].label
 			}
 		}
+		str = strings.Replace(str, "$", "_D_", -1)
+		str = strings.Replace(str, "%", "_P_", -1)
+		str = strings.Replace(str, "^", "_h_", -1)
+		str = strings.Replace(str, "|", "_b_", -1)
+		str = strings.Replace(str, "~", "_t_", -1)
+		str = strings.Replace(str, "#", "_s_", -1)
 		str = strings.Replace(str, "?", "_q_", -1)
 		str = strings.Replace(str, "!", "_e_", -1)
 		str = strings.Replace(str, ".", "_d_", -1)
