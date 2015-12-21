@@ -206,6 +206,7 @@ func Mop(fml Formula, cinf CnvInfMathOp, op string, co *CnvOut) {
 }
 
 func Uniop(fml Formula, cinf CnvInfMathOp, op string, co *CnvOut) {
+	co.Append("(")
 	co.Append(op)
 	if fml.priority > 0 && fml.priority < fml.Args()[0].priority {
 		co.Append("(")
@@ -214,6 +215,7 @@ func Uniop(fml Formula, cinf CnvInfMathOp, op string, co *CnvOut) {
 	} else {
 		Convm(fml.Args()[0], cinf, co)
 	}
+	co.Append(")")
 }
 
 func Conv2(fml Formula, cinf CnvInf, co *CnvOut) {
