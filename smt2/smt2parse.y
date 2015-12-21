@@ -115,7 +115,7 @@ attribute
 	: keyword
 	| kw_status symbol {
 		if l, ok := yylex.(commentI); ok {
-			l.append_comment("status " + $2.str, $2.lno)
+			l.append_comment(":status " + $2.str, $2.lno)
 		} }
 	| keyword attribute_value ;
 
@@ -386,7 +386,7 @@ func (l *synLex) Lex(lval *yySymType) int {
 		}
 		if str != "" {
 			lno := l.Pos().Line
-			l.comment = append(l.comment, NewComment(str, lno))
+			l.append_comment(str, lno)
 		}
 	}
 	trace("Lex! " + string(l.Peek()) + l.Pos().String())
