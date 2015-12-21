@@ -438,6 +438,7 @@ func (l *synLex) Lex(lval *yySymType) int {
 		}
 		str = strings.Replace(str, "?", "_q_", -1)
 		str = strings.Replace(str, "!", "_e_", -1)
+		str = strings.Replace(str, ".", "_d_", -1)
 		lval.node = smt2node{lno,col, symbol, str}
 		return symbol
 	}
