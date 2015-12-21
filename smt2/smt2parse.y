@@ -34,6 +34,7 @@ type smt2node struct {
 }
 
 %token number symbol keyword string_
+%token kw_status
 %token forall exists let as theory par
 %token assert check_sat declare_const declare_fun set_info set_logic exit
 %token set_option
@@ -112,6 +113,10 @@ attribute_value
 
 attribute
 	: keyword
+	| kw_status symbol {
+		if l, ok := yylex.(commentI); ok {
+			l.append_comment("status " + $2.str, $2.lno)
+		} }
 	| keyword attribute_value ;
 
 attribute1
@@ -274,6 +279,11 @@ command : lp assert term rp { assert_cnt += 1 }
 
 %%      /*  start  of  programs  */
 
+type commentI interface {
+	append_comment(comm string, lno int)
+}
+
+
 type synLex struct {
 	scanner.Scanner
 	s string
@@ -348,6 +358,10 @@ func isspace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 }
 
+func (l *synLex) append_comment(comm string, lno int) {
+	l.comment = append(l.comment, NewComment(comm, lno))
+}
+
 func (l *synLex) Lex(lval *yySymType) int {
 
 	// skip space
@@ -418,7 +432,11 @@ func (l *synLex) Lex(lval *yySymType) int {
 		for issimplsym(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = smt2node{lno,col, keyword, string(ret)}
+		str := string(ret)
+		if str == ":status" {
+			return kw_status
+		}
+		lval.node = smt2node{lno,col, keyword, str}
 		return keyword
 	}
 	if c == '|' || c == '"' {
@@ -436,9 +454,6 @@ func (l *synLex) Lex(lval *yySymType) int {
 		}
 		return symbol
 	}
-
-
-
 
 	return int(c)
 }

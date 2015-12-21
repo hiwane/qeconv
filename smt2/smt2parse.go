@@ -35,47 +35,52 @@ const number = 57346
 const symbol = 57347
 const keyword = 57348
 const string_ = 57349
-const forall = 57350
-const exists = 57351
-const let = 57352
-const as = 57353
-const theory = 57354
-const par = 57355
-const assert = 57356
-const check_sat = 57357
-const declare_const = 57358
-const declare_fun = 57359
-const set_info = 57360
-const set_logic = 57361
-const exit = 57362
-const set_option = 57363
-const ltop = 57364
-const gtop = 57365
-const leop = 57366
-const geop = 57367
-const eqop = 57368
-const plus = 57369
-const minus = 57370
-const mult = 57371
-const div = 57372
-const not = 57373
-const and = 57374
-const or = 57375
-const implies = 57376
-const lp = 57377
-const rp = 57378
-const impl = 57379
-const repl = 57380
-const equiv = 57381
-const unaryminus = 57382
-const unaryplus = 57383
-const pow = 57384
+const kw_status = 57350
+const forall = 57351
+const exists = 57352
+const let = 57353
+const as = 57354
+const theory = 57355
+const par = 57356
+const assert = 57357
+const check_sat = 57358
+const declare_const = 57359
+const declare_fun = 57360
+const set_info = 57361
+const set_logic = 57362
+const exit = 57363
+const set_option = 57364
+const ltop = 57365
+const gtop = 57366
+const leop = 57367
+const geop = 57368
+const eqop = 57369
+const plus = 57370
+const minus = 57371
+const mult = 57372
+const div = 57373
+const not = 57374
+const and = 57375
+const or = 57376
+const implies = 57377
+const lp = 57378
+const rp = 57379
+const impl = 57380
+const repl = 57381
+const equiv = 57382
+const unaryminus = 57383
+const unaryplus = 57384
+const pow = 57385
 
-var yyToknames = []string{
+var yyToknames = [...]string{
+	"$end",
+	"error",
+	"$unk",
 	"number",
 	"symbol",
 	"keyword",
 	"string_",
+	"kw_status",
 	"forall",
 	"exists",
 	"let",
@@ -112,15 +117,19 @@ var yyToknames = []string{
 	"unaryplus",
 	"pow",
 }
-var yyStatenames = []string{}
+var yyStatenames = [...]string{}
 
 const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line smt2parse.y:275
+//line smt2parse.y:280
 
 /*  start  of  programs  */
+
+type commentI interface {
+	append_comment(comm string, lno int)
+}
 
 type synLex struct {
 	scanner.Scanner
@@ -196,6 +205,10 @@ func isspace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 }
 
+func (l *synLex) append_comment(comm string, lno int) {
+	l.comment = append(l.comment, NewComment(comm, lno))
+}
+
 func (l *synLex) Lex(lval *yySymType) int {
 
 	// skip space
@@ -266,7 +279,11 @@ func (l *synLex) Lex(lval *yySymType) int {
 		for issimplsym(l.Peek()) {
 			ret = append(ret, l.Next())
 		}
-		lval.node = smt2node{lno, col, keyword, string(ret)}
+		str := string(ret)
+		if str == ":status" {
+			return kw_status
+		}
+		lval.node = smt2node{lno, col, keyword, str}
 		return keyword
 	}
 	if c == '|' || c == '"' {
@@ -311,152 +328,183 @@ func trace(s string) {
 }
 
 //line yacctab:1
-var yyExca = []int{
+var yyExca = [...]int{
 	-1, 1,
 	1, -1,
 	-2, 0,
 }
 
-const yyNprod = 60
+const yyNprod = 61
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 198
+const yyLast = 202
 
-var yyAct = []int{
+var yyAct = [...]int{
 
-	56, 14, 19, 85, 81, 77, 47, 13, 82, 110,
-	83, 137, 136, 17, 107, 108, 18, 20, 135, 17,
-	107, 108, 18, 17, 20, 134, 18, 48, 51, 17,
-	52, 133, 18, 131, 123, 122, 121, 120, 64, 65,
-	66, 67, 68, 69, 109, 132, 72, 20, 103, 48,
-	109, 105, 119, 75, 16, 55, 79, 118, 117, 116,
-	53, 79, 79, 79, 79, 92, 93, 94, 95, 96,
-	87, 79, 79, 100, 113, 97, 48, 48, 73, 106,
-	101, 102, 76, 54, 49, 111, 28, 22, 114, 60,
-	61, 62, 63, 17, 20, 21, 18, 86, 82, 70,
-	71, 59, 58, 57, 46, 4, 48, 26, 20, 15,
-	124, 126, 115, 127, 128, 125, 20, 130, 48, 31,
-	32, 30, 129, 112, 16, 99, 29, 106, 17, 20,
-	27, 18, 24, 40, 38, 39, 37, 41, 33, 34,
-	35, 36, 42, 43, 44, 45, 17, 20, 23, 18,
-	17, 20, 25, 18, 17, 20, 50, 18, 74, 16,
-	98, 17, 20, 104, 18, 17, 20, 2, 18, 6,
-	7, 10, 9, 11, 12, 8, 3, 16, 91, 5,
-	1, 16, 90, 84, 80, 16, 89, 0, 0, 0,
-	0, 0, 16, 88, 0, 0, 16, 78,
+	58, 14, 19, 87, 83, 79, 48, 13, 84, 112,
+	85, 139, 138, 17, 109, 110, 18, 20, 137, 17,
+	109, 110, 18, 17, 20, 20, 18, 49, 52, 17,
+	20, 136, 18, 135, 133, 125, 124, 123, 122, 66,
+	67, 68, 69, 70, 71, 111, 134, 74, 121, 105,
+	49, 111, 107, 120, 77, 16, 57, 75, 81, 119,
+	118, 16, 101, 81, 81, 81, 81, 94, 95, 96,
+	97, 98, 89, 81, 81, 102, 115, 99, 49, 49,
+	78, 108, 103, 104, 56, 50, 29, 113, 22, 21,
+	116, 62, 63, 64, 65, 88, 17, 53, 84, 18,
+	61, 72, 73, 17, 20, 60, 18, 59, 49, 47,
+	4, 20, 126, 128, 117, 129, 130, 127, 114, 132,
+	49, 20, 55, 28, 131, 32, 33, 31, 54, 108,
+	17, 20, 24, 18, 23, 16, 100, 15, 25, 41,
+	39, 40, 38, 42, 34, 35, 36, 37, 43, 44,
+	45, 46, 17, 20, 30, 18, 17, 20, 3, 18,
+	51, 5, 16, 93, 17, 20, 76, 18, 17, 20,
+	106, 18, 6, 7, 10, 9, 11, 12, 8, 26,
+	2, 27, 1, 86, 16, 92, 82, 0, 16, 91,
+	0, 0, 0, 0, 0, 0, 16, 90, 0, 0,
+	16, 80,
 }
-var yyPact = []int{
+var yyPact = [...]int{
 
-	70, -1000, 70, -1000, 155, -1000, 19, 59, 51, 143,
-	127, 101, 125, 50, -1000, -1000, 111, -1000, -1000, -1000,
-	-1000, -1000, -1000, 69, 103, 48, 25, 47, -1000, 19,
-	68, 67, 66, 19, 19, 19, 19, 19, 19, 19,
-	19, 19, 19, 19, 19, 19, 42, 46, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, 161, -1000, 63, 62, 62,
-	157, 150, 146, 142, 19, 19, 19, 19, 19, 39,
-	124, 89, 19, 103, 12, -1000, -1000, 15, -1000, -1000,
-	-27, -1000, 118, 38, 62, -1000, 107, 23, -1000, -1000,
-	-1000, -1000, 22, 21, 16, 1, 0, -1000, -1000, -1000,
-	-1, -2, -1000, 103, -1000, -1000, -1000, -1000, -1000, -1000,
-	19, -1000, 19, 19, -1000, 103, 19, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -3, 9, -5, -11, -18, -24,
-	-25, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	74, -1000, 74, -1000, 157, -1000, 19, 52, 51, 129,
+	127, 173, 118, 49, -1000, -1000, 116, -1000, -1000, -1000,
+	-1000, -1000, -1000, 73, 106, 48, 92, 117, 47, -1000,
+	19, 71, 69, 64, 19, 19, 19, 19, 19, 19,
+	19, 19, 19, 19, 19, 19, 19, 20, 43, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, 164, -1000, 62,
+	59, 59, 160, 152, 148, 126, 19, 19, 19, 19,
+	19, 40, 99, 25, 19, 106, 12, -1000, -1000, 15,
+	-1000, -1000, -28, -1000, 113, 39, 59, -1000, 109, 23,
+	-1000, -1000, -1000, -1000, 22, 16, 11, 1, 0, -1000,
+	-1000, -1000, -1, -2, -1000, 106, -1000, -1000, -1000, -1000,
+	-1000, -1000, 19, -1000, 19, 19, -1000, 106, 19, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -3, 9, -4, -6,
+	-19, -25, -26, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 }
-var yyPgo = []int{
+var yyPgo = [...]int{
 
-	0, 2, 1, 5, 55, 184, 183, 180, 167, 176,
-	163, 6, 158, 156, 152, 152, 0, 109, 10, 3,
+	0, 2, 1, 5, 56, 186, 183, 182, 180, 158,
+	170, 6, 166, 160, 138, 138, 0, 137, 10, 3,
 	4,
 }
-var yyR1 = []int{
+var yyR1 = [...]int{
 
 	0, 7, 8, 8, 10, 10, 10, 10, 3, 3,
 	2, 2, 1, 11, 12, 12, 13, 13, 13, 14,
-	14, 15, 15, 16, 16, 16, 16, 16, 16, 16,
+	14, 14, 15, 15, 16, 16, 16, 16, 16, 16,
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-	16, 16, 4, 4, 18, 6, 6, 5, 5, 19,
-	20, 17, 9, 9, 9, 9, 9, 9, 9, 9,
+	16, 16, 16, 4, 4, 18, 6, 6, 5, 5,
+	19, 20, 17, 9, 9, 9, 9, 9, 9, 9,
+	9,
 }
-var yyR2 = []int{
+var yyR2 = [...]int{
 
 	0, 1, 1, 2, 1, 1, 1, 3, 0, 2,
 	1, 1, 1, 1, 1, 2, 1, 1, 3, 1,
-	2, 1, 2, 1, 1, 4, 7, 7, 7, 4,
-	4, 4, 4, 5, 5, 5, 5, 5, 4, 4,
-	4, 5, 1, 2, 1, 1, 2, 1, 2, 4,
-	4, 1, 4, 3, 3, 7, 8, 5, 4, 4,
+	2, 2, 1, 2, 1, 1, 4, 7, 7, 7,
+	4, 4, 4, 4, 5, 5, 5, 5, 5, 4,
+	4, 4, 5, 1, 2, 1, 1, 2, 1, 2,
+	4, 4, 1, 4, 3, 3, 7, 8, 5, 4,
+	4,
 }
-var yyChk = []int{
+var yyChk = [...]int{
 
-	-1000, -7, -8, -9, 35, -9, 14, 15, 20, 17,
-	16, 18, 19, -16, -2, -17, 35, 4, 7, -1,
-	5, 36, 36, 5, 5, -14, 6, 5, 36, -17,
-	10, 8, 9, 27, 28, 29, 30, 25, 23, 24,
-	22, 26, 31, 32, 33, 34, 35, -11, -1, 36,
-	-13, -2, 5, 35, 36, -4, -16, 35, 35, 35,
-	-4, -4, -4, -4, -16, -16, -16, -16, -16, -16,
-	-4, -4, -16, 36, -12, -11, 36, -3, 36, -16,
-	-5, -20, 35, -18, -6, -19, 35, -18, 36, 36,
-	36, 36, -16, -16, -16, -16, -16, 36, 36, 36,
-	-16, -11, -11, 36, -10, 36, -2, 5, 6, 35,
-	36, -20, 5, 36, -19, 5, 36, 36, 36, 36,
-	36, 36, 36, 36, -11, -3, -16, -16, -16, -11,
-	-16, 36, 36, 36, 36, 36, 36, 36,
+	-1000, -7, -8, -9, 36, -9, 15, 16, 21, 18,
+	17, 19, 20, -16, -2, -17, 36, 4, 7, -1,
+	5, 37, 37, 5, 5, -14, 6, 8, 5, 37,
+	-17, 11, 9, 10, 28, 29, 30, 31, 26, 24,
+	25, 23, 27, 32, 33, 34, 35, 36, -11, -1,
+	37, -13, -2, 5, 36, 5, 37, -4, -16, 36,
+	36, 36, -4, -4, -4, -4, -16, -16, -16, -16,
+	-16, -16, -4, -4, -16, 37, -12, -11, 37, -3,
+	37, -16, -5, -20, 36, -18, -6, -19, 36, -18,
+	37, 37, 37, 37, -16, -16, -16, -16, -16, 37,
+	37, 37, -16, -11, -11, 37, -10, 37, -2, 5,
+	6, 36, 37, -20, 5, 37, -19, 5, 37, 37,
+	37, 37, 37, 37, 37, 37, -11, -3, -16, -16,
+	-16, -11, -16, 37, 37, 37, 37, 37, 37, 37,
 }
-var yyDef = []int{
+var yyDef = [...]int{
 
 	0, -2, 1, 2, 0, 3, 0, 0, 0, 0,
-	0, 0, 0, 0, 23, 24, 0, 10, 11, 51,
-	12, 53, 54, 0, 0, 0, 19, 0, 52, 0,
+	0, 0, 0, 0, 24, 25, 0, 10, 11, 52,
+	12, 54, 55, 0, 0, 0, 19, 0, 0, 53,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 13, 58,
-	20, 16, 17, 8, 59, 0, 42, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 13,
+	59, 21, 16, 17, 8, 20, 60, 0, 43, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 14, 57, 0, 25, 43,
-	0, 47, 0, 0, 44, 45, 0, 0, 29, 30,
-	31, 32, 0, 0, 0, 0, 0, 38, 39, 40,
-	0, 0, 15, 0, 9, 18, 4, 5, 6, 8,
-	0, 48, 0, 0, 46, 0, 0, 33, 34, 35,
-	36, 37, 41, 55, 0, 0, 0, 0, 0, 0,
-	0, 56, 7, 26, 50, 27, 49, 28,
+	0, 0, 0, 0, 0, 0, 0, 14, 58, 0,
+	26, 44, 0, 48, 0, 0, 45, 46, 0, 0,
+	30, 31, 32, 33, 0, 0, 0, 0, 0, 39,
+	40, 41, 0, 0, 15, 0, 9, 18, 4, 5,
+	6, 8, 0, 49, 0, 0, 47, 0, 0, 34,
+	35, 36, 37, 38, 42, 56, 0, 0, 0, 0,
+	0, 0, 0, 57, 7, 27, 51, 28, 50, 29,
 }
-var yyTok1 = []int{
+var yyTok1 = [...]int{
 
 	1,
 }
-var yyTok2 = []int{
+var yyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
 	32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-	42,
+	42, 43,
 }
-var yyTok3 = []int{
+var yyTok3 = [...]int{
 	0,
 }
+
+var yyErrorMessages = [...]struct {
+	state int
+	token int
+	msg   string
+}{}
 
 //line yaccpar:1
 
 /*	parser for yacc output	*/
 
-var yyDebug = 0
+var (
+	yyDebug        = 0
+	yyErrorVerbose = false
+)
 
 type yyLexer interface {
 	Lex(lval *yySymType) int
 	Error(s string)
 }
 
+type yyParser interface {
+	Parse(yyLexer) int
+	Lookahead() int
+}
+
+type yyParserImpl struct {
+	lookahead func() int
+}
+
+func (p *yyParserImpl) Lookahead() int {
+	return p.lookahead()
+}
+
+func yyNewParser() yyParser {
+	p := &yyParserImpl{
+		lookahead: func() int { return -1 },
+	}
+	return p
+}
+
 const yyFlag = -1000
 
 func yyTokname(c int) string {
-	// 4 is TOKSTART above
-	if c >= 4 && c-4 < len(yyToknames) {
-		if yyToknames[c-4] != "" {
-			return yyToknames[c-4]
+	if c >= 1 && c-1 < len(yyToknames) {
+		if yyToknames[c-1] != "" {
+			return yyToknames[c-1]
 		}
 	}
 	return __yyfmt__.Sprintf("tok-%v", c)
@@ -471,51 +519,129 @@ func yyStatname(s int) string {
 	return __yyfmt__.Sprintf("state-%v", s)
 }
 
-func yylex1(lex yyLexer, lval *yySymType) int {
-	c := 0
-	char := lex.Lex(lval)
+func yyErrorMessage(state, lookAhead int) string {
+	const TOKSTART = 4
+
+	if !yyErrorVerbose {
+		return "syntax error"
+	}
+
+	for _, e := range yyErrorMessages {
+		if e.state == state && e.token == lookAhead {
+			return "syntax error: " + e.msg
+		}
+	}
+
+	res := "syntax error: unexpected " + yyTokname(lookAhead)
+
+	// To match Bison, suggest at most four expected tokens.
+	expected := make([]int, 0, 4)
+
+	// Look for shiftable tokens.
+	base := yyPact[state]
+	for tok := TOKSTART; tok-1 < len(yyToknames); tok++ {
+		if n := base + tok; n >= 0 && n < yyLast && yyChk[yyAct[n]] == tok {
+			if len(expected) == cap(expected) {
+				return res
+			}
+			expected = append(expected, tok)
+		}
+	}
+
+	if yyDef[state] == -2 {
+		i := 0
+		for yyExca[i] != -1 || yyExca[i+1] != state {
+			i += 2
+		}
+
+		// Look for tokens that we accept or reduce.
+		for i += 2; yyExca[i] >= 0; i += 2 {
+			tok := yyExca[i]
+			if tok < TOKSTART || yyExca[i+1] == 0 {
+				continue
+			}
+			if len(expected) == cap(expected) {
+				return res
+			}
+			expected = append(expected, tok)
+		}
+
+		// If the default action is to accept or reduce, give up.
+		if yyExca[i+1] != 0 {
+			return res
+		}
+	}
+
+	for i, tok := range expected {
+		if i == 0 {
+			res += ", expecting "
+		} else {
+			res += " or "
+		}
+		res += yyTokname(tok)
+	}
+	return res
+}
+
+func yylex1(lex yyLexer, lval *yySymType) (char, token int) {
+	token = 0
+	char = lex.Lex(lval)
 	if char <= 0 {
-		c = yyTok1[0]
+		token = yyTok1[0]
 		goto out
 	}
 	if char < len(yyTok1) {
-		c = yyTok1[char]
+		token = yyTok1[char]
 		goto out
 	}
 	if char >= yyPrivate {
 		if char < yyPrivate+len(yyTok2) {
-			c = yyTok2[char-yyPrivate]
+			token = yyTok2[char-yyPrivate]
 			goto out
 		}
 	}
 	for i := 0; i < len(yyTok3); i += 2 {
-		c = yyTok3[i+0]
-		if c == char {
-			c = yyTok3[i+1]
+		token = yyTok3[i+0]
+		if token == char {
+			token = yyTok3[i+1]
 			goto out
 		}
 	}
 
 out:
-	if c == 0 {
-		c = yyTok2[1] /* unknown char */
+	if token == 0 {
+		token = yyTok2[1] /* unknown char */
 	}
 	if yyDebug >= 3 {
-		__yyfmt__.Printf("lex %s(%d)\n", yyTokname(c), uint(char))
+		__yyfmt__.Printf("lex %s(%d)\n", yyTokname(token), uint(char))
 	}
-	return c
+	return char, token
 }
 
 func yyParse(yylex yyLexer) int {
+	return yyNewParser().Parse(yylex)
+}
+
+func (yyrcvr *yyParserImpl) Parse(yylex yyLexer) int {
 	var yyn int
 	var yylval yySymType
 	var yyVAL yySymType
+	var yyDollar []yySymType
+	_ = yyDollar // silence set and not used
 	yyS := make([]yySymType, yyMaxDepth)
 
 	Nerrs := 0   /* number of errors */
 	Errflag := 0 /* error recovery flag */
 	yystate := 0
 	yychar := -1
+	yytoken := -1 // yychar translated into internal numbering
+	yyrcvr.lookahead = func() int { return yychar }
+	defer func() {
+		// Make sure we report no lookahead when not parsing.
+		yystate = -1
+		yychar = -1
+		yytoken = -1
+	}()
 	yyp := -1
 	goto yystack
 
@@ -528,7 +654,7 @@ ret1:
 yystack:
 	/* put a state and value onto the stack */
 	if yyDebug >= 4 {
-		__yyfmt__.Printf("char %v in %v\n", yyTokname(yychar), yyStatname(yystate))
+		__yyfmt__.Printf("char %v in %v\n", yyTokname(yytoken), yyStatname(yystate))
 	}
 
 	yyp++
@@ -546,15 +672,16 @@ yynewstate:
 		goto yydefault /* simple state */
 	}
 	if yychar < 0 {
-		yychar = yylex1(yylex, &yylval)
+		yychar, yytoken = yylex1(yylex, &yylval)
 	}
-	yyn += yychar
+	yyn += yytoken
 	if yyn < 0 || yyn >= yyLast {
 		goto yydefault
 	}
 	yyn = yyAct[yyn]
-	if yyChk[yyn] == yychar { /* valid shift */
+	if yyChk[yyn] == yytoken { /* valid shift */
 		yychar = -1
+		yytoken = -1
 		yyVAL = yylval
 		yystate = yyn
 		if Errflag > 0 {
@@ -568,7 +695,7 @@ yydefault:
 	yyn = yyDef[yystate]
 	if yyn == -2 {
 		if yychar < 0 {
-			yychar = yylex1(yylex, &yylval)
+			yychar, yytoken = yylex1(yylex, &yylval)
 		}
 
 		/* look through exception table */
@@ -581,7 +708,7 @@ yydefault:
 		}
 		for xi += 2; ; xi += 2 {
 			yyn = yyExca[xi+0]
-			if yyn < 0 || yyn == yychar {
+			if yyn < 0 || yyn == yytoken {
 				break
 			}
 		}
@@ -594,11 +721,11 @@ yydefault:
 		/* error ... attempt to resume parsing */
 		switch Errflag {
 		case 0: /* brand new error */
-			yylex.Error("syntax error")
+			yylex.Error(yyErrorMessage(yystate, yytoken))
 			Nerrs++
 			if yyDebug >= 1 {
 				__yyfmt__.Printf("%s", yyStatname(yystate))
-				__yyfmt__.Printf(" saw %s\n", yyTokname(yychar))
+				__yyfmt__.Printf(" saw %s\n", yyTokname(yytoken))
 			}
 			fallthrough
 
@@ -626,12 +753,13 @@ yydefault:
 
 		case 3: /* no shift yet; clobber input char */
 			if yyDebug >= 2 {
-				__yyfmt__.Printf("error recovery discards %s\n", yyTokname(yychar))
+				__yyfmt__.Printf("error recovery discards %s\n", yyTokname(yytoken))
 			}
-			if yychar == yyEofCode {
+			if yytoken == yyEofCode {
 				goto ret1
 			}
 			yychar = -1
+			yytoken = -1
 			goto yynewstate /* try again in the same state */
 		}
 	}
@@ -646,6 +774,13 @@ yydefault:
 	_ = yypt // guard against "declared and not used"
 
 	yyp -= yyR2[yyn]
+	// yyp is now the index of $0. Perform the default action. Iff the
+	// reduced production is ε, $1 is possibly out of range.
+	if yyp+1 >= len(yyS) {
+		nyys := make([]yySymType, len(yyS)*2)
+		copy(nyys, yyS)
+		yyS = nyys
+	}
 	yyVAL = yyS[yyp+1]
 
 	/* consult goto table to find next state */
@@ -665,206 +800,252 @@ yydefault:
 	switch yynt {
 
 	case 1:
-		//line smt2parse.y:67
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:68
 		{
 			trace("eof")
 		}
 	case 2:
-		//line smt2parse.y:71
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:72
 		{
 			trace("command")
 		}
 	case 3:
-		//line smt2parse.y:72
+		yyDollar = yyS[yypt-2 : yypt+1]
+		//line smt2parse.y:73
 		{
 			trace("commands")
 		}
 	case 8:
-		//line smt2parse.y:83
+		yyDollar = yyS[yypt-0 : yypt+1]
+		//line smt2parse.y:84
 		{
 			yyVAL.num = 0
 		}
 	case 9:
-		//line smt2parse.y:84
+		yyDollar = yyS[yypt-2 : yypt+1]
+		//line smt2parse.y:85
 		{
-			yyVAL.num = yyS[yypt-1].num + 1
+			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 10:
-		//line smt2parse.y:88
-		{
-			yyVAL.node = yyS[yypt-0].node
-		}
-	case 11:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line smt2parse.y:89
 		{
-			yyVAL.node = yyS[yypt-0].node
+			yyVAL.node = yyDollar[1].node
+		}
+	case 11:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:90
+		{
+			yyVAL.node = yyDollar[1].node
 		}
 	case 12:
-		//line smt2parse.y:97
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:98
 		{
-			yyVAL.node = yyS[yypt-0].node
+			yyVAL.node = yyDollar[1].node
 		}
 	case 13:
-		//line smt2parse.y:99
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:100
 		{
-			if yyS[yypt-0].node.str != "Real" {
+			if yyDollar[1].node.str != "Real" {
 				yylex.Error("unknown sort")
 			}
 		}
-	case 23:
-		//line smt2parse.y:122
+	case 20:
+		yyDollar = yyS[yypt-2 : yypt+1]
+		//line smt2parse.y:116
 		{
-			stack.Push(NewQeNodeNum(yyS[yypt-0].node.str, yyS[yypt-0].node.lno))
-		}
-	case 26:
-		//line smt2parse.y:125
-		{
-			letmap.popn(yyS[yypt-3].num)
-		}
-	case 27:
-		//line smt2parse.y:128
-		{
-			stack.Push(NewQeNodeStr("All", yyS[yypt-5].node.lno))
-		}
-	case 28:
-		//line smt2parse.y:129
-		{
-			stack.Push(NewQeNodeStr("Ex", yyS[yypt-5].node.lno))
-		}
-	case 29:
-		//line smt2parse.y:131
-		{
-			if yyS[yypt-1].num > 1 {
-				stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
+			if l, ok := yylex.(commentI); ok {
+				l.append_comment("status "+yyDollar[2].node.str, yyDollar[2].node.lno)
 			}
 		}
-	case 30:
-		//line smt2parse.y:135
+	case 24:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:127
 		{
-			if yyS[yypt-1].num == 1 {
-				stack.Push(NewQeNodeStr("-.", yyS[yypt-2].node.lno))
-			} else {
-				stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
+			stack.Push(NewQeNodeNum(yyDollar[1].node.str, yyDollar[1].node.lno))
+		}
+	case 27:
+		yyDollar = yyS[yypt-7 : yypt+1]
+		//line smt2parse.y:130
+		{
+			letmap.popn(yyDollar[4].num)
+		}
+	case 28:
+		yyDollar = yyS[yypt-7 : yypt+1]
+		//line smt2parse.y:133
+		{
+			stack.Push(NewQeNodeStr("All", yyDollar[2].node.lno))
+		}
+	case 29:
+		yyDollar = yyS[yypt-7 : yypt+1]
+		//line smt2parse.y:134
+		{
+			stack.Push(NewQeNodeStr("Ex", yyDollar[2].node.lno))
+		}
+	case 30:
+		yyDollar = yyS[yypt-4 : yypt+1]
+		//line smt2parse.y:136
+		{
+			if yyDollar[3].num > 1 {
+				stack.Push(NewQeNodeStrVal(yyDollar[2].node.str, yyDollar[3].num, yyDollar[2].node.lno))
 			}
 		}
 	case 31:
-		//line smt2parse.y:141
+		yyDollar = yyS[yypt-4 : yypt+1]
+		//line smt2parse.y:140
 		{
-			stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
+			if yyDollar[3].num == 1 {
+				stack.Push(NewQeNodeStr("-.", yyDollar[2].node.lno))
+			} else {
+				stack.Push(NewQeNodeStrVal(yyDollar[2].node.str, yyDollar[3].num, yyDollar[2].node.lno))
+			}
 		}
 	case 32:
-		//line smt2parse.y:142
-		{
-			stack.Push(NewQeNodeStrVal(yyS[yypt-2].node.str, yyS[yypt-1].num, yyS[yypt-2].node.lno))
-		}
-	case 33:
-		//line smt2parse.y:143
-		{
-			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
-		}
-	case 34:
-		//line smt2parse.y:144
-		{
-			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
-		}
-	case 35:
-		//line smt2parse.y:145
-		{
-			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
-		}
-	case 36:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line smt2parse.y:146
 		{
-			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
+			stack.Push(NewQeNodeStrVal(yyDollar[2].node.str, yyDollar[3].num, yyDollar[2].node.lno))
 		}
-	case 37:
+	case 33:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line smt2parse.y:147
 		{
-			stack.Push(NewQeNodeStr(yyS[yypt-3].node.str, yyS[yypt-3].node.lno))
+			stack.Push(NewQeNodeStrVal(yyDollar[2].node.str, yyDollar[3].num, yyDollar[2].node.lno))
 		}
-	case 38:
+	case 34:
+		yyDollar = yyS[yypt-5 : yypt+1]
 		//line smt2parse.y:148
 		{
-			stack.Push(NewQeNodeStr("Not", yyS[yypt-2].node.lno))
+			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
-	case 39:
+	case 35:
+		yyDollar = yyS[yypt-5 : yypt+1]
 		//line smt2parse.y:149
 		{
-			stack.Push(NewQeNodeStrVal("And", yyS[yypt-1].num, yyS[yypt-2].node.lno))
+			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
-	case 40:
+	case 36:
+		yyDollar = yyS[yypt-5 : yypt+1]
 		//line smt2parse.y:150
 		{
-			stack.Push(NewQeNodeStrVal("Or", yyS[yypt-1].num, yyS[yypt-2].node.lno))
+			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
-	case 41:
+	case 37:
+		yyDollar = yyS[yypt-5 : yypt+1]
 		//line smt2parse.y:151
 		{
-			stack.Push(NewQeNodeStr("Impl", yyS[yypt-3].node.lno))
+			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
-	case 42:
+	case 38:
+		yyDollar = yyS[yypt-5 : yypt+1]
+		//line smt2parse.y:152
+		{
+			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
+		}
+	case 39:
+		yyDollar = yyS[yypt-4 : yypt+1]
+		//line smt2parse.y:153
+		{
+			stack.Push(NewQeNodeStr("Not", yyDollar[2].node.lno))
+		}
+	case 40:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line smt2parse.y:154
 		{
-			yyVAL.num = 1
+			stack.Push(NewQeNodeStrVal("And", yyDollar[3].num, yyDollar[2].node.lno))
 		}
-	case 43:
+	case 41:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line smt2parse.y:155
 		{
-			yyVAL.num = yyS[yypt-1].num + 1
+			stack.Push(NewQeNodeStrVal("Or", yyDollar[3].num, yyDollar[2].node.lno))
 		}
-	case 44:
-		//line smt2parse.y:157
+	case 42:
+		yyDollar = yyS[yypt-5 : yypt+1]
+		//line smt2parse.y:156
 		{
-			stack.Push(NewQeNodeList(yyS[yypt-0].num, 0))
+			stack.Push(NewQeNodeStr("Impl", yyDollar[2].node.lno))
 		}
-	case 45:
-		//line smt2parse.y:162
+	case 43:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:159
 		{
 			yyVAL.num = 1
 		}
-	case 46:
-		//line smt2parse.y:163
+	case 44:
+		yyDollar = yyS[yypt-2 : yypt+1]
+		//line smt2parse.y:160
 		{
-			yyVAL.num = yyS[yypt-1].num + 1
+			yyVAL.num = yyDollar[1].num + 1
 		}
-	case 47:
+	case 45:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:162
+		{
+			stack.Push(NewQeNodeList(yyDollar[1].num, 0))
+		}
+	case 46:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line smt2parse.y:167
 		{
 			yyVAL.num = 1
 		}
-	case 48:
+	case 47:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line smt2parse.y:168
 		{
-			yyVAL.num = yyS[yypt-1].num + 1
+			yyVAL.num = yyDollar[1].num + 1
+		}
+	case 48:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:172
+		{
+			yyVAL.num = 1
 		}
 	case 49:
-		//line smt2parse.y:171
+		yyDollar = yyS[yypt-2 : yypt+1]
+		//line smt2parse.y:173
 		{
-			stack.Push(NewQeNodeStr(yyS[yypt-2].node.str, yyS[yypt-2].node.lno))
+			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 50:
-		//line smt2parse.y:175
+		yyDollar = yyS[yypt-4 : yypt+1]
+		//line smt2parse.y:176
 		{
-			letmap.update_letmap(stack, yyS[yypt-3].num, yyS[yypt-2].node)
+			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
 	case 51:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line smt2parse.y:180
 		{
-			v, ok := letmap.get(yyS[yypt-0].node.str)
+			letmap.update_letmap(stack, yyDollar[1].num, yyDollar[2].node)
+		}
+	case 52:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line smt2parse.y:185
+		{
+			v, ok := letmap.get(yyDollar[1].node.str)
 			if ok {
 				// letmap $B$NFbMF$rA^F~$9$k(B.
 				stack.Pushn(v)
 			} else {
-				stack.Push(NewQeNodeStr(yyS[yypt-0].node.str, yyS[yypt-0].node.lno))
+				stack.Push(NewQeNodeStr(yyDollar[1].node.str, yyDollar[1].node.lno))
 			}
 		}
-	case 52:
-		//line smt2parse.y:249
+	case 53:
+		yyDollar = yyS[yypt-4 : yypt+1]
+		//line smt2parse.y:254
 		{
 			assert_cnt += 1
 		}
-	case 53:
-		//line smt2parse.y:250
+	case 54:
+		yyDollar = yyS[yypt-3 : yypt+1]
+		//line smt2parse.y:255
 		{
 			trace("go check-sat")
 			stack.Push(NewQeNodeStrVal("And", assert_cnt, 0))
@@ -872,29 +1053,33 @@ yydefault:
 				stack.Push(NewQeNodeStr("Ex", 0))
 			}
 		}
-	case 55:
-		//line smt2parse.y:257
+	case 56:
+		yyDollar = yyS[yypt-7 : yypt+1]
+		//line smt2parse.y:262
 		{
-			stack.Push(NewQeNodeStr(yyS[yypt-4].node.str, yyS[yypt-4].node.lno))
-			stack.Push(NewQeNodeList(1, yyS[yypt-4].node.lno))
+			stack.Push(NewQeNodeStr(yyDollar[3].node.str, yyDollar[3].node.lno))
+			stack.Push(NewQeNodeList(1, yyDollar[3].node.lno))
 			decfun_cnt += 1
 		}
-	case 56:
-		//line smt2parse.y:262
+	case 57:
+		yyDollar = yyS[yypt-8 : yypt+1]
+		//line smt2parse.y:267
 		{
 			yylex.Error("unknown declare")
 		}
-	case 57:
-		//line smt2parse.y:263
+	case 58:
+		yyDollar = yyS[yypt-5 : yypt+1]
+		//line smt2parse.y:268
 		{
-			stack.Push(NewQeNodeStr(yyS[yypt-2].node.str, yyS[yypt-2].node.lno))
-			stack.Push(NewQeNodeList(1, yyS[yypt-2].node.lno))
+			stack.Push(NewQeNodeStr(yyDollar[3].node.str, yyDollar[3].node.lno))
+			stack.Push(NewQeNodeList(1, yyDollar[3].node.lno))
 			decfun_cnt += 1
 		}
-	case 59:
-		//line smt2parse.y:270
+	case 60:
+		yyDollar = yyS[yypt-4 : yypt+1]
+		//line smt2parse.y:275
 		{
-			if yyS[yypt-1].node.str != "QF_NRA" && yyS[yypt-1].node.str != "NRA" {
+			if yyDollar[3].node.str != "QF_NRA" && yyDollar[3].node.str != "NRA" {
 				yylex.Error("unknown logic")
 			}
 		}
