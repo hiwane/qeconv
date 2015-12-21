@@ -97,7 +97,7 @@ spec_const
 
 id : symbol { $$ = $1 }
 
-sort : id	{ if $1.str != "Real" {yylex.Error("unknown sort") }}
+sort : id	{ if $1.str != "Real" {yylex.Error("unknown sort: " + $1.str) }}
 //	 | lp id sort1 rp 
 	 ;
 

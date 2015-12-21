@@ -285,6 +285,7 @@ func (l *synLex) Lex(lval *yySymType) int {
 		}
 		str = strings.Replace(str, "?", "_q_", -1)
 		str = strings.Replace(str, "!", "_e_", -1)
+		str = strings.Replace(str, ".", "_d_", -1)
 		lval.node = smt2node{lno, col, symbol, str}
 		return symbol
 	}
@@ -868,7 +869,7 @@ yydefault:
 		//line smt2parse.y:100
 		{
 			if yyDollar[1].node.str != "Real" {
-				yylex.Error("unknown sort")
+				yylex.Error("unknown sort: " + yyDollar[1].node.str)
 			}
 		}
 	case 20:
