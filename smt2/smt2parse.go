@@ -211,14 +211,30 @@ func (l *synLex) append_comment(comm string, lno int) {
 
 func (l *synLex) Lex(lval *yySymType) int {
 
-	// skip space
-	for isspace(l.Peek()) {
+	for {
+		// skip space
+		for isspace(l.Peek()) {
+			l.Next()
+		}
+		if scanner.EOF == l.Peek() {
+			trace("Lex! eof " + l.Pos().String())
+			l.Next()
+			return 0
+		}
+		c := int(l.Peek())
+		if c != ';' {
+			break
+		}
+		// comment
 		l.Next()
-	}
-	if scanner.EOF == l.Peek() {
-		trace("Lex! eof " + l.Pos().String())
-		l.Next()
-		return 0
+		str := ""
+		for l.Peek() != '\n' {
+			str += string(l.Next())
+		}
+		if str != "" {
+			lno := l.Pos().Line
+			l.comment = append(l.comment, NewComment(str, lno))
+		}
 	}
 	trace("Lex! " + string(l.Peek()) + l.Pos().String())
 
