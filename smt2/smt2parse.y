@@ -251,7 +251,7 @@ qual_id
 
 command : lp assert term rp {
 			update_assert_stk(true)
-			}
+		}
 		| lp check_sat rp { trace("go check-sat"); 
 			upd := 0
 			for i := len(assert_stk) - 1; i >= 0; i-- {
@@ -259,9 +259,7 @@ command : lp assert term rp {
 					stack.Push(NewQeNodeStrVal("And", assert_stk[i] + upd, 0)) 
 					upd = 1
 				} else if assert_stk[i] < 0 {
-					for j := -assert_stk[i]; j > 0; j-- {
-						stack.Push(NewQeNodeStr("Ex", 0))
-					}
+					stack.Push(NewQeNodeStr("Ex", 0))
 				}
 			}
 			assert_stk = make([]int, 1)
@@ -269,14 +267,20 @@ command : lp assert term rp {
 		| lp exit rp
 		| lp declare_fun symbol lp rp sort rp {
 			update_assert_stk(false)
+			if assert_stk[len(assert_stk)-1] < 0 {
+				stack.Pop()
+			}
 			stack.Push(NewQeNodeStr($3.str, $3.lno))
-			stack.Push(NewQeNodeList(1, $3.lno))
+			stack.Push(NewQeNodeList(-assert_stk[len(assert_stk)-1], $3.lno))
 		}
 		| lp declare_fun symbol lp sort1 rp sort rp { yylex.Error("unknown declare") }
 		| lp declare_const symbol sort rp {
 			update_assert_stk(false)
+			if assert_stk[len(assert_stk)-1] < 0 {
+				stack.Pop()
+			}
 			stack.Push(NewQeNodeStr($3.str, $3.lno))
-			stack.Push(NewQeNodeList(1, $3.lno))
+			stack.Push(NewQeNodeList(-assert_stk[len(assert_stk)-1], $3.lno))
 		}
 //		| lp define_fun fun_def rp
 		| lp set_info attribute rp

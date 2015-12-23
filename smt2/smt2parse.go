@@ -121,7 +121,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line smt2parse.y:288
+//line smt2parse.y:292
 
 /*  start  of  programs  */
 
@@ -852,38 +852,42 @@ yydefault:
 					stack.Push(NewQeNodeStrVal("And", assert_stk[i]+upd, 0))
 					upd = 1
 				} else if assert_stk[i] < 0 {
-					for j := -assert_stk[i]; j > 0; j-- {
-						stack.Push(NewQeNodeStr("Ex", 0))
-					}
+					stack.Push(NewQeNodeStr("Ex", 0))
 				}
 			}
 			assert_stk = make([]int, 1)
 		}
 	case 56:
 		yyDollar = yyS[yypt-7 : yypt+1]
-		//line smt2parse.y:270
+		//line smt2parse.y:268
 		{
 			update_assert_stk(false)
+			if assert_stk[len(assert_stk)-1] < 0 {
+				stack.Pop()
+			}
 			stack.Push(NewQeNodeStr(yyDollar[3].node.str, yyDollar[3].node.lno))
-			stack.Push(NewQeNodeList(1, yyDollar[3].node.lno))
+			stack.Push(NewQeNodeList(-assert_stk[len(assert_stk)-1], yyDollar[3].node.lno))
 		}
 	case 57:
 		yyDollar = yyS[yypt-8 : yypt+1]
-		//line smt2parse.y:275
+		//line smt2parse.y:276
 		{
 			yylex.Error("unknown declare")
 		}
 	case 58:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:276
+		//line smt2parse.y:277
 		{
 			update_assert_stk(false)
+			if assert_stk[len(assert_stk)-1] < 0 {
+				stack.Pop()
+			}
 			stack.Push(NewQeNodeStr(yyDollar[3].node.str, yyDollar[3].node.lno))
-			stack.Push(NewQeNodeList(1, yyDollar[3].node.lno))
+			stack.Push(NewQeNodeList(-assert_stk[len(assert_stk)-1], yyDollar[3].node.lno))
 		}
 	case 60:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:283
+		//line smt2parse.y:287
 		{
 			if yyDollar[3].node.str != "QF_NRA" && yyDollar[3].node.str != "NRA" {
 				yylex.Error("unknown logic: " + yyDollar[3].node.str)
