@@ -504,3 +504,19 @@ func update_assert_stk(b bool) {
 	}
 	assert_stk[len(assert_stk)-1] += sgn
 }
+
+
+func declare_sym(sym smt2node) {
+	if assert_stk[len(assert_stk)-1] > 0 {
+		assert_stk = append(assert_stk, -1)
+	} else {
+		if assert_stk[len(assert_stk)-1] < 0 {
+			fmt.Printf("pop dec %v\n", assert_stk)
+			stack.Pop()
+		}
+		assert_stk[len(assert_stk)-1] -= 1
+	}
+	stack.Push(NewQeNodeStr(sym.str, sym.lno))
+	stack.Push(NewQeNodeList(-assert_stk[len(assert_stk)-1], sym.lno))
+}
+

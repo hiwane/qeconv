@@ -262,25 +262,15 @@ command : lp assert term rp {
 					stack.Push(NewQeNodeStr("Ex", 0))
 				}
 			}
-			assert_stk = make([]int, 1)
+			assert_stk = make([]int, 0)
 		}
 		| lp exit rp
 		| lp declare_fun symbol lp rp sort rp {
-			update_assert_stk(false)
-			if assert_stk[len(assert_stk)-1] < 0 {
-				stack.Pop()
-			}
-			stack.Push(NewQeNodeStr($3.str, $3.lno))
-			stack.Push(NewQeNodeList(-assert_stk[len(assert_stk)-1], $3.lno))
+			declare_sym($3)
 		}
 		| lp declare_fun symbol lp sort1 rp sort rp { yylex.Error("unknown declare") }
 		| lp declare_const symbol sort rp {
-			update_assert_stk(false)
-			if assert_stk[len(assert_stk)-1] < 0 {
-				stack.Pop()
-			}
-			stack.Push(NewQeNodeStr($3.str, $3.lno))
-			stack.Push(NewQeNodeList(-assert_stk[len(assert_stk)-1], $3.lno))
+			declare_sym($3)
 		}
 //		| lp define_fun fun_def rp
 		| lp set_info attribute rp
