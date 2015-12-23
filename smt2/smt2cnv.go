@@ -468,7 +468,7 @@ func parse(str string) (*QeStack, []Comment, error) {
 	l := new(synLex)
 	l.Init(strings.NewReader(str))
 	stack = new(QeStack)
-	assert_cnt = 0
+	assert_stk = make([]int, 1)
 	decfun_cnt = 0
 	symbol_cnt = 0
 	letmap.reset()
@@ -479,4 +479,28 @@ func parse(str string) (*QeStack, []Comment, error) {
 
 func trace(s string) {
 	//	fmt.Printf(s + "\n")
+}
+
+func print_ints(a []int, label string) {
+	fmt.Printf("%s: ", label)
+	for i := 0; i < len(a); i++ {
+		fmt.Printf("%d ", a[i])
+	}
+	fmt.Printf("\n")
+}
+
+func update_assert_stk(b bool) {
+	// b=true なら, assert 追加
+	// b=false なら, declare_fun 追加
+
+	var sgn int
+	if b {
+		sgn = 1
+	} else {
+		sgn = -1
+	}
+	if sgn*assert_stk[len(assert_stk)-1] < 0 {
+		assert_stk = append(assert_stk, 0)
+	}
+	assert_stk[len(assert_stk)-1] += sgn
 }
