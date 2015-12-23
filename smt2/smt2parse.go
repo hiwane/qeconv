@@ -9,7 +9,7 @@ import (
 )
 
 var stack *QeStack
-var assert_stk []int
+var assert_stk ex_andStack
 var decfun_cnt int
 var symbol_cnt int
 var symbol_map map[string]string
@@ -121,7 +121,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line smt2parse.y:282
+//line smt2parse.y:273
 
 /*  start  of  programs  */
 
@@ -839,45 +839,36 @@ yydefault:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		//line smt2parse.y:252
 		{
-			update_assert_stk(true)
+			assert_stk.assert()
 		}
 	case 54:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		//line smt2parse.y:255
 		{
 			trace("go check-sat")
-			upd := 0
-			for i := len(assert_stk) - 1; i >= 0; i-- {
-				if assert_stk[i] > 0 {
-					stack.Push(NewQeNodeStrVal("And", assert_stk[i]+upd, 0))
-					upd = 1
-				} else if assert_stk[i] < 0 {
-					stack.Push(NewQeNodeStr("Ex", 0))
-				}
-			}
-			assert_stk = make([]int, 0)
+			assert_stk.check_sat()
 		}
 	case 56:
 		yyDollar = yyS[yypt-7 : yypt+1]
-		//line smt2parse.y:268
+		//line smt2parse.y:259
 		{
-			declare_sym(yyDollar[3].node)
+			assert_stk.declare_sym(yyDollar[3].node)
 		}
 	case 57:
 		yyDollar = yyS[yypt-8 : yypt+1]
-		//line smt2parse.y:271
+		//line smt2parse.y:262
 		{
 			yylex.Error("unknown declare")
 		}
 	case 58:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:272
+		//line smt2parse.y:263
 		{
-			declare_sym(yyDollar[3].node)
+			assert_stk.declare_sym(yyDollar[3].node)
 		}
 	case 60:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:277
+		//line smt2parse.y:268
 		{
 			if yyDollar[3].node.str != "QF_NRA" && yyDollar[3].node.str != "NRA" {
 				yylex.Error("unknown logic: " + yyDollar[3].node.str)

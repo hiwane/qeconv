@@ -8,7 +8,7 @@ import (
 )
 
 var stack *QeStack
-var assert_stk []int
+var assert_stk ex_andStack
 var decfun_cnt int
 var symbol_cnt int
 var symbol_map map[string]string
@@ -250,27 +250,18 @@ qual_id
 //prop_literal : symbol | lpnot symbolrp ;
 
 command : lp assert term rp {
-			update_assert_stk(true)
+			assert_stk.assert()
 		}
 		| lp check_sat rp { trace("go check-sat"); 
-			upd := 0
-			for i := len(assert_stk) - 1; i >= 0; i-- {
-				if assert_stk[i] > 0 {
-					stack.Push(NewQeNodeStrVal("And", assert_stk[i] + upd, 0)) 
-					upd = 1
-				} else if assert_stk[i] < 0 {
-					stack.Push(NewQeNodeStr("Ex", 0))
-				}
-			}
-			assert_stk = make([]int, 0)
+			assert_stk.check_sat()
 		}
 		| lp exit rp
 		| lp declare_fun symbol lp rp sort rp {
-			declare_sym($3)
+			assert_stk.declare_sym($3)
 		}
 		| lp declare_fun symbol lp sort1 rp sort rp { yylex.Error("unknown declare") }
 		| lp declare_const symbol sort rp {
-			declare_sym($3)
+			assert_stk.declare_sym($3)
 		}
 //		| lp define_fun fun_def rp
 		| lp set_info attribute rp

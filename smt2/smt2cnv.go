@@ -468,7 +468,7 @@ func parse(str string) (*QeStack, []Comment, error) {
 	l := new(synLex)
 	l.Init(strings.NewReader(str))
 	stack = new(QeStack)
-	assert_stk = make([]int, 1)
+	assert_stk.v = make([]int, 1)
 	decfun_cnt = 0
 	symbol_cnt = 0
 	letmap.reset()
@@ -489,34 +489,42 @@ func print_ints(a []int, label string) {
 	fmt.Printf("\n")
 }
 
-func update_assert_stk(b bool) {
-	// b=true なら, assert 追加
-	// b=false なら, declare_fun 追加
-
-	var sgn int
-	if b {
-		sgn = 1
-	} else {
-		sgn = -1
-	}
-	if sgn*assert_stk[len(assert_stk)-1] < 0 {
-		assert_stk = append(assert_stk, 0)
-	}
-	assert_stk[len(assert_stk)-1] += sgn
+type ex_andStack struct {
+	v []int
 }
 
+func (es *ex_andStack) assert() {
+	// (assert term) をみつけた
+	if es.v[len(es.v)-1] < 0 {
+		es.v = append(es.v, 0)
+	}
+	es.v[len(es.v)-1] += 1
+}
 
-func declare_sym(sym smt2node) {
-	if assert_stk[len(assert_stk)-1] > 0 {
-		assert_stk = append(assert_stk, -1)
+func (es *ex_andStack) declare_sym(sym smt2node) {
+	// (declare_fun sym ...) をみつけた
+
+	if es.v[len(es.v)-1] > 0 {
+		es.v = append(es.v, -1)
 	} else {
-		if assert_stk[len(assert_stk)-1] < 0 {
-			fmt.Printf("pop dec %v\n", assert_stk)
+		if es.v[len(es.v)-1] < 0 {
 			stack.Pop()
 		}
-		assert_stk[len(assert_stk)-1] -= 1
+		es.v[len(es.v)-1] -= 1
 	}
 	stack.Push(NewQeNodeStr(sym.str, sym.lno))
-	stack.Push(NewQeNodeList(-assert_stk[len(assert_stk)-1], sym.lno))
+	stack.Push(NewQeNodeList(-es.v[len(es.v)-1], sym.lno))
 }
 
+func (es *ex_andStack) check_sat() {
+	upd := 0
+	for i := len(es.v) - 1; i >= 0; i-- {
+		if es.v[i] > 0 {
+			stack.Push(NewQeNodeStrVal("And", es.v[i]+upd, 0))
+			upd = 1
+		} else if es.v[i] < 0 {
+			stack.Push(NewQeNodeStr("Ex", 0))
+		}
+	}
+	es.v = make([]int, 0)
+}
