@@ -10,6 +10,8 @@ import (
 var stack *QeStack
 var assert_cnt int
 var decfun_cnt int
+var symbol_cnt int
+var symbol_map map[string]string
 
 
 var letmap smt2letdat
@@ -18,7 +20,7 @@ var letmap smt2letdat
 type smt2node struct {
 	lno, col int
 	typ int
-	str string
+	str, org_str string
 }
 
 %}
@@ -268,7 +270,7 @@ command : lp assert term rp { assert_cnt += 1 }
 		}
 //		| lp define_fun fun_def rp
 		| lp set_info attribute rp
-		| lp set_logic symbol rp { if $3.str != "QF_NRA" && $3.str != "NRA" { yylex.Error("unknown logic") }}
+		| lp set_logic symbol rp { if $3.str != "QF_NRA" && $3.str != "NRA" { yylex.Error("unknown logic: " + $3.str) }}
 //		| lp set_option option rp
 		;
 

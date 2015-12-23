@@ -377,7 +377,7 @@ func (l *synLex) Lex(lval *yySymType) int {
 			}
 		}
 
-		lval.node = smt2node{lno, col, number, string(ret)}
+		lval.node = smt2node{lno, col, number, string(ret), string(ret)}
 		return number
 	}
 
@@ -390,20 +390,21 @@ func (l *synLex) Lex(lval *yySymType) int {
 
 		for i := 0; i < len(keywords_tbl); i++ {
 			if keywords_tbl[i].val == str {
-				lval.node = smt2node{lno, col, keywords_tbl[i].label, str}
+				lval.node = smt2node{lno, col, keywords_tbl[i].label, str, str}
 				return keywords_tbl[i].label
 			}
 		}
-		str = strings.Replace(str, "$", "_D_", -1)
+		org := str
 		str = strings.Replace(str, "%", "_P_", -1)
-		str = strings.Replace(str, "^", "_h_", -1)
-		str = strings.Replace(str, "|", "_b_", -1)
-		str = strings.Replace(str, "~", "_t_", -1)
-		str = strings.Replace(str, "#", "_s_", -1)
 		str = strings.Replace(str, "?", "_q_", -1)
 		str = strings.Replace(str, "!", "_e_", -1)
 		str = strings.Replace(str, ".", "_d_", -1)
-		lval.node = smt2node{lno, col, symbol, str}
+		str = strings.Replace(str, "$", "_D_", -1)
+		str = strings.Replace(str, "~", "_t_", -1)
+		str = strings.Replace(str, "&", "_s_", -1)
+		str = strings.Replace(str, "^", "_h_", -1)
+		str = strings.Replace(str, "@", "_a_", -1)
+		lval.node = smt2node{lno, col, symbol, str, org}
 		return symbol
 	}
 
@@ -417,7 +418,7 @@ func (l *synLex) Lex(lval *yySymType) int {
 		if str == ":status" {
 			return kw_status
 		}
-		lval.node = smt2node{lno, col, keyword, str}
+		lval.node = smt2node{lno, col, keyword, str, str}
 		return keyword
 	}
 	if c == '|' || c == '"' {
@@ -428,11 +429,28 @@ func (l *synLex) Lex(lval *yySymType) int {
 			ret = append(ret, l.Next())
 		}
 		l.Next()
-		if c == '|' {
-			lval.node = smt2node{lno, col, symbol, string(ret)}
-		} else {
-			lval.node = smt2node{lno, col, string_, string(ret)}
+
+		str := string(ret)
+		if c == '"' {
+			lval.node = smt2node{lno, col, string_, str, str}
+			return string_
 		}
+
+		org := str
+
+		// white space まで許可されるので適当に名前をつけるしかないだろう.
+		if s, ok := symbol_map[org]; ok {
+			str = s
+		} else {
+			symbol_cnt += 1
+			str = "___BAR_" + strconv.Itoa(symbol_cnt) + "__"
+			// str += strings.TrimFunc(org, func(c rune) bool {
+			// 	return !isletter(c)
+			// })
+			symbol_map[org] = str
+		}
+		lval.node = smt2node{lno, col, symbol, str, org}
+
 		return symbol
 	}
 
@@ -452,7 +470,9 @@ func parse(str string) (*QeStack, []Comment, error) {
 	stack = new(QeStack)
 	assert_cnt = 0
 	decfun_cnt = 0
+	symbol_cnt = 0
 	letmap.reset()
+	symbol_map = make(map[string]string)
 	yyParse(l)
 	return stack, l.comment, l.err
 }
