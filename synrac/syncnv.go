@@ -36,8 +36,8 @@ func (self *SynParse) Next(str string) int {
 	return idx
 }
 
-func (self *SynParse) Parse(str string) (Formula, []Comment, error) {
-	stack, c, e := parse(str)
+func (self *SynParse) Parse(str string, cnv bool) (Formula, []Comment, error) {
+	stack, c, e := parse(str, cnv)
 	return ToFml(stack), c, e
 }
 

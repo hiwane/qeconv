@@ -94,7 +94,7 @@ func TestToSyn(t *testing.T) {
 	parser := NewSynParse()
 
 	for i, p := range data {
-		fml, cmts, err := parser.Parse(p.input)
+		fml, cmts, err := parser.Parse(p.input, false)
 		if err != nil {
 			t.Errorf("err invalid input=%s\n", p.input)
 		}

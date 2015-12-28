@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"errors"
 	"strings"
+	"strconv"
 )
 
 var stack *QeStack
@@ -166,6 +167,9 @@ type SynLex struct {
 	s string
 	comment []Comment
 	err error
+	varcnv bool
+	varcnt int
+	varmap map[string]string
 }
 
 type SynLex1 struct {
@@ -305,6 +309,16 @@ func (l *SynLex) Lex(lval *yySymType) int {
 			}
 		}
 
+		if l.varcnv {
+			if s, ok := l.varmap[str]; ok {
+				str = s
+			} else {
+				l.varcnt += 1
+				strx := "x" + strconv.Itoa(l.varcnt)
+				l.varmap[str] = strx
+				str = strx
+			}
+		}
 		lval.node = NewQeNodeStr(str, lno)
 		return name
 	}
@@ -319,9 +333,11 @@ func (l *SynLex) Error(s string) {
 	}
 }
 
-func parse(str string) (*QeStack, []Comment, error) {
+func parse(str string, cnv bool) (*QeStack, []Comment, error) {
 	l := new(SynLex)
 	l.Init(strings.NewReader(str))
+	l.varcnv = cnv
+	l.varmap = make(map[string]string)
 	stack = new(QeStack)
 	yyParse(l)
 	return stack, l.comment, l.err

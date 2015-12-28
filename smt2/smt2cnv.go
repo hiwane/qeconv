@@ -24,8 +24,8 @@ func (self *Smt2Parse) Next(str string) int {
 	return len(str)
 }
 
-func (self *Smt2Parse) Parse(str string) (Formula, []Comment, error) {
-	stack, c, e := parse(str)
+func (self *Smt2Parse) Parse(str string, cnv bool) (Formula, []Comment, error) {
+	stack, c, e := parse(str, cnv)
 	return ToFml(stack), c, e
 }
 
@@ -240,14 +240,16 @@ func (lmap *smt2letdat) popn(n int) {
 
 type commentI interface {
 	append_comment(comm string, lno int)
+	get_symbol(org string) string
 }
 
 type synLex struct {
 	scanner.Scanner
-	s       string
-	comment []Comment
-	err     error
+	s          string
+	comment    []Comment
+	err        error
 	symbol_cnt int
+	symbol_cnv bool
 	symbol_map map[string]string
 }
 
@@ -320,6 +322,35 @@ func isspace(ch rune) bool {
 
 func (l *synLex) append_comment(comm string, lno int) {
 	l.comment = append(l.comment, NewComment(comm, lno))
+}
+
+func (l *synLex) get_symbol(org string) string {
+	var str string
+	if s, ok := l.symbol_map[org]; ok {
+		str = s
+	} else if l.symbol_cnv {
+		l.symbol_cnt += 1
+		str = "x" + strconv.Itoa(l.symbol_cnt)
+	} else if org[0] == '|' {
+		l.symbol_cnt += 1
+		str = "___BAR_" + strconv.Itoa(l.symbol_cnt) + "__"
+		// str += strings.TrimFunc(org, func(c rune) bool {
+		// 	return !isletter(c)
+		// })
+		l.symbol_map[org] = str
+	} else {
+		str = org
+		str = strings.Replace(str, "%", "_P_", -1)
+		str = strings.Replace(str, "?", "_q_", -1)
+		str = strings.Replace(str, "!", "_e_", -1)
+		str = strings.Replace(str, ".", "_d_", -1)
+		str = strings.Replace(str, "$", "_D_", -1)
+		str = strings.Replace(str, "~", "_t_", -1)
+		str = strings.Replace(str, "&", "_s_", -1)
+		str = strings.Replace(str, "^", "_h_", -1)
+		str = strings.Replace(str, "@", "_a_", -1)
+	}
+	return str
 }
 
 func (l *synLex) Lex(lval *yySymType) int {
@@ -396,16 +427,9 @@ func (l *synLex) Lex(lval *yySymType) int {
 				return keywords_tbl[i].label
 			}
 		}
+
 		org := str
-		str = strings.Replace(str, "%", "_P_", -1)
-		str = strings.Replace(str, "?", "_q_", -1)
-		str = strings.Replace(str, "!", "_e_", -1)
-		str = strings.Replace(str, ".", "_d_", -1)
-		str = strings.Replace(str, "$", "_D_", -1)
-		str = strings.Replace(str, "~", "_t_", -1)
-		str = strings.Replace(str, "&", "_s_", -1)
-		str = strings.Replace(str, "^", "_h_", -1)
-		str = strings.Replace(str, "@", "_a_", -1)
+//		str = l.get_symbol(org, false)
 		lval.node = smt2node{lno, col, symbol, str, org}
 		return symbol
 	}
@@ -441,16 +465,7 @@ func (l *synLex) Lex(lval *yySymType) int {
 		org := str
 
 		// white space まで許可されるので適当に名前をつけるしかないだろう.
-		if s, ok := l.symbol_map[org]; ok {
-			str = s
-		} else {
-			l.symbol_cnt += 1
-			str = "___BAR_" + strconv.Itoa(l.symbol_cnt) + "__"
-			// str += strings.TrimFunc(org, func(c rune) bool {
-			// 	return !isletter(c)
-			// })
-			l.symbol_map[org] = str
-		}
+//		str = l.get_symbol(org, true)
 		lval.node = smt2node{lno, col, symbol, str, org}
 
 		return symbol
@@ -466,11 +481,12 @@ func (l *synLex) Error(s string) {
 	}
 }
 
-func parse(str string) (*QeStack, []Comment, error) {
+func parse(str string, conv bool) (*QeStack, []Comment, error) {
 	l := new(synLex)
 	l.Init(strings.NewReader(str))
 	l.symbol_cnt = 0
 	l.symbol_map = make(map[string]string)
+	l.symbol_cnv = conv
 
 	stack = new(QeStack)
 	assert_stk.v = make([]int, 1)

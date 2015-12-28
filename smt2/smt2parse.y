@@ -180,6 +180,9 @@ qual_id
 		if ok {
 			// letmap の内容を挿入する.
 			stack.Pushn(v)
+		} else if l, ok := yylex.(commentI); ok {
+			str := l.get_symbol($1.str)
+			stack.Push(NewQeNodeStr(str, $1.lno))
 		} else {
 			stack.Push(NewQeNodeStr($1.str, $1.lno))
 		}

@@ -89,7 +89,7 @@ func TestToRC(t *testing.T) {
 	m := new(RegChainConv)
 	parser := syn.NewSynParse()
 	for i, p := range data {
-		fml, cmts, err := parser.Parse(p.input)
+		fml, cmts, err := parser.Parse(p.input, false)
 		if err != nil {
 			t.Errorf("err invalid input=%s\n", p.input)
 		}

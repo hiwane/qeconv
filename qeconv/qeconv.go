@@ -17,6 +17,7 @@ func main() {
 		from     string
 		to       string
 		dup      bool
+		cnv      bool
 		idx      int
 	)
 
@@ -26,6 +27,7 @@ func main() {
 	flag.StringVar(&output, "o", "", "output file")
 	flag.BoolVar(&dup, "s", false, "remove duplicate formulas")
 	flag.IntVar(&idx, "n", 0, "index of fof")
+	flag.BoolVar(&cnv, "X", false, "convert symbol name")
 	flag.Parse()
 	if flag.NArg() > 0 {
 		flag.PrintDefaults()
@@ -50,7 +52,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		str, err := qeconv.Convert(parser, cinf, string(b), dup, idx)
+		str, err := qeconv.Convert(parser, cinf, string(b), dup, idx, cnv)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

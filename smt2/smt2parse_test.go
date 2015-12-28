@@ -36,14 +36,14 @@ func TestFromSmt2(t *testing.T) {
 	smtp := NewSmt2Parse()
 
 	for i, p := range data {
-		fmlt, _, err := smtp.Parse(p.smt2)
+		fmlt, _, err := smtp.Parse(p.smt2, false)
 		if err != nil {
 			t.Errorf("err %v\n", err)
 			t.Errorf("[%d] err invalid input1=%s\n", i, p.smt2)
 			continue
 		}
 
-		fmly, _, err := synp.Parse(p.syn + ":")
+		fmly, _, err := synp.Parse(p.syn + ":", false)
 		if err != nil {
 			t.Errorf("err %v\n", err)
 			t.Errorf("[%d] err invalid input2=%s\n", i, p.syn)

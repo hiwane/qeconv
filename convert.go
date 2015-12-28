@@ -115,7 +115,7 @@ func Str2cinf(to string) (CnvInf, error) {
 	return nil, errors.New("unknown converter")
 }
 
-func Convert(p Parser, cinf CnvInf, str string, dup bool, index int) (string, error) {
+func Convert(p Parser, cinf CnvInf, str string, dup bool, index int, varcnv bool) (string, error) {
 	var ret string
 	count := 0
 
@@ -126,7 +126,7 @@ func Convert(p Parser, cinf CnvInf, str string, dup bool, index int) (string, er
 			break
 		}
 
-		fml, cmts, err := p.Parse(str[:idx])
+		fml, cmts, err := p.Parse(str[:idx], varcnv)
 		if err != nil {
 			return "", err
 		}

@@ -8,13 +8,14 @@ import (
 	"errors"
 	"fmt"
 	. "github.com/hiwane/qeconv/def"
+	"strconv"
 	"strings"
 	"text/scanner"
 )
 
 var stack *QeStack
 
-//line synparse.y:20
+//line synparse.y:21
 type yySymType struct {
 	yys  int
 	node QeNode
@@ -107,7 +108,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line synparse.y:162
+//line synparse.y:163
 
 /*  start  of  programs  */
 
@@ -116,6 +117,9 @@ type SynLex struct {
 	s       string
 	comment []Comment
 	err     error
+	varcnv  bool
+	varcnt  int
+	varmap  map[string]string
 }
 
 type SynLex1 struct {
@@ -255,6 +259,16 @@ func (l *SynLex) Lex(lval *yySymType) int {
 			}
 		}
 
+		if l.varcnv {
+			if s, ok := l.varmap[str]; ok {
+				str = s
+			} else {
+				l.varcnt += 1
+				strx := "x" + strconv.Itoa(l.varcnt)
+				l.varmap[str] = strx
+				str = strx
+			}
+		}
 		lval.node = NewQeNodeStr(str, lno)
 		return name
 	}
@@ -269,9 +283,11 @@ func (l *SynLex) Error(s string) {
 	}
 }
 
-func parse(str string) (*QeStack, []Comment, error) {
+func parse(str string, cnv bool) (*QeStack, []Comment, error) {
 	l := new(SynLex)
 	l.Init(strings.NewReader(str))
+	l.varcnv = cnv
+	l.varmap = make(map[string]string)
 	stack = new(QeStack)
 	yyParse(l)
 	return stack, l.comment, l.err
@@ -761,21 +777,21 @@ yydefault:
 
 	case 4:
 		yyDollar = yyS[yypt-6 : yypt+1]
-		//line synparse.y:64
+		//line synparse.y:65
 		{
 			trace("ALL")
 			stack.Push(yyDollar[1].node)
 		}
 	case 5:
 		yyDollar = yyS[yypt-6 : yypt+1]
-		//line synparse.y:65
+		//line synparse.y:66
 		{
 			trace("EX")
 			stack.Push(yyDollar[1].node)
 		}
 	case 6:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line synparse.y:66
+		//line synparse.y:67
 		{
 			trace("and")
 			yyDollar[1].node.SetVal(yyDollar[3].num)
@@ -783,14 +799,14 @@ yydefault:
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:67
+		//line synparse.y:68
 		{
 			trace("and()")
 			stack.Push(NewQeNodeBool(true, yyDollar[1].node.GetLno()))
 		}
 	case 8:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line synparse.y:68
+		//line synparse.y:69
 		{
 			trace("or")
 			yyDollar[1].node.SetVal(yyDollar[3].num)
@@ -798,293 +814,293 @@ yydefault:
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:69
+		//line synparse.y:70
 		{
 			trace("or()")
 			stack.Push(NewQeNodeBool(false, yyDollar[1].node.GetLno()))
 		}
 	case 10:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line synparse.y:70
+		//line synparse.y:71
 		{
 			trace("not")
 			stack.Push(yyDollar[1].node)
 		}
 	case 11:
 		yyDollar = yyS[yypt-6 : yypt+1]
-		//line synparse.y:71
+		//line synparse.y:72
 		{
 			trace("IMPL")
 			stack.Push(yyDollar[1].node)
 		}
 	case 12:
 		yyDollar = yyS[yypt-6 : yypt+1]
-		//line synparse.y:72
+		//line synparse.y:73
 		{
 			trace("REPL")
 			stack.Push(yyDollar[1].node)
 		}
 	case 13:
 		yyDollar = yyS[yypt-6 : yypt+1]
-		//line synparse.y:73
+		//line synparse.y:74
 		{
 			trace("EQUIV")
 			stack.Push(yyDollar[1].node)
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:79
+		//line synparse.y:80
 		{
 			trace("list")
 			stack.Push(NewQeNodeList(yyDollar[2].num, yyDollar[1].node.GetLno()))
 		}
 	case 17:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line synparse.y:83
+		//line synparse.y:84
 		{
 			trace("empty-list")
 			stack.Push(NewQeNodeList(0, yyDollar[1].node.GetLno()))
 		}
 	case 18:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:90
+		//line synparse.y:91
 		{
 			yyVAL.num = 1
 		}
 	case 19:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:91
+		//line synparse.y:92
 		{
 			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 20:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:95
+		//line synparse.y:96
 		{
 			yyVAL.num = 1
 		}
 	case 21:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:96
+		//line synparse.y:97
 		{
 			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 22:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:100
+		//line synparse.y:101
 		{
 			trace("var")
 			stack.Push(NewQeNodeList(1, -1))
 		}
 	case 23:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:104
+		//line synparse.y:105
 		{
 			trace("list")
 			stack.Push(NewQeNodeList(yyDollar[2].num, yyDollar[1].node.GetLno()))
 		}
 	case 24:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:108
+		//line synparse.y:109
 		{
 			trace("set")
 			stack.Push(NewQeNodeList(yyDollar[2].num, yyDollar[1].node.GetLno()))
 		}
 	case 25:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:115
+		//line synparse.y:116
 		{
 			yyVAL.num = 1
 		}
 	case 26:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:116
+		//line synparse.y:117
 		{
 			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 27:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:120
+		//line synparse.y:121
 		{
 			trace("name")
 			stack.Push(yyDollar[1].node)
 		}
 	case 28:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line synparse.y:121
+		//line synparse.y:122
 		{
 			trace("index")
 			stack.Push(NewQeNode(INDEXED, 2, -1))
 		}
 	case 29:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:125
+		//line synparse.y:126
 		{
 			trace("true")
 			stack.Push(yyDollar[1].node)
 		}
 	case 30:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:126
+		//line synparse.y:127
 		{
 			trace("false")
 			stack.Push(yyDollar[1].node)
 		}
 	case 31:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:127
+		//line synparse.y:128
 		{
 			trace("<")
 			stack.Push(yyDollar[2].node)
 		}
 	case 32:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:128
+		//line synparse.y:129
 		{
 			trace(">")
 			stack.Push(yyDollar[2].node)
 		}
 	case 33:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:129
+		//line synparse.y:130
 		{
 			trace("<=")
 			stack.Push(yyDollar[2].node)
 		}
 	case 34:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:130
+		//line synparse.y:131
 		{
 			trace(">=")
 			stack.Push(yyDollar[2].node)
 		}
 	case 35:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:131
+		//line synparse.y:132
 		{
 			trace("=")
 			stack.Push(yyDollar[2].node)
 		}
 	case 36:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:132
+		//line synparse.y:133
 		{
 			trace("<>")
 			stack.Push(yyDollar[2].node)
 		}
 	case 37:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:137
+		//line synparse.y:138
 		{
 			trace("num")
 			stack.Push(yyDollar[1].node)
 		}
 	case 38:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:138
+		//line synparse.y:139
 		{
 		}
 	case 39:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:139
+		//line synparse.y:140
 		{
 			trace("+")
 			stack.Push(yyDollar[2].node)
 		}
 	case 40:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:140
+		//line synparse.y:141
 		{
 			trace("-")
 			stack.Push(yyDollar[2].node)
 		}
 	case 41:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:141
+		//line synparse.y:142
 		{
 			trace("*")
 			stack.Push(yyDollar[2].node)
 		}
 	case 42:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:142
+		//line synparse.y:143
 		{
 			trace("/")
 			stack.Push(yyDollar[2].node)
 		}
 	case 43:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line synparse.y:143
+		//line synparse.y:144
 		{
 			trace("-")
 			NewQeNodeStr("-.", yyDollar[1].node.GetLno())
 		}
 	case 44:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line synparse.y:144
+		//line synparse.y:145
 		{
 			trace("+")
 			NewQeNodeStr("+.", yyDollar[1].node.GetLno())
 		}
 	case 46:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line synparse.y:149
+		//line synparse.y:150
 		{
 			trace("num")
 			stack.Push(yyDollar[1].node)
 		}
 	case 48:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line synparse.y:151
+		//line synparse.y:152
 		{
 			trace("abs")
 			stack.Push(yyDollar[1].node)
 		}
 	case 49:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:152
+		//line synparse.y:153
 		{
 			trace("+")
 			stack.Push(yyDollar[2].node)
 		}
 	case 50:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:153
+		//line synparse.y:154
 		{
 			trace("-")
 			stack.Push(yyDollar[2].node)
 		}
 	case 51:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:154
+		//line synparse.y:155
 		{
 			trace("*")
 			stack.Push(yyDollar[2].node)
 		}
 	case 52:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:155
+		//line synparse.y:156
 		{
 			trace("/")
 			stack.Push(yyDollar[2].node)
 		}
 	case 53:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line synparse.y:156
+		//line synparse.y:157
 		{
 			trace("^")
 			stack.Push(yyDollar[2].node)
 		}
 	case 54:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line synparse.y:157
+		//line synparse.y:158
 		{
 			trace("-")
 			stack.Push(NewQeNodeStr("-.", yyDollar[1].node.GetLno()))
 		}
 	case 55:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line synparse.y:158
+		//line synparse.y:159
 		{
 			trace("+")
 			stack.Push(NewQeNodeStr("+.", yyDollar[1].node.GetLno()))

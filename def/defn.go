@@ -112,7 +112,7 @@ func (self *CnvInfStrstruct) LineAlign() bool {
 }
 
 type Parser interface {
-	Parse(str string) (Formula, []Comment, error)
+	Parse(str string, varcnv bool) (Formula, []Comment, error)
 
 	// str を解析し、次に読むところまでの index を返す
 	Next(str string) int

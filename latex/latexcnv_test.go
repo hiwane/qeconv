@@ -89,7 +89,7 @@ func TestToLaTeX(t *testing.T) {
 	parser := syn.NewSynParse()
 	for _, p := range data {
 		t.Log("inp=%s\n", p.input)
-		fml, cmts, err := parser.Parse(p.input)
+		fml, cmts, err := parser.Parse(p.input, false)
 		if err != nil {
 			t.Errorf("err invalid input=%s\n", p.input)
 		}
