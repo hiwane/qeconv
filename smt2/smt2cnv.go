@@ -247,6 +247,8 @@ type synLex struct {
 	s       string
 	comment []Comment
 	err     error
+	symbol_cnt int
+	symbol_map map[string]string
 }
 
 type smt2_lext struct {
@@ -439,15 +441,15 @@ func (l *synLex) Lex(lval *yySymType) int {
 		org := str
 
 		// white space まで許可されるので適当に名前をつけるしかないだろう.
-		if s, ok := symbol_map[org]; ok {
+		if s, ok := l.symbol_map[org]; ok {
 			str = s
 		} else {
-			symbol_cnt += 1
-			str = "___BAR_" + strconv.Itoa(symbol_cnt) + "__"
+			l.symbol_cnt += 1
+			str = "___BAR_" + strconv.Itoa(l.symbol_cnt) + "__"
 			// str += strings.TrimFunc(org, func(c rune) bool {
 			// 	return !isletter(c)
 			// })
-			symbol_map[org] = str
+			l.symbol_map[org] = str
 		}
 		lval.node = smt2node{lno, col, symbol, str, org}
 
@@ -467,12 +469,12 @@ func (l *synLex) Error(s string) {
 func parse(str string) (*QeStack, []Comment, error) {
 	l := new(synLex)
 	l.Init(strings.NewReader(str))
+	l.symbol_cnt = 0
+	l.symbol_map = make(map[string]string)
+
 	stack = new(QeStack)
 	assert_stk.v = make([]int, 1)
-	decfun_cnt = 0
-	symbol_cnt = 0
 	letmap.reset()
-	symbol_map = make(map[string]string)
 	yyParse(l)
 	return stack, l.comment, l.err
 }

@@ -9,13 +9,8 @@ import (
 
 var stack *QeStack
 var assert_stk ex_andStack
-var decfun_cnt int
-var symbol_cnt int
-var symbol_map map[string]string
-
 
 var letmap smt2letdat
-
 
 type smt2node struct {
 	lno, col int

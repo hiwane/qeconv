@@ -10,9 +10,6 @@ import (
 
 var stack *QeStack
 var assert_stk ex_andStack
-var decfun_cnt int
-var symbol_cnt int
-var symbol_map map[string]string
 
 var letmap smt2letdat
 
@@ -22,7 +19,7 @@ type smt2node struct {
 	str, org_str string
 }
 
-//line smt2parse.y:29
+//line smt2parse.y:26
 type yySymType struct {
 	yys  int
 	node smt2node
@@ -121,7 +118,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line smt2parse.y:273
+//line smt2parse.y:270
 
 /*  start  of  programs  */
 
@@ -599,55 +596,55 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:66
+		//line smt2parse.y:63
 		{
 			trace("eof")
 		}
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:70
+		//line smt2parse.y:67
 		{
 			trace("command")
 		}
 	case 3:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line smt2parse.y:71
+		//line smt2parse.y:68
 		{
 			trace("commands")
 		}
 	case 8:
 		yyDollar = yyS[yypt-0 : yypt+1]
-		//line smt2parse.y:82
+		//line smt2parse.y:79
 		{
 			yyVAL.num = 0
 		}
 	case 9:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line smt2parse.y:83
+		//line smt2parse.y:80
 		{
 			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 10:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:87
+		//line smt2parse.y:84
 		{
 			yyVAL.node = yyDollar[1].node
 		}
 	case 11:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:88
+		//line smt2parse.y:85
 		{
 			yyVAL.node = yyDollar[1].node
 		}
 	case 12:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:96
+		//line smt2parse.y:93
 		{
 			yyVAL.node = yyDollar[1].node
 		}
 	case 13:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:98
+		//line smt2parse.y:95
 		{
 			if yyDollar[1].node.str != "Real" {
 				yylex.Error("unknown sort: " + yyDollar[1].node.str)
@@ -655,7 +652,7 @@ yydefault:
 		}
 	case 20:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line smt2parse.y:114
+		//line smt2parse.y:111
 		{
 			if l, ok := yylex.(commentI); ok {
 				l.append_comment(":status "+yyDollar[2].node.str, yyDollar[2].node.lno)
@@ -663,31 +660,31 @@ yydefault:
 		}
 	case 24:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:125
+		//line smt2parse.y:122
 		{
 			stack.Push(NewQeNodeNum(yyDollar[1].node.str, yyDollar[1].node.lno))
 		}
 	case 27:
 		yyDollar = yyS[yypt-7 : yypt+1]
-		//line smt2parse.y:128
+		//line smt2parse.y:125
 		{
 			letmap.popn(yyDollar[4].num)
 		}
 	case 28:
 		yyDollar = yyS[yypt-7 : yypt+1]
-		//line smt2parse.y:131
+		//line smt2parse.y:128
 		{
 			stack.Push(NewQeNodeStr("All", yyDollar[2].node.lno))
 		}
 	case 29:
 		yyDollar = yyS[yypt-7 : yypt+1]
-		//line smt2parse.y:132
+		//line smt2parse.y:129
 		{
 			stack.Push(NewQeNodeStr("Ex", yyDollar[2].node.lno))
 		}
 	case 30:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:134
+		//line smt2parse.y:131
 		{
 			if yyDollar[3].num > 1 {
 				stack.Push(NewQeNodeStrVal(yyDollar[2].node.str, yyDollar[3].num, yyDollar[2].node.lno))
@@ -695,7 +692,7 @@ yydefault:
 		}
 	case 31:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:138
+		//line smt2parse.y:135
 		{
 			if yyDollar[3].num == 1 {
 				stack.Push(NewQeNodeStr("-.", yyDollar[2].node.lno))
@@ -705,127 +702,127 @@ yydefault:
 		}
 	case 32:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:144
+		//line smt2parse.y:141
 		{
 			stack.Push(NewQeNodeStrVal(yyDollar[2].node.str, yyDollar[3].num, yyDollar[2].node.lno))
 		}
 	case 33:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:145
+		//line smt2parse.y:142
 		{
 			stack.Push(NewQeNodeStrVal(yyDollar[2].node.str, yyDollar[3].num, yyDollar[2].node.lno))
 		}
 	case 34:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:146
+		//line smt2parse.y:143
 		{
 			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
 	case 35:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:147
+		//line smt2parse.y:144
 		{
 			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
 	case 36:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:148
+		//line smt2parse.y:145
 		{
 			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
 	case 37:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:149
+		//line smt2parse.y:146
 		{
 			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
 	case 38:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:150
+		//line smt2parse.y:147
 		{
 			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
 	case 39:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:151
+		//line smt2parse.y:148
 		{
 			stack.Push(NewQeNodeStr("Not", yyDollar[2].node.lno))
 		}
 	case 40:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:152
+		//line smt2parse.y:149
 		{
 			stack.Push(NewQeNodeStrVal("And", yyDollar[3].num, yyDollar[2].node.lno))
 		}
 	case 41:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:153
+		//line smt2parse.y:150
 		{
 			stack.Push(NewQeNodeStrVal("Or", yyDollar[3].num, yyDollar[2].node.lno))
 		}
 	case 42:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:154
+		//line smt2parse.y:151
 		{
 			stack.Push(NewQeNodeStr("Impl", yyDollar[2].node.lno))
 		}
 	case 43:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:157
+		//line smt2parse.y:154
 		{
 			yyVAL.num = 1
 		}
 	case 44:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line smt2parse.y:158
+		//line smt2parse.y:155
 		{
 			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 45:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:160
+		//line smt2parse.y:157
 		{
 			stack.Push(NewQeNodeList(yyDollar[1].num, 0))
 		}
 	case 46:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:165
+		//line smt2parse.y:162
 		{
 			yyVAL.num = 1
 		}
 	case 47:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line smt2parse.y:166
+		//line smt2parse.y:163
 		{
 			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 48:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:170
+		//line smt2parse.y:167
 		{
 			yyVAL.num = 1
 		}
 	case 49:
 		yyDollar = yyS[yypt-2 : yypt+1]
-		//line smt2parse.y:171
+		//line smt2parse.y:168
 		{
 			yyVAL.num = yyDollar[1].num + 1
 		}
 	case 50:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:174
+		//line smt2parse.y:171
 		{
 			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
 		}
 	case 51:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:178
+		//line smt2parse.y:175
 		{
 			letmap.update_letmap(stack, yyDollar[1].num, yyDollar[2].node)
 		}
 	case 52:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:183
+		//line smt2parse.y:180
 		{
 			v, ok := letmap.get(yyDollar[1].node.str)
 			if ok {
@@ -837,38 +834,38 @@ yydefault:
 		}
 	case 53:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:252
+		//line smt2parse.y:249
 		{
 			assert_stk.assert()
 		}
 	case 54:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line smt2parse.y:255
+		//line smt2parse.y:252
 		{
 			trace("go check-sat")
 			assert_stk.check_sat()
 		}
 	case 56:
 		yyDollar = yyS[yypt-7 : yypt+1]
-		//line smt2parse.y:259
+		//line smt2parse.y:256
 		{
 			assert_stk.declare_sym(yyDollar[3].node)
 		}
 	case 57:
 		yyDollar = yyS[yypt-8 : yypt+1]
-		//line smt2parse.y:262
+		//line smt2parse.y:259
 		{
 			yylex.Error("unknown declare")
 		}
 	case 58:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:263
+		//line smt2parse.y:260
 		{
 			assert_stk.declare_sym(yyDollar[3].node)
 		}
 	case 60:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:268
+		//line smt2parse.y:265
 		{
 			if yyDollar[3].node.str != "QF_NRA" && yyDollar[3].node.str != "NRA" {
 				yylex.Error("unknown logic: " + yyDollar[3].node.str)
