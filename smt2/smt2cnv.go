@@ -488,6 +488,8 @@ func parse(str string, conv bool) (*QeStack, []Comment, error) {
 	l.Init(strings.NewReader(str))
 	l.symbol_cnt = 0
 	l.symbol_map = make(map[string]string)
+	l.symbol_map["false"] = "false"
+	l.symbol_map["true"] = "true"
 	l.symbol_cnv = conv
 
 	stack = new(QeStack)
