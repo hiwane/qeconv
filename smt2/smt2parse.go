@@ -118,7 +118,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line smt2parse.y:271
+//line smt2parse.y:266
 
 /*  start  of  programs  */
 
@@ -812,63 +812,58 @@ yydefault:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		//line smt2parse.y:169
 		{
-			stack.Push(NewQeNodeStr(yyDollar[2].node.str, yyDollar[2].node.lno))
+			if l, ok := yylex.(commentI); ok {
+				l.push_symbol(yyDollar[2].node)
+			}
 		}
 	case 51:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:173
+		//line smt2parse.y:175
 		{
 			letmap.update_letmap(stack, yyDollar[1].num, yyDollar[2].node)
 		}
 	case 52:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line smt2parse.y:178
+		//line smt2parse.y:180
 		{
-			v, ok := letmap.get(yyDollar[1].node.str)
-			if ok {
-				// letmap の内容を挿入する.
-				stack.Pushn(v)
-			} else if l, ok := yylex.(commentI); ok {
-				str := l.get_symbol(yyDollar[1].node.str)
-				stack.Push(NewQeNodeStr(str, yyDollar[1].node.lno))
-			} else {
-				stack.Push(NewQeNodeStr(yyDollar[1].node.str, yyDollar[1].node.lno))
+			if l, ok := yylex.(commentI); ok {
+				l.push_symbol(yyDollar[1].node)
 			}
 		}
 	case 53:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:250
+		//line smt2parse.y:245
 		{
 			assert_stk.assert()
 		}
 	case 54:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line smt2parse.y:253
+		//line smt2parse.y:248
 		{
 			trace("go check-sat")
 			assert_stk.check_sat()
 		}
 	case 56:
 		yyDollar = yyS[yypt-7 : yypt+1]
-		//line smt2parse.y:257
+		//line smt2parse.y:252
 		{
-			assert_stk.declare_sym(yyDollar[3].node)
+			assert_stk.declare_sym(yyDollar[3].node, yylex)
 		}
 	case 57:
 		yyDollar = yyS[yypt-8 : yypt+1]
-		//line smt2parse.y:260
+		//line smt2parse.y:255
 		{
 			yylex.Error("unknown declare")
 		}
 	case 58:
 		yyDollar = yyS[yypt-5 : yypt+1]
-		//line smt2parse.y:261
+		//line smt2parse.y:256
 		{
-			assert_stk.declare_sym(yyDollar[3].node)
+			assert_stk.declare_sym(yyDollar[3].node, yylex)
 		}
 	case 60:
 		yyDollar = yyS[yypt-4 : yypt+1]
-		//line smt2parse.y:266
+		//line smt2parse.y:261
 		{
 			if yyDollar[3].node.str != "QF_NRA" && yyDollar[3].node.str != "NRA" {
 				yylex.Error("unknown logic: " + yyDollar[3].node.str)

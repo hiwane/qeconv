@@ -241,6 +241,7 @@ func (lmap *smt2letdat) popn(n int) {
 type commentI interface {
 	append_comment(comm string, lno int)
 	get_symbol(org string) string
+	push_symbol(sym smt2node)
 }
 
 type synLex struct {
@@ -331,6 +332,7 @@ func (l *synLex) get_symbol(org string) string {
 	} else if l.symbol_cnv {
 		l.symbol_cnt += 1
 		str = "x" + strconv.Itoa(l.symbol_cnt)
+		l.symbol_map[org] = str
 	} else if org[0] == '|' {
 		l.symbol_cnt += 1
 		str = "___BAR_" + strconv.Itoa(l.symbol_cnt) + "__"
@@ -519,7 +521,18 @@ func (es *ex_andStack) assert() {
 	es.v[len(es.v)-1] += 1
 }
 
-func (es *ex_andStack) declare_sym(sym smt2node) {
+func (l *synLex) push_symbol(sym smt2node) {
+	v, ok := letmap.get(sym.str)
+	if ok {
+		// letmap の内容を挿入する.
+		stack.Pushn(v)
+	} else {
+		str := l.get_symbol(sym.str)
+		stack.Push(NewQeNodeStr(str, sym.lno))
+	}
+}
+
+func (es *ex_andStack) declare_sym(sym smt2node, yylex yyLexer) {
 	// (declare_fun sym ...) をみつけた
 
 	if es.v[len(es.v)-1] > 0 {
@@ -530,7 +543,11 @@ func (es *ex_andStack) declare_sym(sym smt2node) {
 		}
 		es.v[len(es.v)-1] -= 1
 	}
-	stack.Push(NewQeNodeStr(sym.str, sym.lno))
+	if l, ok := yylex.(commentI); ok {
+		l.push_symbol(sym)
+	} else {
+		stack.Push(NewQeNodeStr(sym.str, sym.lno))
+	}
 	stack.Push(NewQeNodeList(-es.v[len(es.v)-1], sym.lno))
 }
 

@@ -167,7 +167,9 @@ var_bind1
 	;
 
 sorted_var : lp symbol sort rp {
-		stack.Push(NewQeNodeStr($2.str, $2.lno))
+		if l, ok := yylex.(commentI); ok {
+			l.push_symbol($2)
+		}
 	};
 
 var_bind   : lp symbol term rp {
@@ -176,15 +178,8 @@ var_bind   : lp symbol term rp {
 
 qual_id
 	: id {
-		v, ok := letmap.get($1.str)
-		if ok {
-			// letmap の内容を挿入する.
-			stack.Pushn(v)
-		} else if l, ok := yylex.(commentI); ok {
-			str := l.get_symbol($1.str)
-			stack.Push(NewQeNodeStr(str, $1.lno))
-		} else {
-			stack.Push(NewQeNodeStr($1.str, $1.lno))
+		if l, ok := yylex.(commentI); ok {
+			l.push_symbol($1)
 		}
 	}
 //	| lp as id sort rp
@@ -255,11 +250,11 @@ command : lp assert term rp {
 		}
 		| lp exit rp
 		| lp declare_fun symbol lp rp sort rp {
-			assert_stk.declare_sym($3)
+			assert_stk.declare_sym($3, yylex)
 		}
 		| lp declare_fun symbol lp sort1 rp sort rp { yylex.Error("unknown declare") }
 		| lp declare_const symbol sort rp {
-			assert_stk.declare_sym($3)
+			assert_stk.declare_sym($3, yylex)
 		}
 //		| lp define_fun fun_def rp
 		| lp set_info attribute rp
